@@ -21,7 +21,9 @@ export default defineConfig({
   plugins: [
     vue(),
     viteCompression(),
-    VueDevTools(),
+    VueDevTools({
+      launchEditor: 'code' //code,webstorm,cursor
+    }),
     AutoImport({
       imports: [
         'vue',
@@ -37,6 +39,7 @@ export default defineConfig({
   publicDir: resolve('resources'),
   server: {
     host: '0.0.0.0',
+    port: 50088,
     proxy: {}
   }
 });
