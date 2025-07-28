@@ -10,8 +10,8 @@
   "realIP": "",
   "noAnimate": false,
   "animationSpeed": 1,
-  "author": "Alger",
-  "authorUrl": "https://github.com/algerkong",
+  "author": "Size",
+  "authorUrl": "https://music.sizeof.top",
   "musicApiPort": 30488,
   "closeAction": "ask",
   "musicQuality": "higher",
@@ -23,9 +23,9 @@
   "alwaysShowDownloadButton": false,
   "unlimitedDownload": false,
   "enableMusicUnblock": true,
-  "enabledMusicSources": ["migu", "kugou", "pyncmd", "bilibili"],
+  "enabledMusicSources": ["migu", "kugou", "pyncmd", "stellar", "cloud", "gdmusic"],
   "showTopAction": false,
   "contentZoomFactor": 1,
-  "autoTheme": false,
+  "autoTheme": true,
   "manualTheme": "light"
 }

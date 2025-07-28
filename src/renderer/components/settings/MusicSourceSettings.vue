@@ -52,6 +52,7 @@ import { defineEmits, defineProps, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { type Platform } from '@/types/music';
+import { isElectron } from '@/utils';
 
 const props = defineProps({
   show: {
@@ -60,7 +61,7 @@ const props = defineProps({
   },
   sources: {
     type: Array as () => Platform[],
-    default: () => ['migu', 'kugou', 'pyncmd', 'bilibili']
+    default: () => (isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic'])
   }
 });
 
@@ -70,13 +71,24 @@ const { t } = useI18n();
 const visible = ref(props.show);
 const selectedSources = ref<Platform[]>(props.sources);
 
-const musicSourceOptions = ref([
-  { label: 'MG', value: 'migu' },
-  { label: 'KG', value: 'kugou' },
-  { label: 'pyncmd', value: 'pyncmd' },
-  { label: 'Bilibili', value: 'bilibili' },
-  { label: 'GD音乐台', value: 'gdmusic' }
-]);
+const musicSourceOptions = computed(() => {
+  if (isElectron) {
+    return [
+      { label: 'MG', value: 'migu' },
+      { label: 'KG', value: 'kugou' },
+      { label: 'pyncmd', value: 'pyncmd' },
+      { label: '星辰音乐', value: 'stellar' },
+      { label: '云端音乐', value: 'cloud' },
+      { label: 'GD音乐台', value: 'gdmusic' }
+    ];
+  } else {
+    return [
+      { label: '星辰音乐', value: 'stellar' },
+      { label: '云端音乐', value: 'cloud' },
+      { label: 'GD音乐台', value: 'gdmusic' }
+    ];
+  }
+});
 
 // 同步外部show属性变化
 watch(
@@ -105,7 +117,8 @@ watch(
 
 const handleConfirm = () => {
   // 确保至少选择一个音源
-  const defaultPlatforms = ['migu', 'kugou', 'pyncmd', 'bilibili'];
+  const defaultPlatforms = isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic'];
+
   const valuesToEmit =
     selectedSources.value.length > 0 ? [...new Set(selectedSources.value)] : defaultPlatforms;
 

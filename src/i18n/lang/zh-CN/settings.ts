@@ -1,16 +1,13 @@
 export default {
   theme: '主题',
   language: '语言',
-  regard: '关于',
   logout: '退出登录',
   sections: {
     basic: '基础设置',
     playback: '播放设置',
     application: '应用设置',
     network: '网络设置',
-    system: '系统管理',
-    donation: '捐赠支持',
-    regard: '关于'
+    system: '系统管理'
   },
   basic: {
     themeMode: '主题模式',
@@ -26,6 +23,7 @@ export default {
       lyric: '仅歌词'
     },
     animation: '动画速度',
+    animationSpeedPlaceholder: '请输入动画速度',
     animationDesc: '是否开启动画',
     animationSpeed: {
       slow: '极慢',
@@ -61,6 +59,7 @@ export default {
     musicSources: '音源设置',
     musicSourcesDesc: '选择音乐解析使用的音源平台',
     musicSourcesWarning: '至少需要选择一个音源平台',
+    webPlatformNote: '网页版仅支持在线音源（GD音乐台、星辰音乐、云端音乐）',
     musicUnblockEnable: '启用音乐解析',
     musicUnblockEnableDesc: '开启后将尝试解析无法播放的音乐',
     configureMusicSources: '配置音源',
@@ -87,9 +86,7 @@ export default {
     unlimitedDownload: '无限制下载',
     unlimitedDownloadDesc: '开启后将无限制下载音乐（可能出现下载失败的情况）, 默认限制 300 首',
     downloadPath: '下载目录',
-    downloadPathDesc: '选择音乐文件的下载位置',
-    remoteControl: '远程控制',
-    remoteControlDesc: '设置远程控制功能'
+    downloadPathDesc: '选择音乐文件的下载位置'
   },
   network: {
     apiPort: '音乐API端口',
@@ -147,20 +144,6 @@ export default {
     restartDesc: '重启应用',
     messages: {
       clearSuccess: '清除成功，部分设置在重启后生效'
-    }
-  },
-  about: {
-    version: '版本',
-    checkUpdate: '检查更新',
-    checking: '检查中...',
-    latest: '当前已是最新版本',
-    hasUpdate: '发现新版本',
-    gotoUpdate: '前往更新',
-    gotoGithub: '前往 Github',
-    author: '作者',
-    authorDesc: 'algerkong 点个star🌟呗',
-    messages: {
-      checkError: '检查更新失败，请稍后重试'
     }
   },
   validation: {
@@ -271,15 +254,5 @@ export default {
       disableAll: '已禁用所有快捷键，请记得保存',
       enableAll: '已启用所有快捷键，请记得保存'
     }
-  },
-  remoteControl: {
-    title: '远程控制',
-    enable: '启用远程控制',
-    port: '服务端口',
-    allowedIps: '允许的IP地址',
-    addIp: '添加IP',
-    emptyListHint: '空列表表示允许所有IP访问',
-    saveSuccess: '远程控制设置已保存',
-    accessInfo: '远程控制访问地址:'
   }
 };

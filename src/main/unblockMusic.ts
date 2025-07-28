@@ -1,6 +1,6 @@
 import match from '@unblockneteasemusic/server';
 
-type Platform = 'qq' | 'migu' | 'kugou' | 'pyncmd' | 'joox' | 'bilibili';
+type Platform = 'qq' | 'migu' | 'kugou' | 'pyncmd' | 'joox' | 'gdmusic' | 'stellar' | 'cloud';
 
 interface SongData {
   name: string;
@@ -29,8 +29,9 @@ interface UnblockResult {
   };
 }
 
-// 所有可用平台
-export const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd', 'bilibili'];
+// UnblockMusic支持的平台（需要Electron环境）
+// 注意：gdmusic、stellar、cloud 通过HTTP API在渲染进程处理
+export const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];
 
 /**
  * 确保对象数据结构完整，处理null或undefined的情况

@@ -1,15 +1,4 @@
 export default {
-  installApp: {
-    description: '앱을 설치하여 더 나은 경험을 얻으세요',
-    noPrompt: '다시 묻지 않기',
-    install: '지금 설치',
-    cancel: '나중에 설치',
-    download: '다운로드',
-    downloadFailed: '다운로드 실패',
-    downloadComplete: '다운로드 완료',
-    downloadProblem: '다운로드에 문제가 있나요?',
-    downloadProblemLinkText: '최신 버전 다운로드'
-  },
   playlistDrawer: {
     title: '플레이리스트에 추가',
     createPlaylist: '새 플레이리스트 만들기',
@@ -28,41 +17,6 @@ export default {
     loginFirst: '먼저 로그인해주세요',
     getPlaylistFailed: '플레이리스트 가져오기 실패',
     inputPlaylistName: '플레이리스트 이름을 입력해주세요'
-  },
-  update: {
-    title: '새 버전 발견',
-    currentVersion: '현재 버전',
-    cancel: '나중에 업데이트',
-    prepareDownload: '다운로드 준비 중...',
-    downloading: '다운로드 중...',
-    nowUpdate: '지금 업데이트',
-    downloadFailed: '다운로드 실패, 다시 시도하거나 수동으로 다운로드해주세요',
-    startFailed: '다운로드 시작 실패, 다시 시도하거나 수동으로 다운로드해주세요',
-    noDownloadUrl: '현재 시스템에 적합한 설치 패키지를 찾을 수 없습니다. 수동으로 다운로드해주세요',
-    installConfirmTitle: '업데이트 설치',
-    installConfirmContent: '앱을 닫고 업데이트를 설치하시겠습니까?',
-    manualInstallTip: '앱을 닫은 후 설치 프로그램이 정상적으로 나타나지 않으면 다운로드 폴더에서 파일을 찾아 수동으로 열어주세요.',
-    yesInstall: '지금 설치',
-    noThanks: '나중에 설치',
-    fileLocation: '파일 위치',
-    copy: '경로 복사',
-    copySuccess: '경로가 클립보드에 복사됨',
-    copyFailed: '복사 실패',
-    backgroundDownload: '백그라운드 다운로드'
-  },
-  coffee: {
-    title: '커피 한 잔 사주세요',
-    alipay: '알리페이',
-    wechat: '위챗 페이',
-    alipayQR: '알리페이 결제 QR코드',
-    wechatQR: '위챗 결제 QR코드',
-    coffeeDesc: '커피 한 잔, 하나의 지원',
-    coffeeDescLinkText: '더 보기',
-    qqGroup: 'QQ 채널: algermusic',
-    messages: {
-      copySuccess: '클립보드에 복사됨'
-    },
-    donateList: '커피 한 잔 사주세요'
   },
   playlistType: {
     title: '플레이리스트 분류',
@@ -136,7 +90,7 @@ export default {
       linkTip3: '기사 링크 직접 복사',
       textTips: '곡 정보를 입력하세요. 한 줄에 한 곡씩',
       textFormat: '형식: 곡명 가수명',
-      localTips: '곡 메타데이터를 추가해주세요',
+      localTips: '곡 메타데이터를 추가하세요',
       localFormat: '형식 예시:',
       songNamePlaceholder: '곡명',
       artistNamePlaceholder: '아티스트명',
@@ -172,7 +126,8 @@ export default {
       noTasks: '가져오기 작업이 없습니다',
       clearTasks: '작업 지우기',
       clearTasksConfirmTitle: '지우기 확인',
-      clearTasksConfirmContent: '모든 가져오기 작업 기록을 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      clearTasksConfirmContent:
+        '모든 가져오기 작업 기록을 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.',
       confirm: '확인',
       cancel: '취소',
       clearTasksSuccess: '작업 목록이 지워졌습니다',

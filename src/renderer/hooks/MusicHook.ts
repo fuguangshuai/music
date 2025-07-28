@@ -1,8 +1,15 @@
 import { cloneDeep } from 'lodash';
 import { createDiscreteApi } from 'naive-ui';
-import { computed, type ComputedRef,nextTick, onUnmounted, ref, watch } from 'vue';
+import {
+  computed,
+  type ComputedRef,
+  getCurrentInstance,
+  nextTick,
+  onUnmounted,
+  ref,
+  watch
+} from 'vue';
 
-import { getBilibiliAudioUrl } from '@/api/bilibili';
 import useIndexedDB from '@/hooks/IndexDBHook';
 import { audioService } from '@/services/audioService';
 import type { usePlayerStore } from '@/store';
@@ -464,7 +471,10 @@ const setupAudioListeners = () => {
         let randomIndex;
         do {
           randomIndex = Math.floor(Math.random() * getPlayerStore().playList.length);
-        } while (randomIndex === getPlayerStore().playListIndex && getPlayerStore().playList.length > 1);
+        } while (
+          randomIndex === getPlayerStore().playListIndex &&
+          getPlayerStore().playList.length > 1
+        );
         getPlayerStore().playListIndex = randomIndex;
         getPlayerStore().setPlay(getPlayerStore().playList[randomIndex]);
       }
@@ -829,9 +839,12 @@ const setupPlayStateWatcher = () => {
 };
 
 // 在组件卸载时清理资源
-onUnmounted(() => {
-  stopLyricSync();
-});
+const instance = getCurrentInstance();
+if (instance) {
+  onUnmounted(() => {
+    stopLyricSync();
+  });
+}
 
 // 添加播放控制命令监听
 if (isElectron) {
@@ -928,45 +941,8 @@ audioService.on('url_expired', async (expiredTrack) => {
     const currentPosition = nowTime.value; // 保存当前播放进度
     console.log('保存当前播放进度:', currentPosition);
 
-    // 处理B站视频
-    if (expiredTrack.source === 'bilibili' && expiredTrack.bilibiliData) {
-      console.log('重新获取B站视频URL');
-      try {
-        // 使用API中的函数获取B站音频URL
-        const newUrl = await getBilibiliAudioUrl(
-          expiredTrack.bilibiliData.bvid,
-          expiredTrack.bilibiliData.cid
-        );
-
-        console.log('成功获取新的B站URL:', newUrl);
-
-        // 更新存储
-        (expiredTrack as any).playMusicUrl = newUrl;
-        getPlayerStore().playMusicUrl = newUrl;
-
-        // 重新播放并设置进度
-        const newSound = await audioService.play(newUrl, expiredTrack);
-        sound.value = newSound as Howl;
-
-        // 恢复播放进度
-        if (currentPosition > 0) {
-          newSound.seek(currentPosition);
-          nowTime.value = currentPosition;
-          console.log('恢复播放进度:', currentPosition);
-        }
-
-        // 如果之前是播放状态，继续播放
-        if (getPlayerStore().play) {
-          newSound.play();
-          getPlayerStore().setIsPlay(true);
-        }
-
-        message.success('已自动恢复播放');
-      } catch (error) {
-        console.error('重新获取B站URL失败:', error);
-        message.error('重新获取音频地址失败，请手动点击播放');
-      }
-    } else if (expiredTrack.source === 'netease') {
+    // 处理网易云音乐
+    if (expiredTrack.source === 'netease') {
       // 处理网易云音乐，重新获取URL
       console.log('重新获取网易云音乐URL');
       try {
@@ -1034,3 +1010,10 @@ window.addEventListener('audio-ready', ((event: CustomEvent) => {
     console.error('处理音频就绪事件出错:', error);
   }
 }) as EventListener);
+
+// 添加页面卸载时的清理
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    stopLyricSync();
+  });
+}

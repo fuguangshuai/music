@@ -1,25 +1,13 @@
 <template>
   <div class="settings-container">
-    <!-- 左侧导航栏 -->
-    <div v-if="!isMobile" class="settings-nav">
-      <div
-        v-for="section in settingSections"
-        :key="section.id"
-        class="nav-item"
-        :class="{ active: currentSection === section.id }"
-        @click="scrollToSection(section.id)"
-      >
-        {{ t(`settings.sections.${section.id}`) }}
-      </div>
-    </div>
-
     <!-- 右侧内容区 -->
-    <n-scrollbar ref="scrollbarRef" class="settings-content" @scroll="handleScroll">
+    <n-scrollbar ref="scrollbarRef" class="settings-content">
       <div class="set-page">
         <!-- 基础设置 -->
-        <div id="basic" ref="basicRef" class="settings-section">
+        <div class="settings-section">
           <div class="settings-section-title">{{ t('settings.sections.basic') }}</div>
           <div class="settings-section-content">
+            <!-- 主题设置 -->
             <div class="set-item">
               <div>
                 <div class="set-item-title">{{ t('settings.basic.themeMode') }}</div>
@@ -158,7 +146,7 @@
         </div>
 
         <!-- 播放设置 -->
-        <div id="playback" ref="playbackRef" class="settings-section">
+        <div class="settings-section">
           <div class="settings-section-title">{{ t('settings.sections.playback') }}</div>
           <div class="settings-section-content">
             <div>
@@ -185,33 +173,8 @@
                   style="width: 160px"
                 />
               </div>
-              <!-- 网易云 QQ 音乐 酷我 酷狗 会员购买链接 -->
-              <div class="p-2 bg-light-100 dark:bg-dark-100 rounded-lg mt-2">
-                <div>大家还是需要支持正版，本软件只做开源探讨</div>
-                <div class="mt-2">各大音乐会员购买链接</div>
-                <div class="flex gap-5 flex-wrap">
-                  <a
-                    class="text-green-400 hover:text-green-500"
-                    href="https://music.163.com/store/vip"
-                    target="_blank"
-                    >网易云音乐会员</a
-                  >
-                  <a
-                    class="text-green-400 hover:text-green-500"
-                    href="https://y.qq.com/portal/vipportal/"
-                    target="_blank"
-                    >QQ音乐会员</a
-                  >
-                  <a
-                    class="text-green-400 hover:text-green-500"
-                    href="https://vip.kugou.com/"
-                    target="_blank"
-                    >酷狗音乐会员</a
-                  >
-                </div>
-              </div>
             </div>
-            <div class="set-item" v-if="isElectron">
+            <div class="set-item">
               <div>
                 <div class="set-item-title">{{ t('settings.playback.musicSources') }}</div>
                 <div class="set-item-content">
@@ -273,7 +236,7 @@
         </div>
 
         <!-- 应用设置 -->
-        <div v-if="isElectron" id="application" ref="applicationRef" class="settings-section">
+        <div v-if="isElectron" class="settings-section">
           <div class="settings-section-title">{{ t('settings.sections.application') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -347,23 +310,11 @@
                 }}</n-button>
               </div>
             </div>
-
-            <div class="set-item">
-              <div>
-                <div class="set-item-title">{{ t('settings.application.remoteControl') }}</div>
-                <div class="set-item-content">
-                  {{ t('settings.application.remoteControlDesc') }}
-                </div>
-              </div>
-              <n-button size="small" @click="showRemoteControlModal = true">{{
-                t('common.configure')
-              }}</n-button>
-            </div>
           </div>
         </div>
 
         <!-- 网络设置 -->
-        <div v-if="isElectron" id="network" ref="networkRef" class="settings-section">
+        <div v-if="isElectron" class="settings-section">
           <div class="settings-section-title">{{ t('settings.sections.network') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -413,7 +364,7 @@
         </div>
 
         <!-- 系统管理 -->
-        <div v-if="isElectron" id="system" ref="systemRef" class="settings-section">
+        <div v-if="isElectron" class="settings-section">
           <div class="settings-section-title">{{ t('settings.sections.system') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -437,71 +388,6 @@
             </div>
           </div>
         </div>
-
-        <!-- 关于 -->
-        <div id="about" ref="aboutRef" class="settings-section">
-          <div class="settings-section-title">{{ t('settings.regard') }}</div>
-          <div class="settings-section-content">
-            <div class="set-item">
-              <div>
-                <div class="set-item-title">{{ t('settings.about.version') }}</div>
-                <div class="set-item-content">
-                  {{ updateInfo.currentVersion }}
-                  <template v-if="updateInfo.hasUpdate">
-                    <n-tag type="success" class="ml-2">
-                      {{ t('settings.about.hasUpdate') }} {{ updateInfo.latestVersion }}
-                    </n-tag>
-                  </template>
-                </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <n-button size="small" :loading="checking" @click="checkForUpdates(true)">
-                  {{ checking ? t('settings.about.checking') : t('settings.about.checkUpdate') }}
-                </n-button>
-                <n-button v-if="updateInfo.hasUpdate" size="small" @click="openReleasePage">
-                  {{ t('settings.about.gotoUpdate') }}
-                </n-button>
-              </div>
-            </div>
-
-            <div
-              class="set-item cursor-pointer hover:text-green-500 hover:bg-green-950 transition-all"
-              @click="openAuthor"
-            >
-              <coffee>
-                <div>
-                  <div class="set-item-title">{{ t('settings.about.author') }}</div>
-                  <div class="set-item-content">{{ t('settings.about.authorDesc') }}</div>
-                </div>
-              </coffee>
-              <div>
-                <n-button size="small" @click="openAuthor">
-                  <i class="ri-github-line"></i>{{ t('settings.about.gotoGithub') }}
-                </n-button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 捐赠支持 -->
-        <div id="donation" ref="donationRef" class="settings-section">
-          <div class="settings-section-title">{{ t('settings.sections.donation') }}</div>
-          <div class="settings-section-content">
-            <div class="set-item">
-              <div>
-                <div class="set-item-title">{{ t('settings.sections.donation') }}</div>
-                <div class="set-item-content">{{ t('donation.message') }}</div>
-              </div>
-              <n-button text @click="toggleDonationList">
-                <template #icon>
-                  <i :class="isDonationListVisible ? 'ri-eye-line' : 'ri-eye-off-line'" />
-                </template>
-                {{ isDonationListVisible ? t('common.hide') : t('common.show') }}
-              </n-button>
-            </div>
-            <donation-list v-if="isDonationListVisible" />
-          </div>
-        </div>
       </div>
       <play-bottom />
     </n-scrollbar>
@@ -516,13 +402,10 @@
         :config="proxyForm"
         @confirm="handleProxyConfirm"
       />
-
-      <!-- 音源设置弹窗 -->
-      <music-source-settings v-model:show="showMusicSourcesModal" v-model:sources="musicSources" />
-
-      <!-- 远程控制设置弹窗 -->
-      <remote-control-setting v-model:visible="showRemoteControlModal" />
     </template>
+
+    <!-- 音源设置弹窗 -->
+    <music-source-settings v-model:show="showMusicSourcesModal" v-model:sources="musicSources" />
 
     <!-- 清除缓存弹窗 -->
     <clear-cache-settings v-model:show="showClearCacheModal" @confirm="clearCache" />
@@ -532,30 +415,23 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core';
 import { useMessage } from 'naive-ui';
-import { computed, h, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, h, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import localData from '@/../main/set.json';
-import Coffee from '@/components/Coffee.vue';
-import DonationList from '@/components/common/DonationList.vue';
 import PlayBottom from '@/components/common/PlayBottom.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import ClearCacheSettings from '@/components/settings/ClearCacheSettings.vue';
 import MusicSourceSettings from '@/components/settings/MusicSourceSettings.vue';
 import ProxySettings from '@/components/settings/ProxySettings.vue';
-import RemoteControlSetting from '@/components/settings/ServerSetting.vue';
 import ShortcutSettings from '@/components/settings/ShortcutSettings.vue';
 import { useSettingsStore } from '@/store/modules/settings';
 import { useUserStore } from '@/store/modules/user';
 import { type Platform } from '@/types/music';
 import { isElectron, isMobile } from '@/utils';
 import { openDirectory, selectDirectory } from '@/utils/fileOperation';
-import { checkUpdate, UpdateResult } from '@/utils/update';
 
-import config from '../../../../package.json';
-
-// 所有平台默认值
-const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd', 'bilibili'];
+const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];
 
 const platform = window.electron ? window.electron.ipcRenderer.sendSync('get-platform') : 'web';
 
@@ -571,20 +447,7 @@ onUnmounted(() => {
   settingsStore.setSetData(localSetData.value);
 });
 
-const checking = ref(false);
-const updateInfo = ref<UpdateResult>({
-  hasUpdate: false,
-  latestVersion: '',
-  currentVersion: config.version,
-  releaseInfo: null
-});
-
 const { t } = useI18n();
-
-// 创建一个防抖的保存函数
-// const debouncedSaveSettings = debounce((newData) => {
-//   settingsStore.setSetData(newData);
-// }, 500);
 
 const saveSettings = useDebounceFn((data) => {
   settingsStore.setSetData(data);
@@ -628,39 +491,10 @@ const handleAutoThemeChange = (value: boolean) => {
   settingsStore.setAutoTheme(value);
 };
 
-const openAuthor = () => {
-  window.open(setData.value.authorUrl);
-};
-
 const restartApp = () => {
   window.electron.ipcRenderer.send('restart');
 };
 const message = useMessage();
-const checkForUpdates = async (isClick = false) => {
-  checking.value = true;
-  try {
-    const result = await checkUpdate(config.version);
-    if (result) {
-      updateInfo.value = result;
-      if (!result.hasUpdate && isClick) {
-        message.success(t('settings.about.latest'));
-      }
-    } else if (isClick) {
-      message.success(t('settings.about.latest'));
-    }
-  } catch (error) {
-    console.error('检查更新失败:', error);
-    if (isClick) {
-      message.error(t('settings.about.messages.checkError'));
-    }
-  } finally {
-    checking.value = false;
-  }
-};
-
-const openReleasePage = () => {
-  settingsStore.showUpdateModal = true;
-};
 
 const selectDownloadPath = async () => {
   const path = await selectDirectory(message);
@@ -732,7 +566,6 @@ watch(
 
 // 初始化时从store获取配置
 onMounted(async () => {
-  checkForUpdates();
   if (setData.value.proxyConfig) {
     proxyForm.value = { ...setData.value.proxyConfig };
   }
@@ -806,13 +639,6 @@ watch(
   }
 );
 
-const isDonationListVisible = ref(localStorage.getItem('donationListVisible') !== 'false');
-
-const toggleDonationList = () => {
-  isDonationListVisible.value = !isDonationListVisible.value;
-  localStorage.setItem('donationListVisible', isDonationListVisible.value.toString());
-};
-
 // 清除缓存相关
 const showClearCacheModal = ref(false);
 
@@ -884,91 +710,6 @@ const handleShortcutsChange = (shortcuts: any) => {
   console.log('快捷键已更新:', shortcuts);
 };
 
-// 定义设置分类
-const settingSections = [
-  { id: 'basic', title: t('settings.sections.basic') },
-  { id: 'playback', title: t('settings.sections.playback') },
-  { id: 'application', title: t('settings.sections.application'), electron: true },
-  { id: 'network', title: t('settings.sections.network'), electron: true },
-  { id: 'system', title: t('settings.sections.system'), electron: true },
-  { id: 'regard', title: t('settings.sections.regard') },
-  { id: 'donation', title: t('settings.sections.donation') }
-];
-
-// 当前激活的分类
-const currentSection = ref('basic');
-const scrollbarRef = ref();
-
-// 各个分类的ref
-const basicRef = ref();
-const playbackRef = ref();
-const applicationRef = ref();
-const networkRef = ref();
-const systemRef = ref();
-const aboutRef = ref();
-const donationRef = ref();
-
-// 滚动到指定分类
-const scrollToSection = async (sectionId: string) => {
-  currentSection.value = sectionId;
-  const sectionRef = {
-    basic: basicRef,
-    playback: playbackRef,
-    application: applicationRef,
-    network: networkRef,
-    system: systemRef,
-    about: aboutRef,
-    donation: donationRef
-  }[sectionId];
-
-  if (sectionRef?.value) {
-    await nextTick();
-    scrollbarRef.value?.scrollTo({
-      top: sectionRef.value.offsetTop - 20,
-      behavior: 'smooth'
-    });
-  }
-};
-
-// 处理滚动，更新当前激活的分类
-const handleScroll = (e: any) => {
-  const { scrollTop } = e.target;
-
-  const sections = [
-    { id: 'basic', ref: basicRef },
-    { id: 'playback', ref: playbackRef },
-    { id: 'application', ref: applicationRef },
-    { id: 'network', ref: networkRef },
-    { id: 'system', ref: systemRef },
-    { id: 'about', ref: aboutRef },
-    { id: 'donation', ref: donationRef }
-  ];
-
-  const activeSection = sections[0].id;
-  let lastValidSection = activeSection;
-
-  for (const section of sections) {
-    if (section.ref?.value) {
-      const { offsetTop } = section.ref.value;
-      if (scrollTop >= offsetTop - 100) {
-        lastValidSection = section.id;
-      }
-    }
-  }
-
-  if (lastValidSection !== currentSection.value) {
-    currentSection.value = lastValidSection;
-  }
-};
-
-// 初始化时设置当前激活的分类
-onMounted(() => {
-  // 延迟一帧等待 DOM 完全渲染
-  nextTick(() => {
-    handleScroll({ target: { scrollTop: 0 } });
-  });
-});
-
 // 音源设置相关
 const musicSources = computed({
   get: () => {
@@ -988,37 +729,11 @@ const musicSources = computed({
 });
 
 const showMusicSourcesModal = ref(false);
-
-// 远程控制设置弹窗
-const showRemoteControlModal = ref(false);
 </script>
 
 <style lang="scss" scoped>
 .settings-container {
   @apply flex h-full;
-}
-
-.settings-nav {
-  @apply w-32 h-full flex-shrink-0 border-r border-gray-200 dark:border-gray-700;
-  @apply bg-light dark:bg-dark;
-
-  .nav-item {
-    @apply px-4 py-2.5 cursor-pointer text-sm;
-    @apply text-gray-600 dark:text-gray-400;
-    @apply transition-colors duration-200;
-    @apply border-l-2 border-transparent;
-
-    &:hover {
-      @apply text-primary dark:text-white bg-gray-50 dark:bg-dark-100;
-      @apply border-l-2 border-gray-200 dark:border-gray-200;
-    }
-
-    &.active {
-      @apply text-primary dark:text-white bg-gray-50 dark:bg-dark-100;
-      @apply border-l-2 border-gray-200 dark:border-gray-200;
-      @apply font-medium;
-    }
-  }
 }
 
 .settings-content {
@@ -1027,19 +742,6 @@ const showRemoteControlModal = ref(false);
 
 .set-page {
   @apply p-4 pb-20;
-}
-
-.settings-section {
-  @apply mb-6 scroll-mt-4;
-
-  &-title {
-    @apply text-base font-medium mb-4;
-    @apply text-gray-600 dark:text-white;
-  }
-
-  &-content {
-    @apply space-y-4;
-  }
 }
 
 .set-item {
@@ -1057,10 +759,6 @@ const showRemoteControlModal = ref(false);
 
   &:hover {
     @apply bg-gray-50 dark:bg-gray-800;
-  }
-
-  &.cursor-pointer:hover {
-    @apply text-green-500 bg-green-50 dark:bg-green-900;
   }
 }
 

@@ -1,16 +1,13 @@
 export default {
   theme: 'Theme',
   language: 'Language',
-  regard: 'About',
   logout: 'Logout',
   sections: {
     basic: 'Basic Settings',
     playback: 'Playback Settings',
     application: 'Application Settings',
     network: 'Network Settings',
-    system: 'System Management',
-    donation: 'Donation',
-    regard: 'About'
+    system: 'System Management'
   },
   basic: {
     themeMode: 'Theme Mode',
@@ -26,6 +23,7 @@ export default {
       lyric: 'Lyrics Only'
     },
     animation: 'Animation Speed',
+    animationSpeedPlaceholder: 'Enter animation speed',
     animationDesc: 'Enable/disable animations',
     animationSpeed: {
       slow: 'Very Slow',
@@ -89,9 +87,7 @@ export default {
     unlimitedDownload: 'Unlimited Download',
     unlimitedDownloadDesc: 'Enable unlimited download mode for music , default limit 300 songs',
     downloadPath: 'Download Directory',
-    downloadPathDesc: 'Choose download location for music files',
-    remoteControl: 'Remote Control',
-    remoteControlDesc: 'Set remote control function'
+    downloadPathDesc: 'Choose download location for music files'
   },
   network: {
     apiPort: 'Music API Port',
@@ -149,20 +145,6 @@ export default {
     restartDesc: 'Restart application',
     messages: {
       clearSuccess: 'Cache cleared successfully, some settings will take effect after restart'
-    }
-  },
-  about: {
-    version: 'Version',
-    checkUpdate: 'Check for Updates',
-    checking: 'Checking...',
-    latest: 'Already latest version',
-    hasUpdate: 'New version available',
-    gotoUpdate: 'Go to Update',
-    gotoGithub: 'Go to Github',
-    author: 'Author',
-    authorDesc: 'algerkong Give a star🌟',
-    messages: {
-      checkError: 'Failed to check for updates, please try again later'
     }
   },
   validation: {
@@ -273,15 +255,5 @@ export default {
       disableAll: 'All shortcuts disabled, please save to apply',
       enableAll: 'All shortcuts enabled, please save to apply'
     }
-  },
-  remoteControl: {
-    title: 'Remote Control',
-    enable: 'Enable Remote Control',
-    port: 'Port',
-    allowedIps: 'Allowed IPs',
-    addIp: 'Add IP',
-    emptyListHint: 'Empty list means allow all IPs',
-    saveSuccess: 'Remote control settings saved',
-    accessInfo: 'Remote control access address:'
   }
 };

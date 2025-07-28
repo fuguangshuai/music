@@ -1,16 +1,13 @@
 export default {
   theme: '主題',
   language: '語言',
-  regard: '關於',
   logout: '登出',
   sections: {
     basic: '基礎設定',
     playback: '播放設定',
     application: '應用程式設定',
     network: '網路設定',
-    system: '系統管理',
-    donation: '捐贈支持',
-    regard: '關於'
+    system: '系統管理'
   },
   basic: {
     themeMode: '主題模式',
@@ -26,6 +23,7 @@ export default {
       lyric: '僅歌詞'
     },
     animation: '動畫速度',
+    animationSpeedPlaceholder: '請輸入動畫速度',
     animationDesc: '是否開起動畫',
     animationSpeed: {
       slow: '極慢',
@@ -61,6 +59,7 @@ export default {
     musicSources: '音源設定',
     musicSourcesDesc: '選擇音樂解析使用的音源平台',
     musicSourcesWarning: '至少需要選擇一個音源平台',
+    webPlatformNote: '網頁版僅支援線上音源（GD音樂台、星辰音樂、雲端音樂）',
     musicUnblockEnable: '啟用音樂解析',
     musicUnblockEnableDesc: '開啟後將嘗試解析無法播放的音樂',
     configureMusicSources: '設定音源',
@@ -87,9 +86,7 @@ export default {
     unlimitedDownload: '無限制下載',
     unlimitedDownloadDesc: '開啟後將無限制下載音樂（可能出現下載失敗的情況）, 預設限制 300 首',
     downloadPath: '下載目錄',
-    downloadPathDesc: '選擇音樂檔案的下載位置',
-    remoteControl: '遠端控制',
-    remoteControlDesc: '設定遠端控制功能'
+    downloadPathDesc: '選擇音樂檔案的下載位置'
   },
   network: {
     apiPort: '音樂API連接埠',
@@ -147,20 +144,6 @@ export default {
     restartDesc: '重新啟動應用程式',
     messages: {
       clearSuccess: '清除成功，部分設定在重啟後生效'
-    }
-  },
-  about: {
-    version: '版本',
-    checkUpdate: '檢查更新',
-    checking: '檢查中...',
-    latest: '目前已是最新版本',
-    hasUpdate: '發現新版本',
-    gotoUpdate: '前往更新',
-    gotoGithub: '前往 Github',
-    author: '作者',
-    authorDesc: 'algerkong 點個star🌟呗',
-    messages: {
-      checkError: '檢查更新失敗，請稍後重試'
     }
   },
   validation: {

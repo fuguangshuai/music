@@ -1,15 +1,4 @@
 export default {
-  installApp: {
-    description: 'Install the application for a better experience',
-    noPrompt: 'Do not prompt again',
-    install: 'Install now',
-    cancel: 'Cancel',
-    download: 'Download',
-    downloadFailed: 'Download failed',
-    downloadComplete: 'Download complete',
-    downloadProblem: 'Download problem? Go to',
-    downloadProblemLinkText: 'Download the latest version'
-  },
   playlistDrawer: {
     title: 'Add to playlist',
     createPlaylist: 'Create new playlist',
@@ -28,43 +17,6 @@ export default {
     loginFirst: 'Please login first',
     getPlaylistFailed: 'Get playlist failed',
     inputPlaylistName: 'Please enter the playlist name'
-  },
-  update: {
-    title: 'New version found',
-    currentVersion: 'Current version',
-    cancel: 'Do not update',
-    prepareDownload: 'Preparing to download...',
-    downloading: 'Downloading...',
-    nowUpdate: 'Update now',
-    downloadFailed: 'Download failed, please try again or download manually',
-    startFailed: 'Start download failed, please try again or download manually',
-    noDownloadUrl:
-      'No suitable installation package found for the current system, please download manually',
-    installConfirmTitle: 'Install Update',
-    installConfirmContent: 'Do you want to close the application and install the update?',
-    manualInstallTip:
-      'If the installer does not open automatically after closing the application, please find the file in your download folder and open it manually.',
-    yesInstall: 'Install Now',
-    noThanks: 'Later',
-    fileLocation: 'File Location',
-    copy: 'Copy Path',
-    copySuccess: 'Path copied to clipboard',
-    copyFailed: 'Copy failed',
-    backgroundDownload: 'Background Download'
-  },
-  coffee: {
-    title: 'Buy me a coffee',
-    alipay: 'Alipay',
-    wechat: 'Wechat',
-    alipayQR: 'Alipay QR code',
-    wechatQR: 'Wechat QR code',
-    coffeeDesc: 'A cup of coffee, a support',
-    coffeeDescLinkText: 'View more',
-    qqGroup: 'QQ group: algermusic',
-    messages: {
-      copySuccess: 'Copied to clipboard'
-    },
-    donateList: 'Buy me a coffee'
   },
   playlistType: {
     title: 'Playlist Category',

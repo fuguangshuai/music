@@ -1,16 +1,13 @@
 export default {
   theme: 'テーマ',
   language: '言語',
-  regard: 'について',
   logout: 'ログアウト',
   sections: {
     basic: '基本設定',
     playback: '再生設定',
     application: 'アプリケーション設定',
     network: 'ネットワーク設定',
-    system: 'システム管理',
-    donation: '寄付サポート',
-    regard: 'について'
+    system: 'システム管理'
   },
   basic: {
     themeMode: 'テーマモード',
@@ -70,7 +67,8 @@ export default {
     autoPlay: '自動再生',
     autoPlayDesc: 'アプリを再起動した際に自動的に再生を継続するかどうか',
     showStatusBar: 'ステータスバーコントロール機能を表示するかどうか',
-    showStatusBarContent: 'Macのステータスバーに音楽コントロール機能を表示できます（再起動後に有効）'
+    showStatusBarContent:
+      'Macのステータスバーに音楽コントロール機能を表示できます（再起動後に有効）'
   },
   application: {
     closeAction: '閉じる動作',
@@ -85,11 +83,10 @@ export default {
     download: 'ダウンロード管理',
     downloadDesc: 'ダウンロードリストボタンを常に表示するかどうか',
     unlimitedDownload: '無制限ダウンロード',
-    unlimitedDownloadDesc: '有効にすると音楽を無制限でダウンロードします（ダウンロード失敗の可能性があります）。デフォルトは300曲制限',
+    unlimitedDownloadDesc:
+      '有効にすると音楽を無制限でダウンロードします（ダウンロード失敗の可能性があります）、デフォルトは300曲制限',
     downloadPath: 'ダウンロードディレクトリ',
-    downloadPathDesc: '音楽ファイルのダウンロード場所を選択',
-    remoteControl: 'リモートコントロール',
-    remoteControlDesc: 'リモートコントロール機能を設定'
+    downloadPathDesc: '音楽ファイルのダウンロード場所を選択'
   },
   network: {
     apiPort: '音楽APIポート',
@@ -101,7 +98,8 @@ export default {
     proxyPort: 'プロキシポート',
     proxyPortPlaceholder: 'プロキシポートを入力してください',
     realIP: 'realIP設定',
-    realIPDesc: '制限により、このプロジェクトは海外での使用が制限されます。realIPパラメータを使用して国内IPを渡すことで解決できます',
+    realIPDesc:
+      '制限により、このプロジェクトは海外での使用が制限されます。realIPパラメータを使用して国内IPを渡すことで解決できます',
     messages: {
       proxySuccess: 'プロキシ設定を保存しました。アプリ再起動後に有効になります',
       proxyError: '入力が正しいかどうか確認してください',
@@ -149,24 +147,10 @@ export default {
       clearSuccess: 'クリア成功。一部の設定は再起動後に有効になります'
     }
   },
-  about: {
-    version: 'バージョン',
-    checkUpdate: '更新を確認',
-    checking: '確認中...',
-    latest: '現在最新バージョンです',
-    hasUpdate: '新しいバージョンが見つかりました',
-    gotoUpdate: '更新へ',
-    gotoGithub: 'Githubへ',
-    author: '作者',
-    authorDesc: 'algerkong スターを付けてください🌟',
-    messages: {
-      checkError: '更新確認に失敗しました。後でもう一度お試しください'
-    }
-  },
   validation: {
     selectProxyProtocol: 'プロキシプロトコルを選択してください',
     proxyHost: 'プロキシアドレスを入力してください',
-    portNumber: '有効なポート番号を入力してください（1-65535）'
+    portNumber: '有効なポート番号を入力してください(1-65535)'
   },
   lyricSettings: {
     title: '歌詞設定',
@@ -271,15 +255,5 @@ export default {
       disableAll: 'すべてのショートカットを無効にしました。保存を忘れずに',
       enableAll: 'すべてのショートカットを有効にしました。保存を忘れずに'
     }
-  },
-  remoteControl: {
-    title: 'リモートコントロール',
-    enable: 'リモートコントロールを有効にする',
-    port: 'サービスポート',
-    allowedIps: '許可されたIPアドレス',
-    addIp: 'IPを追加',
-    emptyListHint: '空のリストはすべてのIPアクセスを許可することを意味します',
-    saveSuccess: 'リモートコントロール設定を保存しました',
-    accessInfo: 'リモートコントロールアクセスアドレス:'
   }
 };

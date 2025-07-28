@@ -8,10 +8,8 @@ import { loadLyricWindow } from './lyric';
 import { initializeConfig } from './modules/config';
 import { initializeFileManager } from './modules/fileManager';
 import { initializeFonts } from './modules/fonts';
-import { initializeRemoteControl } from './modules/remoteControl';
 import { initializeShortcuts, registerShortcuts } from './modules/shortcuts';
 import { initializeTray, updateCurrentSong, updatePlayState, updateTrayMenu } from './modules/tray';
-import { setupUpdateHandlers } from './modules/update';
 import { createMainWindow, initializeWindowManager, setAppQuitting } from './modules/window';
 import { initWindowSizeManager } from './modules/window-size';
 import { startMusicApi } from './server';
@@ -56,12 +54,6 @@ function initialize() {
 
   // 初始化快捷键
   initializeShortcuts(mainWindow);
-
-  // 初始化远程控制服务
-  initializeRemoteControl(mainWindow);
-
-  // 初始化更新处理程序
-  setupUpdateHandlers(mainWindow);
 }
 
 // 检查是否为第一个实例
@@ -84,7 +76,7 @@ if (!isSingleInstance) {
   // 应用程序准备就绪时的处理
   app.whenReady().then(() => {
     // 设置应用ID
-    electronApp.setAppUserModelId('com.alger.music');
+    electronApp.setAppUserModelId('com.size.music');
 
     // 监听窗口创建事件
     app.on('browser-window-created', (_, window) => {

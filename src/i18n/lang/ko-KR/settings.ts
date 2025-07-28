@@ -85,11 +85,10 @@ export default {
     download: '다운로드 관리',
     downloadDesc: '다운로드 목록 버튼을 항상 표시할지 여부',
     unlimitedDownload: '무제한 다운로드',
-    unlimitedDownloadDesc: '활성화하면 음악을 무제한으로 다운로드합니다 (다운로드 실패가 발생할 수 있음), 기본 제한 300곡',
+    unlimitedDownloadDesc:
+      '활성화하면 음악을 무제한으로 다운로드합니다 (다운로드 실패가 발생할 수 있음), 기본 제한 300곡',
     downloadPath: '다운로드 디렉토리',
-    downloadPathDesc: '음악 파일의 다운로드 위치 선택',
-    remoteControl: '원격 제어',
-    remoteControlDesc: '원격 제어 기능 설정'
+    downloadPathDesc: '음악 파일의 다운로드 위치 선택'
   },
   network: {
     apiPort: '음악 API 포트',
@@ -101,7 +100,8 @@ export default {
     proxyPort: '프록시 포트',
     proxyPortPlaceholder: '프록시 포트를 입력하세요',
     realIP: 'realIP 설정',
-    realIPDesc: '제한으로 인해 이 프로젝트는 해외에서 사용할 때 제한을 받을 수 있으며, realIP 매개변수를 사용하여 국내 IP를 전달하여 해결할 수 있습니다',
+    realIPDesc:
+      '제한으로 인해 이 프로젝트는 해외에서 사용할 때 제한을 받을 수 있으며, realIP 매개변수를 사용하여 국내 IP를 전달하여 해결할 수 있습니다',
     messages: {
       proxySuccess: '프록시 설정이 저장되었습니다. 앱을 재시작한 후 적용됩니다',
       proxyError: '입력이 올바른지 확인하세요',
@@ -271,15 +271,5 @@ export default {
       disableAll: '모든 단축키가 비활성화되었습니다. 저장을 잊지 마세요',
       enableAll: '모든 단축키가 활성화되었습니다. 저장을 잊지 마세요'
     }
-  },
-  remoteControl: {
-    title: '원격 제어',
-    enable: '원격 제어 활성화',
-    port: '서비스 포트',
-    allowedIps: '허용된 IP 주소',
-    addIp: 'IP 추가',
-    emptyListHint: '빈 목록은 모든 IP 액세스를 허용함을 의미합니다',
-    saveSuccess: '원격 제어 설정이 저장되었습니다',
-    accessInfo: '원격 제어 액세스 주소:'
   }
 };

@@ -4,7 +4,6 @@
       <n-dialog-provider>
         <n-message-provider>
           <router-view></router-view>
-          <traffic-warning-drawer v-if="!isElectron"></traffic-warning-drawer>
         </n-message-provider>
       </n-dialog-provider>
     </n-config-provider>
@@ -18,7 +17,6 @@ import { computed, nextTick, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import TrafficWarningDrawer from '@/components/TrafficWarningDrawer.vue';
 import homeRouter from '@/router/home';
 import { useMenuStore } from '@/store/modules/menu';
 import { usePlayerStore } from '@/store/modules/player';

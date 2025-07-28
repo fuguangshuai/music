@@ -1,4 +1,5 @@
-import { cloneDeep, merge } from 'lodash';
+// import { cloneDeep, merge } from 'lodash';//,暂时注释换一种方式,因为这个方式用户配置的会被覆盖,去掉merge的模块确保没有沉余
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
@@ -16,7 +17,6 @@ export const useSettingsStore = defineStore('settings', () => {
   const theme = ref<ThemeType>(getCurrentTheme());
   const isMobile = ref(false);
   const isMiniMode = ref(false);
-  const showUpdateModal = ref(false);
   const showArtistDrawer = ref(false);
   const currentArtistId = ref<number | null>(null);
   const systemFonts = ref<{ label: string; value: string }[]>([
@@ -53,8 +53,40 @@ export const useSettingsStore = defineStore('settings', () => {
       ? window.electron.ipcRenderer.sendSync('get-store-value', 'set')
       : JSON.parse(localStorage.getItem('appSettings') || '{}');
 
-    // 合并默认设置和保存的设置
-    const mergedSettings = merge({}, setDataDefault, savedSettings);
+    // 合并默认设置和保存的设置,暂时注释换一种方式,因为这个方式用户配置的会被覆盖
+    // const mergedSettings = merge({}, setDataDefault, savedSettings);
+
+    // 使用对象展开语法合并，确保用户配置完全覆盖默认配置
+    const mergedSettings = { ...setDataDefault, ...savedSettings };
+
+    // 根据平台智能处理音源设置
+    if (mergedSettings.enabledMusicSources) {
+      if (isElectron) {
+        // Win端：支持所有音源，不做处理
+        console.log('🔧 Win端支持所有音源，保持原配置');
+      } else {
+        // Web端：只保留Web端支持的音源
+        const webSupportedSources = ['gdmusic', 'stellar', 'cloud'];
+        const currentSources = mergedSettings.enabledMusicSources;
+        const filteredSources = currentSources.filter((source) =>
+          webSupportedSources.includes(source)
+        );
+
+        if (filteredSources.length > 0) {
+          mergedSettings.enabledMusicSources = filteredSources;
+          console.log('🔧 Web端过滤后的音源:', filteredSources);
+        } else {
+          // 如果过滤后没有可用音源，使用Web端默认音源
+          mergedSettings.enabledMusicSources = ['gdmusic'];
+          console.log('🔧 Web端没有可用音源，使用默认音源: gdmusic');
+        }
+      }
+    }
+
+    console.log('🔧 初始化音源设置:', {
+      platform: isElectron ? 'Electron' : 'Web',
+      sources: mergedSettings.enabledMusicSources
+    });
 
     // 更新设置并返回
     setSetData(mergedSettings);
@@ -122,10 +154,6 @@ export const useSettingsStore = defineStore('settings', () => {
     isMiniMode.value = value;
   };
 
-  const setShowUpdateModal = (value: boolean) => {
-    showUpdateModal.value = value;
-  };
-
   const setShowArtistDrawer = (show: boolean) => {
     showArtistDrawer.value = show;
     if (!show) {
@@ -191,7 +219,6 @@ export const useSettingsStore = defineStore('settings', () => {
     theme,
     isMobile,
     isMiniMode,
-    showUpdateModal,
     showArtistDrawer,
     currentArtistId,
     systemFonts,
@@ -200,7 +227,6 @@ export const useSettingsStore = defineStore('settings', () => {
     toggleTheme,
     setAutoTheme,
     setMiniMode,
-    setShowUpdateModal,
     setShowArtistDrawer,
     setCurrentArtistId,
     setSystemFonts,

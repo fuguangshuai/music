@@ -69,11 +69,11 @@
       <h3>{{ t('player.playBar.playbackSpeed') }}</h3>
       <div class="speed-controls">
         <div class="speed-options">
-          <div 
-            v-for="option in playbackRateOptions" 
+          <div
+            v-for="option in playbackRateOptions"
             :key="option.key"
             class="speed-option"
-            :class="{ 'active': playbackRate === option.key }"
+            :class="{ active: playbackRate === option.key }"
             @click="selectSpeed(option.key)"
           >
             {{ option.label }}

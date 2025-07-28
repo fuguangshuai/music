@@ -13,9 +13,6 @@
   <a href="https://t.me/+9efsKRuvKBk2NWVl">
     <img src="https://img.shields.io/badge/AlgerMusic-blue?style=for-the-badge&logo=telegram&logoColor=white&label=Telegram" alt="Telegram">
   </a>
-   <a href="https://donate.alger.fun/">
-    <img src="https://img.shields.io/badge/%E9%A1%B9%E7%9B%AE%E6%8D%90%E8%B5%A0-blue?style=for-the-badge&logo=telegram&logoColor=pink&color=pink&label=%E8%B5%9E%E5%8A%A9" alt="赞助">
-  </a>
 </div>
 </div>
 <div align="center">
@@ -31,7 +28,7 @@
 - 📝 功能
   - 播放历史记录
   - 歌曲收藏管理
-  - 歌单 MV 排行榜 每日推荐
+  - 歌单 MV 榜单 每日推荐
   - 自定义快捷键配置（全局或应用内）
 - 🎨 界面与交互
   - 沉浸式歌词显示（点击左下角封面进入）
@@ -47,7 +44,7 @@
   - 定时播放 远程控制播放 倍速播放
   - 高品质音乐
   - 音乐文件下载
-  - 搜索 MV 音乐 专辑 歌单 bilibili
+  - 搜索 MV 音乐 专辑 歌单
   - 音乐单独选择音源解析
 - 🚀 技术特性
   - 本地化服务，无需依赖在线API (基于 netease-cloud-music-api)
@@ -80,13 +77,6 @@ npm run dev
 ## 开发文档
 
 点击这里[开发文档](./DEV.md)
-
-## 赞赏☕️
-
-[赞赏列表](http://donate.alger.fun/)
-| 微信赞赏 | 支付宝赞赏 |
-| :--------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
-| <img src="https://github.com/algerkong/algerkong/blob/main/wechat.jpg?raw=true" alt="WeChat QRcode" width=200> <br><small>喝点咖啡继续干</small> | <img src="https://github.com/algerkong/algerkong/blob/main/alipay.jpg?raw=true" alt="Wechat QRcode" width=200> <br><small>来包辣条吧~</small> |
 
 ## 项目统计
 
