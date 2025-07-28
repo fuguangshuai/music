@@ -1,5 +1,6 @@
 <template>
-  <n-scrollbar v-loading="loading" class="artist-page">
+  <div v-loading="loading">
+    <n-scrollbar class="artist-page">
     <!-- 歌手信息头部 -->
     <div class="artist-header">
       <div class="artist-cover">
@@ -178,6 +179,7 @@
 
     <play-bottom />
   </n-scrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">

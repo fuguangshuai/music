@@ -204,20 +204,11 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
     { key: 'stellar', index: 0, name: '星辰' },
     { key: 'cloud', index: 1, name: '云端' }
   ];
-  let tried = false;
   for (const src of sourceMap) {
     if (musicSources.includes(src.key)) {
-      tried = true;
       const result = await tryParseMusic(src.index, src.name, String(id), data);
       if (result) return result;
     }
-  }
-  if (tried) {
-    console.error('❌ 所有可用音乐API均解析失败');
-    return null;
-  } else {
-    console.error('❌ 没有可用的音乐API');
-    return null;
   }
   // 2.4 GD音乐台解析（优先级最低）
   if (musicSources.includes('gdmusic')) {
