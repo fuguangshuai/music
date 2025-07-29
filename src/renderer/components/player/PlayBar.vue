@@ -178,7 +178,6 @@ import { audioService } from '@/services/audioService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { getImgUrl, isElectron, isMobile, secondToMinute, setAnimationClass } from '@/utils';
-import { storageOptimizer } from '@/utils/storageOptimizer';
 
 const playerStore = usePlayerStore();
 const settingsStore = useSettingsStore();
@@ -247,26 +246,22 @@ const formatTooltip = (value: number) => {
   return `${secondToMinute(value)} / ${secondToMinute(allTime.value)}`;
 };
 
-// 音量条 - 使用优化的存储
-const audioVolume = ref(storageOptimizer.getItem('volume', 1) || 1);
+// 音量条 - 使用 playerStore 的统一音量管理
 const getVolumeIcon = computed(() => {
   // 0 静音 ri-volume-mute-line 0.5 ri-volume-down-line 1 ri-volume-up-line
-  if (audioVolume.value === 0) {
+  if (playerStore.volume === 0) {
     return 'ri-volume-mute-line';
   }
-  if (audioVolume.value <= 0.5) {
+  if (playerStore.volume <= 0.5) {
     return 'ri-volume-down-line';
   }
   return 'ri-volume-up-line';
 });
 
 const volumeSlider = computed({
-  get: () => (audioVolume.value || 1) * 100,
+  get: () => playerStore.volume * 100,
   set: (value) => {
-    const volumeValue = value / 100;
-    storageOptimizer.setItem('volume', volumeValue.toString());
-    audioService.setVolume(volumeValue);
-    audioVolume.value = volumeValue;
+    playerStore.setVolume(value / 100);
   }
 });
 
