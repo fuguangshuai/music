@@ -58,7 +58,10 @@ const api = {
 };
 
 // 跟踪活跃的监听器
-const activeListeners = new Map<string, Set<(event: Electron.IpcRendererEvent, ...args: any[]) => void>>();
+const activeListeners = new Map<
+  string,
+  Set<(event: Electron.IpcRendererEvent, ...args: any[]) => void>
+>();
 
 // 创建带类型的ipcRenderer对象，暴露给渲染进程
 const ipc = {
