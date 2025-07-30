@@ -98,34 +98,38 @@ const unblockMusic = async (
   // 处理歌曲数据，确保数据结构完整
   const processedSongData = ensureDataStructure(songData);
 
-  const retry = async (attempt: number): Promise<UnblockResult> => {
-    try {
-      const data = await match(parseInt(String(id), 10), filteredPlatforms, processedSongData);
-      const result: UnblockResult = {
-        data: {
-          data,
-          params: {
-            id: parseInt(String(id), 10),
-            type: 'song'
-          }
-        }
-      };
-      return result;
-    } catch (err) {
-      if (attempt < retryCount) {
-        // 延迟重试，每次重试增加延迟时间
-        await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
-        return retry(attempt + 1);
-      }
+  // ✅ 使用循环替代递归，避免栈溢出
+  const retryWithLoop = async (): Promise<UnblockResult> => {
+    let lastError: Error | undefined;
 
-      // 所有重试都失败后，抛出详细错误
-      throw new Error(
-        `音乐解析失败 (ID: ${id}): ${err instanceof Error ? err.message : '未知错误'}`
-      );
+    for (let attempt = 1; attempt <= retryCount; attempt++) {
+      try {
+        const data = await match(parseInt(String(id), 10), filteredPlatforms, processedSongData);
+        const result: UnblockResult = {
+          data: {
+            data,
+            params: {
+              id: parseInt(String(id), 10),
+              type: 'song'
+            }
+          }
+        };
+        return result;
+      } catch (err) {
+        lastError = err as Error;
+
+        if (attempt < retryCount) {
+          // 指数退避延迟，避免过于频繁的重试
+          const delay = Math.min(100 * Math.pow(2, attempt - 1), 5000);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
     }
+
+    throw new Error(`音乐解析失败 (ID: ${id}): ${lastError?.message || '未知错误'}`);
   };
 
-  return retry(1);
+  return retryWithLoop();
 };
 
 export { type Platform, type ResponseData, type SongData, unblockMusic, type UnblockResult };

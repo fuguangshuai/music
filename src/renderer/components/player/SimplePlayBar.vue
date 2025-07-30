@@ -74,6 +74,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import { allTime, nowTime, playMusic } from '@/hooks/MusicHook';
 import { audioService } from '@/services/audioService';
+import { fastPlayControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { secondToMinute } from '@/utils';
@@ -155,11 +156,11 @@ const handleVolumeWheel = (e: WheelEvent) => {
 const handlePrev = () => playerStore.prevPlay();
 const handleNext = () => playerStore.nextPlay();
 
+// 主播放按钮事件 - 使用统一的播放控制服务
 const playMusicEvent = async () => {
-  try {
-    await playerStore.setPlay({ ...playMusic.value });
-  } catch (error) {
-    console.error('播放出错:', error);
+  const result = await fastPlayControl(playMusic.value, 'SimplePlayBar');
+  // 如果播放失败，尝试下一首
+  if (!result) {
     playerStore.nextPlay();
   }
 };

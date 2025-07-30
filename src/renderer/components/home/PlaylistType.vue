@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
@@ -72,26 +72,42 @@ const getAnimationDelay = computed(() => {
   };
 });
 
+// 存储动画定时器
+const animationTimers: NodeJS.Timeout[] = [];
+
+// 清理所有动画定时器
+const clearAnimationTimers = () => {
+  animationTimers.forEach((timer) => {
+    clearTimeout(timer);
+  });
+  animationTimers.length = 0;
+};
+
 watch(isShowAllPlaylistCategory, (newVal) => {
   if (!newVal) {
+    // 先清理之前的定时器
+    clearAnimationTimers();
+
     const elements = playlistCategory.value?.sub.map((_, index) =>
       document.querySelector(`.type-item-${index}`)
     ) as HTMLElement[];
+
     elements
       .slice(20)
       .reverse()
       .forEach((element, index) => {
         if (element) {
-          setTimeout(
+          const timer = setTimeout(
             () => {
               (element as HTMLElement).style.position = 'absolute';
             },
             index * DELAY_TIME + 400
           );
+          animationTimers.push(timer);
         }
       });
 
-    setTimeout(
+    const finalTimer = setTimeout(
       () => {
         isHiding.value = false;
         document.querySelectorAll('.play-list-type-item').forEach((element) => {
@@ -103,7 +119,11 @@ watch(isShowAllPlaylistCategory, (newVal) => {
       },
       (playlistCategory.value?.sub.length || 0 - 19) * DELAY_TIME
     );
+    animationTimers.push(finalTimer);
   } else {
+    // 清理定时器
+    clearAnimationTimers();
+
     document.querySelectorAll('.play-list-type-item').forEach((element) => {
       if (element) {
         (element as HTMLElement).style.position = 'none';
@@ -138,6 +158,11 @@ const handleToggleShowAllPlaylistCategory = () => {
 // 页面初始化
 onMounted(() => {
   loadPlaylistCategory();
+});
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  clearAnimationTimers();
 });
 </script>
 

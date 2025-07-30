@@ -1,7 +1,9 @@
 import { Howl, Howler } from 'howler';
 
 import type { SongResult } from '@/type/music';
+import type { AudioNodeInfo } from '@/types/howler';
 import { isElectron } from '@/utils'; // 导入isElectron常量
+import { createAudioError, handleError } from '@/utils/errorHandler';
 
 class AudioService {
   private currentSound: Howl | null = null;
@@ -48,6 +50,7 @@ class AudioService {
   private operationLockTimer: NodeJS.Timeout | null = null;
   private operationLockTimeout = 5000; // 5秒超时
   private operationLockStartTime: number = 0;
+
   private operationLockId: string = '';
 
   constructor() {
@@ -115,7 +118,9 @@ class AudioService {
   private updateMediaSessionMetadata(track: SongResult) {
     if (!('mediaSession' in navigator)) return;
 
-    const artists = track.ar ? track.ar.map((a) => a.name) : track.song.artists?.map((a) => a.name);
+    const artists = track.ar
+      ? track.ar.map((artist) => artist.name)
+      : track.song.artists?.map((artist) => artist.name);
     const album = track.al ? track.al.name : track.song.album.name;
     const artwork = ['96', '128', '192', '256', '384', '512'].map((size) => ({
       src: `${track.picUrl}?param=${size}y${size}`,
@@ -172,6 +177,35 @@ class AudioService {
     const eventCallbacks = this.callbacks[event];
     if (eventCallbacks) {
       this.callbacks[event] = eventCallbacks.filter((cb) => cb !== callback);
+      // 如果事件回调数组为空，删除该事件键以防止内存泄漏
+      if (this.callbacks[event].length === 0) {
+        delete this.callbacks[event];
+      }
+    }
+  }
+
+  // 清理所有事件监听器
+  removeAllListeners() {
+    this.callbacks = {};
+  }
+
+  // 类型安全的音频节点获取方法
+  private getAudioNodeInfo(sound: Howl): AudioNodeInfo | null {
+    try {
+      const howlWithSounds = sound as any;
+      const audioNode = howlWithSounds._sounds?.[0]?._node;
+
+      if (!audioNode || !(audioNode instanceof HTMLMediaElement)) {
+        return null;
+      }
+
+      return {
+        node: audioNode,
+        id: howlWithSounds._sounds?.[0]?._id
+      };
+    } catch (error) {
+      console.error('获取音频节点信息失败:', error);
+      return null;
     }
   }
 
@@ -264,9 +298,14 @@ class AudioService {
         this.bypass = true;
         return;
       }
-      const howl = sound as any;
 
-      const audioNode = howl._sounds?.[0]?._node;
+      // 使用类型安全的方式获取音频节点
+      const audioNodeInfo = this.getAudioNodeInfo(sound);
+      if (!audioNodeInfo) {
+        throw new Error('无法获取音频节点信息');
+      }
+
+      const audioNode = audioNodeInfo.node;
 
       if (!audioNode || !(audioNode instanceof HTMLMediaElement)) {
         if (this.retryCount < 3) {
@@ -275,7 +314,12 @@ class AudioService {
           this.retryCount++;
           return await this.setupEQ(sound);
         }
-        throw new Error('无法获取音频节点，请重试');
+
+        const error = createAudioError('无法获取音频节点，EQ设置失败', 'EQ_NODE_UNAVAILABLE', {
+          retryCount: this.retryCount
+        });
+        handleError(error);
+        throw error;
       }
 
       this.retryCount = 0;
@@ -648,6 +692,7 @@ class AudioService {
           // 设置音频事件监听
           if (this.currentSound) {
             this.currentSound.on('play', () => {
+              console.log('Howler.js 播放事件触发');
               this.updateMediaSessionState(true);
               this.emit('play');
             });
@@ -698,8 +743,12 @@ class AudioService {
           // 确保任何进行中的seek操作被取消
           if (this.seekLock && this.seekDebounceTimer) {
             clearTimeout(this.seekDebounceTimer);
+            this.seekDebounceTimer = null;
             this.seekLock = false;
           }
+
+          // 移除所有事件监听器，防止内存泄漏
+          this.currentSound.off();
           this.currentSound.stop();
           this.currentSound.unload();
         } catch (error) {
@@ -713,6 +762,9 @@ class AudioService {
         navigator.mediaSession.playbackState = 'none';
       }
       this.disposeEQ();
+
+      // 清理所有自定义事件监听器
+      this.removeAllListeners();
     } catch (error) {
       console.error('停止音频时发生错误:', error);
     }
@@ -740,7 +792,7 @@ class AudioService {
   }
 
   pause() {
-    this.forceResetOperationLock();
+    console.log('audioService.pause() 被调用');
 
     if (this.currentSound) {
       try {
@@ -749,10 +801,31 @@ class AudioService {
           clearTimeout(this.seekDebounceTimer);
           this.seekLock = false;
         }
-        this.currentSound.pause();
+
+        // 检查当前音频状态
+        const isPlaying = this.currentSound.playing();
+        console.log('当前音频播放状态:', isPlaying);
+
+        if (isPlaying) {
+          // 直接调用暂停，依赖 Howler.js 的原生事件机制
+          this.currentSound.pause();
+          console.log('音频暂停命令已发送，等待 Howler.js 事件确认');
+        } else {
+          console.log('音频已处于暂停状态');
+          // 手动触发暂停事件以确保状态同步
+          this.emit('pause');
+          this.updateMediaSessionState(false);
+        }
       } catch (error) {
         console.error('暂停音频失败:', error);
+        // 发生错误时也触发暂停事件
+        this.emit('pause');
+        this.updateMediaSessionState(false);
       }
+    } else {
+      console.warn('没有可暂停的音频实例');
+      // 没有音频实例时也触发暂停事件
+      this.emit('pause');
     }
   }
 

@@ -114,6 +114,7 @@ import { computed, ref, watch } from 'vue';
 
 import MusicFullWrapper from '@/components/lyric/MusicFullWrapper.vue';
 import { allTime, artistList, nowTime, playMusic, sound, textColors } from '@/hooks/MusicHook';
+import { fastPlayControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { getImgUrl, secondToMinute, setAnimationClass } from '@/utils';
@@ -181,12 +182,11 @@ const toggleFavorite = () => {
   }
 };
 
-// 播放暂停按钮事件
+// 移动端播放按钮事件 - 使用快速播放控制服务
 const playMusicEvent = async () => {
-  try {
-    playerStore.setPlay(playMusic.value);
-  } catch (error) {
-    console.error('播放出错:', error);
+  const result = await fastPlayControl(playMusic.value, 'MobilePlayBar');
+  // 如果播放失败，尝试下一首
+  if (!result) {
     playerStore.nextPlay();
   }
 };

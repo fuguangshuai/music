@@ -174,7 +174,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
   }
 
   /**
-   * 通用音乐解析尝试函数
+   * 通用音乐解析尝试函数 - 使用指定的API索引
    * @param apiIndex API索引
    * @param apiName API名称（用于日志）
    * @param id 歌曲ID
@@ -182,16 +182,18 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
    * @returns axios响应或null
    */
   async function tryParseMusic(apiIndex: number, apiName: string, id: string, data: any) {
-    console.log(`🎵 使用${apiName}音乐解析`);
+    console.log(`🎵 使用${apiName}音乐解析 (API索引: ${apiIndex})`);
     try {
+      // 使用指定的API索引，不进行自动切换
       const result = await requestMusic(apiIndex).get<any>('/music', { params: { id } });
-      if (result) {
+
+      if (result?.data) {
         console.log(
           `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${data.name || '未知'}, 音源: ${result.data.data?.source || apiName}`
         );
         return result;
       } else {
-        console.log(`❌ ${apiName}音乐解析失败`);
+        console.log(`❌ ${apiName}音乐解析失败 - 无有效数据`);
       }
     } catch (error) {
       console.log(`❌ ${apiName}音乐解析失败:`, error);
@@ -199,13 +201,15 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
     return null;
   }
 
-  // 自动主备切换音乐解析
+  // 按用户启用的音源顺序解析，不进行自动切换
   const sourceMap = [
     { key: 'stellar', index: 0, name: '星辰' },
     { key: 'cloud', index: 1, name: '云端' }
   ];
+
   for (const src of sourceMap) {
     if (musicSources.includes(src.key)) {
+      console.log(`🎵 尝试使用用户启用的音源: ${src.name}`);
       const result = await tryParseMusic(src.index, src.name, String(id), data);
       if (result) return result;
     }

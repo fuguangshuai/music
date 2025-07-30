@@ -181,17 +181,29 @@ const props = defineProps({
 
 // 获取当前页的收藏歌曲ID
 const getCurrentPageIds = () => {
-  let ids = [...favoriteList.value]; // 复制一份以免修改原数组
+  // 确保favoriteList.value是数组
+  if (!Array.isArray(favoriteList.value)) {
+    console.warn('favoriteList.value不是数组:', favoriteList.value);
+    return [];
+  }
+
+  let ids = [...favoriteList.value];
 
   // 根据排序方式调整顺序
   if (isDescending.value) {
     ids = ids.reverse(); // 倒序，最新收藏的在前面
   }
 
-  const startIndex = (currentPage.value - 1) * pageSize;
+  const startIndex = Math.max(0, (currentPage.value - 1) * pageSize);
   const endIndex = startIndex + pageSize;
+
+  // 确保索引在有效范围内
+  if (startIndex >= ids.length) {
+    return [];
+  }
+
   // 返回原始ID，不进行类型转换
-  return ids.slice(startIndex, endIndex);
+  return ids.slice(startIndex, Math.min(endIndex, ids.length));
 };
 
 // 获取收藏歌曲详情

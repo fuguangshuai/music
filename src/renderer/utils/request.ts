@@ -90,11 +90,17 @@ request.interceptors.response.use(
     }
 
     // 处理 301 状态码
-    if (error.response?.status === 301 && config.params.noLogin !== true) {
+    if (error.response?.status === 301 && config?.params?.noLogin !== true) {
       // 使用 store mutation 清除用户信息
       const userStore = useUserStore();
       userStore.handleLogout();
-      console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount} 次`);
+
+      // 确保配置对象存在
+      if (!config.params) {
+        config.params = {};
+      }
+
+      console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount || 0} 次`);
       config.retryCount = 3;
     }
 

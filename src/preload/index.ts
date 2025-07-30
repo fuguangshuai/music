@@ -57,6 +57,9 @@ const api = {
   }
 };
 
+// 跟踪活跃的监听器
+const activeListeners = new Map<string, Set<(event: Electron.IpcRendererEvent, ...args: any[]) => void>>();
+
 // 创建带类型的ipcRenderer对象，暴露给渲染进程
 const ipc = {
   // 发送消息到主进程（无返回值）
@@ -69,14 +72,39 @@ const ipc = {
   },
   // 监听主进程消息
   on: (channel: string, listener: (...args: any[]) => void) => {
-    ipcRenderer.on(channel, (_, ...args) => listener(...args));
+    const wrappedListener = (_, ...args) => listener(...args);
+    ipcRenderer.on(channel, wrappedListener);
+
+    // 跟踪活跃的监听器
+    if (!activeListeners.has(channel)) {
+      activeListeners.set(channel, new Set());
+    }
+    activeListeners.get(channel)!.add(wrappedListener);
+
     return () => {
-      ipcRenderer.removeListener(channel, listener);
+      ipcRenderer.removeListener(channel, wrappedListener);
+      const channelListeners = activeListeners.get(channel);
+      if (channelListeners) {
+        channelListeners.delete(wrappedListener);
+        if (channelListeners.size === 0) {
+          activeListeners.delete(channel);
+        }
+      }
     };
   },
   // 移除所有监听器
   removeAllListeners: (channel: string) => {
     ipcRenderer.removeAllListeners(channel);
+    activeListeners.delete(channel);
+  },
+  // 添加全局清理方法
+  cleanup: () => {
+    for (const [channel, listeners] of activeListeners) {
+      for (const listener of listeners) {
+        ipcRenderer.removeListener(channel, listener);
+      }
+    }
+    activeListeners.clear();
   }
 };
 

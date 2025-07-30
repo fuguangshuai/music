@@ -119,6 +119,7 @@ import { getHotSearch } from '@/api/home';
 import { getSearch } from '@/api/search';
 import SearchItem from '@/components/common/SearchItem.vue';
 import SongItem from '@/components/common/SongItem.vue';
+import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSearchStore } from '@/store/modules/search';
 import type { IHotSearch } from '@/type/search';
@@ -352,9 +353,9 @@ watch(
 
 // 播放单首歌曲 (用于模板中的@play事件)
 // @ts-ignore - 用于模板中的@play事件
-const handlePlay = (item: any) => {
-  // 添加到下一首
-  playerStore.addToNextPlay(item);
+const handlePlay = async (item: any) => {
+  // 使用统一的播放控制服务立即播放歌曲
+  await playControl(item, 'SearchPage-SongItem');
 };
 
 // 点击搜索历史
@@ -369,15 +370,15 @@ const handleSearchHistory = (item: { keyword: string; type: number }) => {
 
 // 播放全部搜索结果 (用于模板中的@click事件)
 // @ts-ignore - 用于模板中的@click事件
-const handlePlayAll = () => {
+const handlePlayAll = async () => {
   if (!searchDetail.value?.songs?.length) return;
 
   // 设置播放列表为搜索结果中的所有歌曲
   playerStore.setPlayList(searchDetail.value.songs);
 
-  // 开始播放第一首歌
+  // 使用统一的播放控制服务开始播放第一首歌
   if (searchDetail.value.songs[0]) {
-    playerStore.setPlay(searchDetail.value.songs[0]);
+    await playControl(searchDetail.value.songs[0], 'SearchPage-PlayAll');
   }
 };
 </script>

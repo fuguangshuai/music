@@ -18,6 +18,13 @@ import type { Artist, ILyricText, SongResult } from '@/type/music';
 import { isElectron } from '@/utils';
 import { getTextColors } from '@/utils/linearColor';
 
+// 全局定时器管理
+declare global {
+  interface Window {
+    musicHookTimers: NodeJS.Timeout[];
+  }
+}
+
 const windowData = window as any;
 
 // 全局 playerStore 引用，通过 initMusicHook 函数注入
@@ -80,13 +87,9 @@ const setupKeyboardListeners = () => {
     const store = getPlayerStore();
     switch (e.code) {
       case 'Space':
-        if (store.play) {
-          store.setPlayMusic(false);
-          audioService.getCurrentSound()?.pause();
-        } else {
-          store.setPlayMusic(true);
-          audioService.getCurrentSound()?.play();
-        }
+        console.log('空格键播放/暂停，当前状态:', store.play ? '播放' : '暂停');
+        // 使用统一的播放/暂停逻辑
+        store.setPlay(store.playMusic);
         break;
       default:
     }
@@ -98,7 +101,25 @@ const { message } = createDiscreteApi(['message']);
 // 全局变量
 let progressAnimationInitialized = false;
 let globalAnimationFrameId: number | null = null;
+let debounceTimer: NodeJS.Timeout | null = null;
 const lastSavedTime = ref(0);
+
+// 存储所有 watch 停止函数
+const watchStopFunctions: Array<() => void> = [];
+
+// 清理所有MusicHook定时器的函数
+export const clearAllMusicHookTimers = () => {
+  if (window.musicHookTimers) {
+    window.musicHookTimers.forEach((timer) => {
+      try {
+        clearTimeout(timer);
+      } catch (error) {
+        console.error('清理MusicHook定时器失败:', error);
+      }
+    });
+    window.musicHookTimers = [];
+  }
+};
 
 // 全局停止函数
 const stopProgressAnimation = () => {
@@ -210,9 +231,7 @@ const initProgressAnimation = () => {
   progressAnimationInitialized = true;
 
   // 监听播放状态变化，这里使用防抖，避免频繁触发
-  let debounceTimer: any = null;
-
-  watch(
+  const stopPlayStateWatch = watch(
     () => getPlayerStore().play,
     (newIsPlaying) => {
       console.log('播放状态变化:', newIsPlaying);
@@ -251,22 +270,25 @@ const initProgressAnimation = () => {
       }, 100);
     }
   );
+  watchStopFunctions.push(stopPlayStateWatch);
 
   // 监听当前歌词索引变化
-  watch(nowIndex, () => {
+  const stopNowIndexWatch = watch(nowIndex, () => {
     currentLrcProgress.value = 0;
     if (getPlayerStore().play) {
       startProgressAnimation();
     }
   });
+  watchStopFunctions.push(stopNowIndexWatch);
 
   // 监听音频对象变化
-  watch(sound, (newSound) => {
+  const stopSoundWatch = watch(sound, (newSound) => {
     console.log('sound 对象变化:', !!newSound);
     if (newSound && getPlayerStore().play) {
       startProgressAnimation();
     }
   });
+  watchStopFunctions.push(stopSoundWatch);
 };
 
 // 设置音乐相关的监听器
@@ -274,7 +296,7 @@ const setupMusicWatchers = () => {
   const store = getPlayerStore();
 
   // 监听 playerStore.playMusic 的变化以更新歌词数据
-  watch(
+  const stopPlayMusicWatch = watch(
     () => store.playMusic,
     () => {
       nextTick(async () => {
@@ -290,9 +312,15 @@ const setupMusicWatchers = () => {
           sendLyricToWin();
 
           // 再次延迟发送，确保歌词窗口已完全加载
-          setTimeout(() => {
+          const lyricSendTimer = setTimeout(() => {
             sendLyricToWin();
           }, 500);
+
+          // 存储定时器以便可能的清理
+          if (!window.musicHookTimers) {
+            window.musicHookTimers = [];
+          }
+          window.musicHookTimers.push(lyricSendTimer);
         }
       });
     },
@@ -301,6 +329,7 @@ const setupMusicWatchers = () => {
       immediate: true
     }
   );
+  watchStopFunctions.push(stopPlayMusicWatch);
 };
 
 const setupAudioListeners = () => {
@@ -369,9 +398,30 @@ const setupAudioListeners = () => {
 
   // 监听播放
   audioService.on('play', () => {
-    getPlayerStore().setPlayMusic(true);
-    if (isElectron) {
-      window.api.sendSong(cloneDeep(getPlayerStore().playMusic));
+    console.log('音频播放事件触发');
+    const store = getPlayerStore();
+
+    console.log('当前用户播放意图:', store.userPlayIntent);
+    console.log('当前播放状态:', store.play);
+
+    // 只有在用户意图是播放时才更新播放状态
+    // 这防止暂停过程中的意外播放事件干扰用户意图
+    console.log('🔍 检查用户播放意图:', store.userPlayIntent);
+    if (store.userPlayIntent) {
+      console.log('✅ 用户意图播放，更新播放状态为true');
+      store.setPlayMusic(true);
+
+      if (isElectron) {
+        window.api.sendSong(cloneDeep(store.playMusic));
+      }
+    } else {
+      console.log('❌ 用户意图暂停，忽略播放事件，保持暂停状态');
+      // 如果用户意图是暂停，但音频开始播放了，强制暂停
+      const currentSound = audioService.getCurrentSound();
+      if (currentSound && currentSound.playing()) {
+        console.log('🔧 强制暂停音频以符合用户意图');
+        currentSound.pause();
+      }
     }
     clearInterval();
     interval = window.setInterval(() => {
@@ -547,7 +597,7 @@ export const correctionTime = ref(0);
 // 设置歌词矫正时间的监听器
 const setupCorrectionTimeWatcher = () => {
   // 切歌时自动读取矫正时间
-  watch(
+  const stopCorrectionTimeWatch = watch(
     () => playMusic.value?.id,
     (id) => {
       if (!id) return;
@@ -555,6 +605,7 @@ const setupCorrectionTimeWatcher = () => {
     },
     { immediate: true }
   );
+  watchStopFunctions.push(stopCorrectionTimeWatch);
 };
 
 /**
@@ -572,8 +623,13 @@ export const adjustCorrectionTime = (delta: number) => {
 
 // 获取当前播放歌词
 export const isCurrentLrc = (index: number, time: number): boolean => {
+  // 添加边界检查防止数组越界
+  if (index < 0 || index >= lrcTimeArray.value.length) {
+    return false;
+  }
+
   const currentTime = lrcTimeArray.value[index];
-  const nextTime = lrcTimeArray.value[index + 1];
+  const nextTime = lrcTimeArray.value[index + 1] || currentTime + 1; // 如果是最后一行，使用默认值
   const correctedTime = time + correctionTime.value;
   return correctedTime > currentTime && correctedTime < nextTime;
 };
@@ -599,6 +655,11 @@ const currentLrcTiming = computed(() => {
 
 // 获取歌词样式
 export const getLrcStyle = (index: number) => {
+  // 添加边界检查防止数组越界
+  if (index < 0 || index >= lrcTimeArray.value.length) {
+    return {};
+  }
+
   const currentTime = nowTime.value + correctionTime.value;
   const start = lrcTimeArray.value[index];
   const end = lrcTimeArray.value[index + 1] ?? start + 1;
@@ -645,13 +706,20 @@ export const getCurrentLrc = () => {
 };
 
 // 获取一句歌词播放时间几秒到几秒
-export const getLrcTimeRange = (index: number) => ({
-  currentTime: lrcTimeArray.value[index],
-  nextTime: lrcTimeArray.value[index + 1]
-});
+export const getLrcTimeRange = (index: number) => {
+  // 添加边界检查防止数组越界
+  if (index < 0 || index >= lrcTimeArray.value.length) {
+    return { currentTime: 0, nextTime: 0 };
+  }
+
+  return {
+    currentTime: lrcTimeArray.value[index],
+    nextTime: lrcTimeArray.value[index + 1] || lrcTimeArray.value[index] + 1
+  };
+};
 
 // 监听歌词数组变化，当切换歌曲时重新初始化歌词窗口
-watch(
+const stopLrcArrayWatch = watch(
   () => lrcArray.value,
   (newLrcArray) => {
     if (newLrcArray.length > 0 && isElectron && isLyricWindowOpen.value) {
@@ -659,6 +727,7 @@ watch(
     }
   }
 );
+watchStopFunctions.push(stopLrcArrayWatch);
 
 // 发送歌词更新数据
 export const sendLyricToWin = () => {
@@ -818,7 +887,7 @@ export const closeLyric = () => {
 // 设置播放状态监听器
 const setupPlayStateWatcher = () => {
   // 在组件挂载时设置对播放状态的监听
-  watch(
+  const stopPlayStateWatcher = watch(
     () => getPlayerStore().play,
     (isPlaying) => {
       // 如果歌词窗口打开，根据播放状态控制同步
@@ -836,6 +905,7 @@ const setupPlayStateWatcher = () => {
       }
     }
   );
+  watchStopFunctions.push(stopPlayStateWatcher);
 };
 
 // 在组件卸载时清理资源
@@ -851,14 +921,9 @@ if (isElectron) {
   windowData.electron.ipcRenderer.on('lyric-control-back', (_, command: string) => {
     switch (command) {
       case 'playpause':
-        if (getPlayerStore().play) {
-          getPlayerStore().setPlayMusic(false);
-          audioService.getCurrentSound()?.pause();
-        } else {
-          getPlayerStore().setPlayMusic(true);
-
-          audioService.getCurrentSound()?.play();
-        }
+        console.log('歌词窗口播放/暂停，当前状态:', getPlayerStore().play ? '播放' : '暂停');
+        // 使用统一的播放/暂停逻辑
+        getPlayerStore().setPlay(getPlayerStore().playMusic);
         break;
       case 'prev':
         getPlayerStore().prevPlay();
@@ -987,29 +1052,120 @@ audioService.on('url_expired', async (expiredTrack) => {
   }
 });
 
-// 添加音频就绪事件监听器
-window.addEventListener('audio-ready', ((event: CustomEvent) => {
+// 音频就绪事件处理器
+const audioReadyHandler = ((event: CustomEvent) => {
   try {
+    // 多层次验证事件数据
+    if (!event || !event.detail) {
+      console.warn('音频就绪事件数据无效');
+      return;
+    }
+
     const { sound: newSound } = event.detail;
-    if (newSound) {
-      // 更新本地 sound 引用
-      sound.value = newSound as Howl;
+    if (!newSound || typeof newSound.seek !== 'function') {
+      console.warn('音频对象无效或缺少必要方法');
+      return;
+    }
 
-      // 设置音频监听器
-      setupAudioListeners();
+    // 更新本地 sound 引用
+    sound.value = newSound as Howl;
 
-      // 获取当前播放位置并更新显示
-      const currentPosition = newSound.seek() as number;
-      if (typeof currentPosition === 'number' && !Number.isNaN(currentPosition)) {
+    // 设置音频监听器
+    setupAudioListeners();
+
+    // 安全的位置获取
+    try {
+      const currentPosition = newSound.seek();
+      if (
+        typeof currentPosition === 'number' &&
+        !Number.isNaN(currentPosition) &&
+        currentPosition >= 0
+      ) {
         nowTime.value = currentPosition;
       }
-
-      console.log('音频就绪，已设置监听器并更新进度显示');
+    } catch (seekError) {
+      console.warn('获取音频位置失败:', seekError);
     }
+
+    console.log('音频就绪，已设置监听器并更新进度显示');
   } catch (error) {
     console.error('处理音频就绪事件出错:', error);
   }
-}) as EventListener);
+}) as EventListener;
+
+// 添加音频就绪事件监听器
+window.addEventListener('audio-ready', audioReadyHandler);
+
+// 清理函数 - 在组件卸载时调用
+export const cleanupMusicHook = () => {
+  try {
+    // 移除全局事件监听器
+    window.removeEventListener('audio-ready', audioReadyHandler);
+
+    // 批量异步清理 watch 监听器
+    const cleanupWatchers = async () => {
+      const batchSize = 10;
+      for (let i = 0; i < watchStopFunctions.length; i += batchSize) {
+        const batch = watchStopFunctions.slice(i, i + batchSize);
+
+        // 批量处理
+        await Promise.allSettled(
+          batch.map(
+            (stopFn) =>
+              new Promise<void>((resolve) => {
+                try {
+                  stopFn();
+                } catch (error) {
+                  console.error('清理 watch 监听器失败:', error);
+                }
+                resolve();
+              })
+          )
+        );
+
+        // 让出控制权，避免阻塞UI
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+
+      watchStopFunctions.length = 0;
+    };
+
+    // 执行异步清理
+    cleanupWatchers().catch((error) => {
+      console.error('批量清理监听器失败:', error);
+    });
+
+    // 清理所有定时器和动画帧
+    if (globalAnimationFrameId) {
+      // globalAnimationFrameId 可能是 requestAnimationFrame 或 setTimeout 的返回值
+      // 两者都可以用 clearTimeout 安全清理
+      clearTimeout(globalAnimationFrameId);
+      globalAnimationFrameId = null;
+    }
+
+    // 清理防抖定时器
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+
+    // 清理所有MusicHook定时器
+    clearAllMusicHookTimers();
+
+    // 清理歌词同步定时器
+    stopLyricSync();
+
+    // 停止进度动画
+    stopProgressAnimation();
+
+    // 清理音频服务事件监听器
+    audioService.removeAllListeners();
+
+    console.log('MusicHook 清理完成');
+  } catch (error) {
+    console.error('MusicHook 清理失败:', error);
+  }
+};
 
 // 添加页面卸载时的清理
 if (typeof window !== 'undefined') {

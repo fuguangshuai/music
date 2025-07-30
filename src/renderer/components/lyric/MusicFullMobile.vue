@@ -43,10 +43,10 @@
           <div
             ref="lyricsScrollerRef"
             class="lyrics-scroller"
-            @touchstart="handleTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchEnd"
-            @scroll="handleScroll"
+            @touchstart.passive="handleTouchStart"
+            @touchmove.passive="handleTouchMove"
+            @touchend.passive="handleTouchEnd"
+            @scroll.passive="handleScroll"
           >
             <div class="lyrics-padding-top"></div>
             <div
@@ -175,9 +175,9 @@
                   class="progress-thumb"
                   :class="{ active: isThumbDragging || isMouseDragging }"
                   :style="{ left: `${(nowTime / Math.max(1, allTime)) * 100}%` }"
-                  @touchstart="handleThumbTouchStart"
-                  @touchmove="handleThumbTouchMove"
-                  @touchend="handleThumbTouchEnd"
+                  @touchstart.passive="handleThumbTouchStart"
+                  @touchmove.passive="handleThumbTouchMove"
+                  @touchend.passive="handleThumbTouchEnd"
                   @mousedown="handleMouseDown"
                 ></div>
               </div>
@@ -211,10 +211,10 @@
           <div
             ref="landscapeLyricsRef"
             class="landscape-lyrics-scroller"
-            @touchstart="handleTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchEnd"
-            @scroll="handleScroll"
+            @touchstart.passive="handleTouchStart"
+            @touchmove.passive="handleTouchMove"
+            @touchend.passive="handleTouchEnd"
+            @scroll.passive="handleScroll"
           >
             <div class="lyrics-padding-top"></div>
             <div
@@ -274,9 +274,9 @@
                 class="progress-thumb"
                 :class="{ active: isThumbDragging || isMouseDragging }"
                 :style="{ left: `${(nowTime / Math.max(1, allTime)) * 100}%` }"
-                @touchstart="handleThumbTouchStart"
-                @touchmove="handleThumbTouchMove"
-                @touchend="handleThumbTouchEnd"
+                @touchstart.passive="handleThumbTouchStart"
+                @touchmove.passive="handleThumbTouchMove"
+                @touchend.passive="handleThumbTouchEnd"
                 @mousedown="handleMouseDown"
               ></div>
             </div>
@@ -874,9 +874,11 @@ const handleArtistClick = (id: number) => {
 };
 
 // 播放控制功能
-const togglePlay = () => {
+const togglePlay = async () => {
   try {
-    playerStore.setPlay(playMusic.value);
+    console.log('MusicFullMobile togglePlay 被调用，当前播放状态:', play.value);
+    await playerStore.setPlay(playMusic.value);
+    console.log('togglePlay 完成，新的播放状态:', play.value);
   } catch (error) {
     console.error('播放出错:', error);
   }

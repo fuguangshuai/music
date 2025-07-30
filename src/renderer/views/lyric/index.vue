@@ -107,6 +107,13 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import ThemeColorPanel from '@/components/lyric/ThemeColorPanel.vue';
+
+// 全局定时器管理
+declare global {
+  interface Window {
+    lyricTimers: NodeJS.Timeout[];
+  }
+}
 import { SongResult } from '@/type/music';
 import {
   getCurrentLyricThemeColor,
@@ -458,8 +465,11 @@ const updateProgress = () => {
 
 // 记录上次更新时间
 
+// 存储 watch 停止函数
+const watchStopFunctions: Array<() => void> = [];
+
 // 监听据更新
-watch(
+const stopDynamicDataWatch = watch(
   () => dynamicData.value,
   (newData: any) => {
     // 更新最后更新时间
@@ -475,9 +485,10 @@ watch(
   },
   { deep: true }
 );
+watchStopFunctions.push(stopDynamicDataWatch);
 
 // 监听播放状态变化
-watch(
+const stopPlayStateWatch = watch(
   () => dynamicData.value.isPlay,
   (isPlaying: boolean) => {
     if (isPlaying) {
@@ -489,6 +500,7 @@ watch(
     }
   }
 );
+watchStopFunctions.push(stopPlayStateWatch);
 
 // 修改数据更新处
 const handleDataUpdate = (parsedData: {
@@ -573,6 +585,22 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateContainerHeight);
+
+  // 清理所有 watch 监听器
+  watchStopFunctions.forEach((stopFn) => {
+    try {
+      stopFn();
+    } catch (error) {
+      console.error('清理 watch 监听器失败:', error);
+    }
+  });
+  watchStopFunctions.length = 0;
+
+  // 清理动画帧
+  if (animationFrameId.value) {
+    cancelAnimationFrame(animationFrameId.value);
+    animationFrameId.value = null;
+  }
 });
 
 const checkTheme = () => {
@@ -685,11 +713,17 @@ const updateThemeColorWithTransition = (newColor: string) => {
   updateCSSVariable('--lyric-highlight-color', newColor);
 
   // 移除过渡类
-  setTimeout(() => {
+  const transitionTimer = setTimeout(() => {
     if (lyricWindow) {
       lyricWindow.classList.remove('color-transitioning');
     }
   }, 300);
+
+  // 存储定时器以便可能的清理
+  if (!window.lyricTimers) {
+    window.lyricTimers = [];
+  }
+  window.lyricTimers.push(transitionTimer);
 };
 
 const initializeThemeColor = () => {

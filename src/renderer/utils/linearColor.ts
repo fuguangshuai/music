@@ -360,9 +360,22 @@ const PRESET_LYRIC_COLORS: LyricThemeColor[] = [
  * 验证颜色是否有效
  */
 export const validateColor = (color: string): boolean => {
-  if (!color || typeof color !== 'string') return false;
-  const tc = tinycolor(color);
-  return tc.isValid() && tc.getAlpha() > 0;
+  if (!color || typeof color !== 'string' || color.trim() === '') {
+    return false;
+  }
+
+  try {
+    const tc = tinycolor(color);
+    if (!tc.isValid()) {
+      return false;
+    }
+
+    const alpha = tc.getAlpha();
+    return typeof alpha === 'number' && !Number.isNaN(alpha) && alpha > 0;
+  } catch (error) {
+    console.warn('颜色验证失败:', error);
+    return false;
+  }
 };
 
 /**

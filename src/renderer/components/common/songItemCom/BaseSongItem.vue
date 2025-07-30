@@ -4,7 +4,6 @@
     @contextmenu.prevent="handleContextMenu"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
-    @dblclick.stop="playMusicEvent(item)"
   >
     <slot name="index"></slot>
     <slot name="select" v-if="selectable"></slot>

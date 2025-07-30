@@ -175,11 +175,11 @@
                 {{ t('comp.musicList.noSearchResults') }}
               </div>
 
-              <!-- 虚拟列表，设置正确的固定高度 -->
+              <!-- 虚拟列表，使用响应式高度计算 -->
               <n-virtual-list
                 ref="songListRef"
                 class="song-virtual-list"
-                style="max-height: calc(100vh - 130px)"
+                :style="{ maxHeight: virtualListHeight }"
                 :items="filteredSongs"
                 :item-size="isCompactLayout ? 50 : 70"
                 item-resizable
@@ -299,6 +299,24 @@ const total = computed(() => {
     return listInfo.value.trackIds.length;
   }
   return songList.value.length;
+});
+
+// 响应式虚拟列表高度计算
+const virtualListHeight = computed(() => {
+  // 基础高度：100vh - 顶部导航(60px) - 搜索栏(70px)
+  const baseHeight = 'calc(100vh - 130px)';
+
+  // 在小屏幕设备上调整高度
+  if (typeof window !== 'undefined') {
+    const screenHeight = window.innerHeight;
+    if (screenHeight < 600) {
+      return 'calc(100vh - 100px)';
+    } else if (screenHeight < 800) {
+      return 'calc(100vh - 120px)';
+    }
+  }
+
+  return baseHeight;
 });
 
 // 初始化数据

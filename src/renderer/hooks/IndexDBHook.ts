@@ -159,17 +159,31 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       const skip = (page - 1) * pageSize;
 
       request.onsuccess = (event: any) => {
-        const cursor = event.target.result;
+        const cursor = event.target?.result;
         if (!cursor) {
           resolve(results);
           return;
         }
 
-        if (index >= skip && results.length < pageSize) {
-          results.push(cursor.value);
+        // 验证游标值的有效性
+        if (cursor.value && index >= skip && results.length < pageSize) {
+          try {
+            results.push(cursor.value);
+          } catch (error) {
+            console.error('添加游标数据失败:', error);
+          }
         }
 
         index++;
+
+        // 防止无限循环
+        if (index > skip + pageSize * 10) {
+          // 设置合理的上限
+          console.warn('游标操作达到安全上限，停止遍历');
+          resolve(results);
+          return;
+        }
+
         cursor.continue();
       };
 

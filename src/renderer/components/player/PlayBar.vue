@@ -178,6 +178,7 @@ import { audioService } from '@/services/audioService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { getImgUrl, isElectron, isMobile, secondToMinute, setAnimationClass } from '@/utils';
+import { storageOptimizer } from '@/utils/storageOptimizer';
 
 const playerStore = usePlayerStore();
 const settingsStore = useSettingsStore();
@@ -188,14 +189,15 @@ const play = computed(() => playerStore.isPlay);
 // 背景颜色
 const background = ref('#000');
 
+// 优化监听器，避免深度监听造成的性能问题
 watch(
-  () => playerStore.playMusic,
-  async () => {
-    if (playMusic && playMusic.value && playMusic.value.backgroundColor) {
-      background.value = playMusic.value.backgroundColor as string;
+  () => playerStore.playMusic?.backgroundColor,
+  (newBackgroundColor) => {
+    if (newBackgroundColor) {
+      background.value = newBackgroundColor as string;
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 );
 
 // 节流版本的 seek 函数
@@ -245,10 +247,8 @@ const formatTooltip = (value: number) => {
   return `${secondToMinute(value)} / ${secondToMinute(allTime.value)}`;
 };
 
-// 音量条
-const audioVolume = ref(
-  localStorage.getItem('volume') ? parseFloat(localStorage.getItem('volume') as string) : 1
-);
+// 音量条 - 使用优化的存储
+const audioVolume = ref(storageOptimizer.getItem('volume', 1) || 1);
 const getVolumeIcon = computed(() => {
   // 0 静音 ri-volume-mute-line 0.5 ri-volume-down-line 1 ri-volume-up-line
   if (audioVolume.value === 0) {
@@ -261,11 +261,12 @@ const getVolumeIcon = computed(() => {
 });
 
 const volumeSlider = computed({
-  get: () => audioVolume.value * 100,
+  get: () => (audioVolume.value || 1) * 100,
   set: (value) => {
-    localStorage.setItem('volume', (value / 100).toString());
-    audioService.setVolume(value / 100);
-    audioVolume.value = value / 100;
+    const volumeValue = value / 100;
+    storageOptimizer.setItem('volume', volumeValue.toString());
+    audioService.setVolume(volumeValue);
+    audioVolume.value = volumeValue;
   }
 });
 

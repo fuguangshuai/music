@@ -26,15 +26,17 @@ export const vLoading = {
 };
 
 function formatterClass(el: HTMLElement, binding: any) {
-  const classStr = el.getAttribute('class');
-  const tagetClass: number = classStr?.indexOf('loading-parent') as number;
+  const classStr = el.getAttribute('class') || '';
+  const targetClass = classStr.indexOf('loading-parent');
+
   if (binding.value) {
-    if (tagetClass === -1) {
-      el.setAttribute('class', `${classStr} loading-parent`);
+    // 添加 loading-parent 类
+    if (targetClass === -1) {
+      el.setAttribute('class', `${classStr} loading-parent`.trim());
     }
-  } else if (tagetClass > -1) {
-    const classArray: Array<string> = classStr?.split('') as string[];
-    classArray.splice(tagetClass - 1, tagetClass + 15);
-    el.setAttribute('class', classArray?.join(''));
+  } else if (targetClass > -1) {
+    // 移除 loading-parent 类
+    const newClassStr = classStr.replace(/\s*loading-parent\s*/g, ' ').trim();
+    el.setAttribute('class', newClassStr);
   }
 }

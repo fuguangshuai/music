@@ -2,6 +2,7 @@ import { useDialog, useMessage } from 'naive-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store';
 import type { SongResult } from '@/type/music';
 import { getImgUrl } from '@/utils';
@@ -59,18 +60,9 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     props.item.primaryColor = primaryColor;
   };
 
-  // 播放音乐
+  // 播放音乐 - 使用统一的播放控制服务
   const playMusicEvent = async (item: SongResult) => {
-    try {
-      const result = await playerStore.setPlay(item);
-      if (!result) {
-        throw new Error('播放失败');
-      }
-      return true;
-    } catch (error) {
-      console.error('播放出错:', error);
-      return false;
-    }
+    return await playControl(item, 'useSongItem');
   };
 
   // 切换收藏状态

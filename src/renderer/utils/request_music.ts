@@ -63,11 +63,21 @@ export const smartRequest = async (config: AxiosRequestConfig, maxRetry = apiUrl
   for (let i = 0; i <= maxRetry; i++) {
     try {
       const instance = requestMusic(i);
-      return await instance(config);
+      console.log(`尝试使用API ${i}: ${apiUrls[i]}`);
+      const result = await instance(config);
+      console.log(`API ${i} 请求成功`);
+      return result;
     } catch (err) {
+      console.warn(`API ${i} 请求失败:`, err);
       lastError = err;
+
+      // 如果不是最后一次尝试，添加延迟
+      if (i < maxRetry) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      }
     }
   }
+  console.error('所有API都请求失败:', lastError);
   throw lastError;
 };
 

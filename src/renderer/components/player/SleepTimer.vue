@@ -188,6 +188,9 @@ const formattedRemainingTime = computed(() => {
 // 监听剩余时间变化
 let timerInterval: number | null = null;
 
+// 存储 watch 停止函数
+const watchStopFunctions: Array<() => void> = [];
+
 onMounted(() => {
   // 如果当前有定时器，开始更新UI
   if (hasTimerActive.value && timerType.value === 'time') {
@@ -195,7 +198,7 @@ onMounted(() => {
   }
 
   // 监听定时器状态变化
-  watch(
+  const stopTimerStateWatch = watch(
     () => [hasTimerActive.value, timerType.value],
     ([newHasTimer, newType]) => {
       if (newHasTimer && newType === 'time') {
@@ -205,6 +208,7 @@ onMounted(() => {
       }
     }
   );
+  watchStopFunctions.push(stopTimerStateWatch);
 });
 
 // 启动定时器更新UI
@@ -228,6 +232,16 @@ function stopTimerUpdate() {
 
 onUnmounted(() => {
   stopTimerUpdate();
+
+  // 清理所有 watch 监听器
+  watchStopFunctions.forEach((stopFn) => {
+    try {
+      stopFn();
+    } catch (error) {
+      console.error('清理 watch 监听器失败:', error);
+    }
+  });
+  watchStopFunctions.length = 0;
 });
 </script>
 

@@ -84,7 +84,11 @@ const isLoadingMore = ref(false);
 
 // 计算每个项目的动画延迟
 const getItemAnimationDelay = (index: number) => {
-  const currentPageIndex = index % TOTAL_ITEMS;
+  // 确保index为非负整数
+  const safeIndex = Math.max(0, Math.floor(index));
+  const currentPageIndex = safeIndex % TOTAL_ITEMS;
+
+  // 限制延迟值在合理范围内，直接返回CSS样式字符串
   return setAnimationDelay(currentPageIndex, 30);
 };
 

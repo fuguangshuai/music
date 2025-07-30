@@ -445,6 +445,16 @@ const localSetData = ref({ ...settingsStore.setData });
 onUnmounted(() => {
   // 确保最终设置被保存
   settingsStore.setSetData(localSetData.value);
+
+  // 清理所有 watch 监听器
+  watchStopFunctions.forEach((stopFn) => {
+    try {
+      stopFn();
+    } catch (error) {
+      console.error('清理 watch 监听器失败:', error);
+    }
+  });
+  watchStopFunctions.length = 0;
 });
 
 const { t } = useI18n();
@@ -461,17 +471,21 @@ const setData = computed({
   }
 });
 
+// 存储 watch 停止函数
+const watchStopFunctions: Array<() => void> = [];
+
 // 监听localSetData变化，保存设置
-watch(
+const stopLocalSetDataWatch = watch(
   () => localSetData.value,
   (newValue) => {
     saveSettings(newValue);
   },
   { deep: true }
 );
+watchStopFunctions.push(stopLocalSetDataWatch);
 
 // 监听store中setData的变化，同步到本地
-watch(
+const stopStoreSetDataWatch = watch(
   () => settingsStore.setData,
   (newValue) => {
     // 只在初始加载时更新本地数据，避免循环更新
@@ -481,6 +495,7 @@ watch(
   },
   { deep: true, immediate: true }
 );
+watchStopFunctions.push(stopStoreSetDataWatch);
 
 const isDarkTheme = computed({
   get: () => settingsStore.theme === 'dark',
