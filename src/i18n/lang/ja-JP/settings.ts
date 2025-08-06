@@ -16,6 +16,14 @@ export default {
     manualTheme: '手動切り替え',
     language: '言語設定',
     languageDesc: '表示言語を切り替え',
+    tokenManagement: 'Cookie管理',
+    tokenManagementDesc: 'NetEase Cloud MusicログインCookieを管理',
+    tokenStatus: '現在のCookieステータス',
+    tokenSet: '設定済み',
+    tokenNotSet: '未設定',
+    setToken: 'Cookieを設定',
+    modifyToken: 'Cookieを変更',
+    clearToken: 'Cookieをクリア',
     font: 'フォント設定',
     fontDesc: 'フォントを選択します。前に配置されたフォントが優先されます',
     fontScope: {
@@ -167,6 +175,7 @@ export default {
     hideLyrics: '歌詞を非表示',
     hidePlayBar: '再生バーを非表示',
     hideMiniPlayBar: 'ミニ再生バーを非表示',
+    showMiniPlayBar: 'ミニ再生バーを表示',
     backgroundTheme: '背景テーマ',
     themeOptions: {
       default: 'デフォルト',
@@ -254,6 +263,34 @@ export default {
       cancelEdit: '変更をキャンセルしました',
       disableAll: 'すべてのショートカットを無効にしました。保存を忘れずに',
       enableAll: 'すべてのショートカットを有効にしました。保存を忘れずに'
+    }
+  },
+  cookie: {
+    title: 'Cookie設定',
+    description: 'NetEase Cloud MusicのCookieを入力してください：',
+    placeholder: '完全なCookieを貼り付けてください...',
+    help: {
+      format: 'Cookieは通常「MUSIC_U=」で始まります',
+      source: 'ブラウザの開発者ツールのネットワークリクエストから取得できます',
+      storage: 'Cookie設定後、自動的にローカルストレージに保存されます'
+    },
+    action: {
+      save: 'Cookieを保存',
+      paste: '貼り付け',
+      clear: 'クリア'
+    },
+    validation: {
+      required: 'Cookieを入力してください',
+      format: 'Cookie形式が正しくない可能性があります。MUSIC_Uが含まれているか確認してください'
+    },
+    message: {
+      saveSuccess: 'Cookieの保存に成功しました',
+      saveError: 'Cookieの保存に失敗しました',
+      pasteSuccess: '貼り付けに成功しました',
+      pasteError: '貼り付けに失敗しました。手動でコピーしてください'
+    },
+    info: {
+      length: '現在の長さ：{length} 文字'
     }
   }
 };

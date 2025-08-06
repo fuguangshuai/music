@@ -9,6 +9,7 @@ import { loadLyricWindow } from './lyric';
 import { initializeConfig } from './modules/config';
 import { initializeFileManager } from './modules/fileManager';
 import { initializeFonts } from './modules/fonts';
+import { initializeLoginWindow } from './modules/loginWindow';
 import { initializeShortcuts, registerShortcuts } from './modules/shortcuts';
 import { initializeTray, updateCurrentSong, updatePlayState, updateTrayMenu } from './modules/tray';
 import { createMainWindow, initializeWindowManager, setAppQuitting } from './modules/window';
@@ -40,6 +41,8 @@ function initialize() {
   initializeWindowManager();
   // 初始化字体管理
   initializeFonts();
+  // 初始化登录窗口
+  initializeLoginWindow();
 
   // 创建主窗口
   mainWindow = createMainWindow(icon);
