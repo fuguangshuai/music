@@ -50,7 +50,7 @@
         isElectron &&
         (settingsStore.setData?.alwaysShowDownloadButton ||
           settingsStore.showDownloadDrawer ||
-          settingsStore.setData?.hasDownloadingTasks)
+          (settingsStore.setData as any)?.hasDownloadingTasks)
       "
     />
     <!-- 播放列表抽屉 -->

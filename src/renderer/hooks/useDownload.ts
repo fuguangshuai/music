@@ -21,8 +21,8 @@ const createDownloadManager = () => {
   let isInitialized = false;
 
   // 监听器引用（用于清理）
-  let completeListener: ((event: any, data: any) => void) | null = null;
-  let errorListener: ((event: any, data: any) => void) | null = null;
+  let completeListener: ((event: Electron.IpcRendererEvent, data: unknown) => void) | null = null;
+  let errorListener: ((event: Electron.IpcRendererEvent, data: unknown) => void) | null = null;
 
   return {
     // 添加下载
@@ -56,7 +56,7 @@ const createDownloadManager = () => {
     },
 
     // 初始化事件监听器
-    initEventListeners: (message: any, t: any) => {
+    initEventListeners: (message: { success: (msg: string) => void; error: (msg: string) => void }, t: (key: string) => string) => {
       if (isInitialized) return;
 
       // 移除可能存在的旧监听器
@@ -69,7 +69,7 @@ const createDownloadManager = () => {
       }
 
       // 创建新的监听器
-      completeListener = (_event, data) => {
+      completeListener = (_event, data: any) => {
         if (!data.filename || !activeDownloads.has(data.filename)) return;
 
         // 如果该文件已经通知过，则跳过
@@ -82,7 +82,7 @@ const createDownloadManager = () => {
         activeDownloads.delete(data.filename);
       };
 
-      errorListener = (_event, data) => {
+      errorListener = (_event, data: any) => {
         if (!data.filename || !activeDownloads.has(data.filename)) return;
 
         // 如果该文件已经通知过，则跳过
@@ -93,10 +93,7 @@ const createDownloadManager = () => {
 
         // 显示失败通知
         message.error(
-          t('songItem.message.downloadFailed', {
-            filename: data.filename,
-            error: data.error || '未知错误'
-          })
+          `${t('songItem.message.downloadFailed')}: ${data.filename} - ${data.error || '未知错误'}`
         );
 
         // 从活动下载移除
@@ -164,13 +161,13 @@ export const useDownload = () => {
     try {
       isDownloading.value = true;
 
-      const musicUrl = (await getSongUrl(song.id as number, cloneDeep(song), true)) as any;
+      const musicUrl = (await getSongUrl(song.id as number, cloneDeep(song), true)) as string;
       if (!musicUrl) {
         throw new Error(t('songItem.message.getUrlFailed'));
       }
 
       // 构建文件名
-      const artistNames = (song.ar || song.song?.artists)?.map((a) => a.name).join(',');
+      const artistNames = (song.ar || (song.song as any)?.artists)?.map((a: any) => a.name).join(',');
       const filename = `${song.name} - ${artistNames}`;
 
       // 检查是否已在下载
@@ -187,13 +184,13 @@ export const useDownload = () => {
 
       // 发送下载请求
       ipcRenderer?.send('download-music', {
-        url: typeof musicUrl === 'string' ? musicUrl : musicUrl.url,
+        url: typeof musicUrl === 'string' ? musicUrl : (musicUrl as any)?.url || '',
         filename,
         songInfo: {
           ...songData,
           downloadTime: Date.now()
         },
-        type: musicUrl.type
+        type: typeof musicUrl === 'string' ? 'mp3' : (musicUrl as any)?.type || 'mp3'
       });
 
       message.success(t('songItem.message.downloadQueued'));
@@ -202,10 +199,10 @@ export const useDownload = () => {
       setTimeout(() => {
         isDownloading.value = false;
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Download error:', error);
       isDownloading.value = false;
-      message.error(error.message || t('songItem.message.downloadFailed'));
+      message.error((error as Error)?.message || t('songItem.message.downloadFailed'));
     }
   };
 
@@ -245,12 +242,16 @@ export const useDownload = () => {
       const downloadUrls = await Promise.all(
         songs.map(async (song) => {
           try {
-            const data = (await getSongUrl(song.id, song, true)) as any;
-            return { song, ...data };
+            const data = await getSongUrl(song.id, song, true);
+            if (typeof data === 'string') {
+              return { song, url: data, type: 'mp3' };
+            } else {
+              return { song, url: (data as any)?.url || null, type: (data as any)?.type || 'mp3' };
+            }
           } catch (error) {
             console.error(`获取歌曲 ${song.name} 下载链接失败:`, error);
             failCount++;
-            return { song, url: null };
+            return { song, url: null, type: 'mp3' };
           }
         })
       );

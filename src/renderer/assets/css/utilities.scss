@@ -1,0 +1,207 @@
+/**
+ * 统一的样式工具类
+ * 提供可复用的样式组合，消除项目中的重复样式定义
+ */
+
+@layer utilities {
+  /* ===== 布局工具类 ===== */
+  .flex-center { @apply flex items-center justify-center; }
+  .flex-between { @apply flex items-center justify-between; }
+  .flex-start { @apply flex items-center justify-start; }
+  .flex-end { @apply flex items-center justify-end; }
+  .flex-col-center { @apply flex flex-col items-center justify-center; }
+  .flex-col-start { @apply flex flex-col items-start justify-start; }
+
+  /* ===== 间距工具类 ===== */
+  .spacing-xs { @apply gap-1; }
+  .spacing-sm { @apply gap-2; }
+  .spacing-md { @apply gap-4; }
+  .spacing-lg { @apply gap-6; }
+  .spacing-xl { @apply gap-8; }
+
+  /* ===== 圆角工具类 ===== */
+  .rounded-card { @apply rounded-lg; }
+  .rounded-card-lg { @apply rounded-xl; }
+  .rounded-card-xl { @apply rounded-2xl; }
+  .rounded-button { @apply rounded-md; }
+  .rounded-button-lg { @apply rounded-lg; }
+  .rounded-full-button { @apply rounded-full; }
+
+  /* ===== 阴影工具类 ===== */
+  .shadow-card { @apply shadow-sm hover:shadow-md transition-shadow duration-200; }
+  .shadow-card-lg { @apply shadow-md hover:shadow-lg transition-shadow duration-200; }
+  .shadow-modal { @apply shadow-lg; }
+  .shadow-dropdown { @apply shadow-md; }
+
+  /* ===== 背景工具类 ===== */
+  .bg-card { @apply bg-light-100 dark:bg-dark-100; }
+  .bg-card-elevated { @apply bg-light dark:bg-dark-200; }
+  .bg-surface { @apply bg-light-200 dark:bg-dark-200; }
+  .bg-overlay { @apply bg-black bg-opacity-40; }
+
+  /* ===== 文本工具类 ===== */
+  .text-primary { @apply text-gray-900 dark:text-white; }
+  .text-secondary { @apply text-gray-600 dark:text-gray-400; }
+  .text-muted { @apply text-gray-500 dark:text-gray-500; }
+  .text-accent { @apply text-green-500; }
+  .text-error { @apply text-red-500; }
+  .text-warning { @apply text-yellow-500; }
+  .text-success { @apply text-green-500; }
+  .text-ellipsis { @apply overflow-ellipsis overflow-hidden whitespace-nowrap; }
+
+  /* ===== 边框工具类 ===== */
+  .border-card { @apply border border-gray-200 dark:border-gray-700; }
+  .border-input { @apply border border-gray-200 dark:border-gray-600; }
+  .border-focus { @apply border-green-500; }
+
+  /* ===== 按钮工具类 ===== */
+  .btn-base { @apply px-4 py-2 rounded-button font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50; }
+  .btn-primary { @apply btn-base bg-green-600 text-white hover:bg-green-700; }
+  .btn-secondary { @apply btn-base bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600; }
+  .btn-ghost { @apply btn-base bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800; }
+  .btn-icon { @apply flex-center w-9 h-9 rounded-full-button cursor-pointer transition-all duration-200 bg-light-100 dark:bg-dark-100 text-gray-900 dark:text-white hover:bg-light-200 dark:hover:bg-dark-200; }
+
+  /* ===== 输入框工具类 ===== */
+  .input-base { @apply w-full px-4 py-2 rounded-button border-input bg-transparent text-primary placeholder-gray-500 dark:placeholder-gray-400 focus:border-focus focus:outline-none transition-colors duration-200; }
+  .input-underline { @apply w-full px-4 py-2 bg-transparent border-0 border-b border-input text-primary placeholder-gray-500 dark:placeholder-gray-400 focus:border-focus focus:outline-none transition-colors duration-200; }
+
+  /* ===== 卡片工具类 ===== */
+  .card-base { @apply bg-card rounded-card p-4; }
+  .card-elevated { @apply card-base shadow-card; }
+  .card-outlined { @apply card-base border-card; }
+  .card-interactive { @apply card-base cursor-pointer hover:shadow-card transition-all duration-200; }
+
+  /* ===== 动画工具类 ===== */
+  .transition-base { @apply transition-all duration-200; }
+  .transition-fast { @apply transition-all duration-150; }
+  .transition-slow { @apply transition-all duration-300; }
+  .hover-scale { @apply hover:scale-105 transition-transform duration-200; }
+  .hover-lift { @apply hover:-translate-y-1 transition-transform duration-200; }
+
+  /* ===== 状态工具类 ===== */
+  .loading-spinner { @apply animate-spin rounded-full border-2 border-gray-300 border-t-green-500; }
+  .disabled { @apply opacity-50 cursor-not-allowed pointer-events-none; }
+  .active { @apply bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300; }
+  .selected { @apply bg-green-500 text-white; }
+
+  /* ===== 无障碍访问工具类 ===== */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .focus-visible {
+    @apply outline-none ring-2 ring-green-500 ring-offset-2;
+  }
+
+  .skip-link {
+    @apply absolute -top-10 left-4 bg-green-600 text-white px-4 py-2 rounded;
+    @apply transform transition-transform duration-200;
+    @apply focus:top-4 focus:translate-y-0;
+    z-index: 9999;
+  }
+
+  /* ===== 响应式工具类 ===== */
+  .mobile-hidden { @apply hidden md:block; }
+  .mobile-only { @apply block md:hidden; }
+  .desktop-grid { @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4; }
+  .mobile-stack { @apply flex flex-col md:flex-row; }
+}
+
+/* ===== 无障碍访问主题样式 ===== */
+
+/* 高对比度模式 */
+.high-contrast {
+  --bg-primary: #000000;
+  --bg-secondary: #ffffff;
+  --text-primary: #ffffff;
+  --text-secondary: #000000;
+  --border-color: #ffffff;
+  --focus-color: #ffff00;
+
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+
+  * {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  button, a, input, select, textarea {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border: 2px solid var(--border-color) !important;
+
+    &:focus {
+      outline: 3px solid var(--focus-color) !important;
+      outline-offset: 2px !important;
+    }
+  }
+
+  img {
+    filter: contrast(150%) brightness(150%) !important;
+  }
+}
+
+/* 减少动画模式 */
+.reduce-motion {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 字体大小调整 */
+.font-size-small {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+.font-size-medium {
+  font-size: 1rem !important;
+  line-height: 1.5rem !important;
+}
+
+.font-size-large {
+  font-size: 1.125rem !important;
+  line-height: 1.75rem !important;
+}
+
+.font-size-extra-large {
+  font-size: 1.25rem !important;
+  line-height: 1.875rem !important;
+}
+
+/* 焦点指示器增强 */
+*:focus-visible {
+  outline: 2px solid #10b981 !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* 键盘导航增强 */
+.keyboard-navigation {
+  button, a, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+    &:focus {
+      @apply ring-2 ring-green-500 ring-offset-2;
+    }
+  }
+}
+
+/* 触摸目标大小增强 */
+@media (pointer: coarse) {
+  button, a, input[type="button"], input[type="submit"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}

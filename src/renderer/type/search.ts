@@ -1,6 +1,6 @@
 export interface ISearchKeyword {
   code: number;
-  message?: any;
+  message?: string;
   data: SearchKeywordData;
 }
 
@@ -11,7 +11,7 @@ interface SearchKeywordData {
   action: number;
   alg: string;
   gap: number;
-  source?: any;
+  source?: unknown;
   bizQueryInfo: string;
 }
 
@@ -47,7 +47,7 @@ interface Result {
   video: Video2;
   sim_query: Simquery2;
   djRadio: DjRadio2;
-  rec_type?: any;
+  rec_type?: unknown;
   talk: Talk2;
   rec_query: null[];
   user: User2;
@@ -82,13 +82,13 @@ interface User {
   backgroundUrl: string;
   authority: number;
   mutual: boolean;
-  expertTags?: any;
-  experts?: any;
+  expertTags?: unknown;
+  experts?: unknown;
   djStatus: number;
   vipType: number;
-  remarkName?: any;
+  remarkName?: string | null;
   authenticationTypes: number;
-  avatarDetail?: any;
+  avatarDetail?: unknown;
   anchor: boolean;
   avatarImgIdStr: string;
   backgroundImgIdStr: string;
@@ -113,7 +113,7 @@ interface Talk {
   participations: number;
   showParticipations: number;
   status: number;
-  time?: any;
+  time?: number;
   hasTag: boolean;
   alg: string;
   mlogCount: number;
@@ -149,23 +149,23 @@ interface DjRadio {
   radioFeeType: number;
   feeScope: number;
   buyed: boolean;
-  videos?: any;
+  videos?: Record<string, unknown>[];
   finished: boolean;
   underShelf: boolean;
   purchaseCount: number;
   price: number;
   originalPrice: number;
-  discountPrice?: any;
+  discountPrice?: number;
   lastProgramCreateTime: number;
-  lastProgramName?: any;
+  lastProgramName?: string;
   lastProgramId: number;
   picId: number;
   rcmdText?: string;
   hightQuality: boolean;
   whiteList: boolean;
-  liveInfo?: any;
+  liveInfo?: Record<string, unknown>;
   playCount: number;
-  icon?: any;
+  icon?: string;
   composeVideo: boolean;
   shareCount: number;
   likedCount: number;
@@ -194,13 +194,13 @@ interface Dj {
   backgroundUrl: string;
   authority: number;
   mutual: boolean;
-  expertTags?: any;
-  experts?: any;
+  expertTags?: string[];
+  experts?: Record<string, unknown>;
   djStatus: number;
   vipType: number;
-  remarkName?: any;
+  remarkName?: string;
   authenticationTypes: number;
-  avatarDetail?: any;
+  avatarDetail?: Record<string, unknown>;
   anchor: boolean;
   avatarImgIdStr: string;
   backgroundImgIdStr: string;
@@ -231,8 +231,8 @@ interface Video {
   playTime: number;
   type: number;
   creator: Creator2[];
-  aliaName?: any;
-  transName?: any;
+  aliaName?: string;
+  transName?: string;
   vid: string;
   markTypes?: number[];
   alg: string;
@@ -266,7 +266,7 @@ interface Album2 {
   company?: string;
   briefDesc: string;
   artist: Artist4;
-  songs?: any;
+  songs?: Record<string, unknown>[];
   alias: string[];
   status: number;
   copyrightId: number;
@@ -287,7 +287,7 @@ interface Artist5 {
   picUrl: string;
   img1v1Url: string;
   albumSize: number;
-  alias: any[];
+  alias: string[];
   trans: string;
   musicSize: number;
   topicPerson: number;
@@ -332,7 +332,7 @@ interface Artist2 {
   followed: boolean;
   alg: string;
   alia?: string[];
-  trans?: any;
+  trans?: string;
   accountId?: number;
 }
 
@@ -365,7 +365,7 @@ interface Track {
   name: string;
   id: number;
   position: number;
-  alias: any[];
+  alias: string[];
   status: number;
   fee: number;
   copyrightId: number;
@@ -382,27 +382,27 @@ interface Track {
   dayPlays: number;
   hearTime: number;
   ringtone?: string;
-  crbt?: any;
-  audition?: any;
+  crbt?: string;
+  audition?: string;
   copyFrom: string;
   commentThreadId: string;
-  rtUrl?: any;
+  rtUrl?: string;
   ftype: number;
-  rtUrls: any[];
+  rtUrls: string[];
   copyright: number;
   mvid: number;
   rtype: number;
-  rurl?: any;
+  rurl?: string;
   hMusic: HMusic;
   mMusic: HMusic;
   lMusic: HMusic;
   bMusic: HMusic;
-  mp3Url?: any;
+  mp3Url?: string;
   transNames?: string[];
 }
 
 interface HMusic {
-  name?: any;
+  name?: string;
   id: number;
   size: number;
   extension: string;
@@ -429,8 +429,8 @@ interface Album {
   company?: string;
   briefDesc: string;
   artist: Artist;
-  songs: any[];
-  alias: any[];
+  songs: Record<string, unknown>[];
+  alias: string[];
   status: number;
   copyrightId: number;
   commentThreadId: string;
@@ -447,7 +447,7 @@ interface Artist {
   picUrl: string;
   img1v1Url: string;
   albumSize: number;
-  alias: any[];
+  alias: string[];
   trans: string;
   musicSize: number;
 }
@@ -458,25 +458,25 @@ interface Creator {
   userType: number;
   avatarUrl: string;
   authStatus: number;
-  expertTags?: any;
-  experts?: any;
+  expertTags?: string[];
+  experts?: Record<string, unknown>;
 }
 
 interface Mlog2 {
   moreText: string;
   more: boolean;
   mlogs: Mlog[];
-  resourceIds: any[];
+  resourceIds: number[];
 }
 
 interface Mlog {
   id: string;
   type: number;
   mlogBaseDataType: number;
-  position?: any;
+  position?: number;
   resource: Resource;
   alg: string;
-  reason?: any;
+  reason?: string;
   matchField: number;
   matchFieldContent: string;
   sameCity: boolean;
@@ -503,15 +503,15 @@ interface MlogExtVO {
   likedCount: number;
   commentCount: number;
   playCount: number;
-  song?: any;
-  canCollect?: any;
-  artistName?: any;
-  rcmdInfo?: any;
-  strongPushMark?: any;
-  strongPushIcon?: any;
-  specialTag?: any;
+  song?: Record<string, unknown>;
+  canCollect?: boolean;
+  artistName?: string;
+  rcmdInfo?: Record<string, unknown>;
+  strongPushMark?: number;
+  strongPushIcon?: string;
+  specialTag?: string;
   channelTag: string;
-  artists: any[];
+  artists: Record<string, unknown>[];
 }
 
 interface MlogBaseData {
@@ -525,8 +525,8 @@ interface MlogBaseData {
   coverWidth: number;
   coverColor: number;
   coverPicKey: string;
-  coverDynamicUrl?: any;
-  audio?: any;
+  coverDynamicUrl?: string;
+  audio?: Record<string, unknown>;
   threadId: string;
   duration: number;
 }
@@ -555,37 +555,37 @@ interface Song {
   pst: number;
   t: number;
   ar: Ar[];
-  alia: any[];
+  alia: string[];
   pop: number;
   st: number;
   rt: string;
   fee: number;
   v: number;
-  crbt?: any;
+  crbt?: string;
   cf: string;
   al: Al;
   dt: number;
   h: H;
   m: H;
   l: H;
-  a?: any;
+  a?: Record<string, unknown>;
   cd: string;
   no: number;
-  rtUrl?: any;
+  rtUrl?: string;
   ftype: number;
-  rtUrls: any[];
+  rtUrls: string[];
   djId: number;
   copyright: number;
   s_id: number;
   mark: number;
   originCoverType: number;
-  originSongSimpleData?: any;
+  originSongSimpleData?: Record<string, unknown>;
   resourceState: boolean;
   version: number;
   single: number;
-  noCopyrightRcmd?: any;
+  noCopyrightRcmd?: Record<string, unknown>;
   rtype: number;
-  rurl?: any;
+  rurl?: string;
   mst: number;
   cp: number;
   mv: number;
@@ -593,10 +593,10 @@ interface Song {
   showRecommend: boolean;
   recommendText: string;
   tns?: string[];
-  officialTags: any[];
+  officialTags: string[];
   privilege: Privilege;
   alg: string;
-  specialTags: any[];
+  specialTags: string[];
 }
 
 interface Privilege {
@@ -617,15 +617,15 @@ interface Privilege {
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: any;
+  rscl?: unknown;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }
 
 interface ChargeInfoList {
   rate: number;
-  chargeUrl?: any;
-  chargeMessage?: any;
+  chargeUrl?: string;
+  chargeMessage?: string;
   chargeType: number;
 }
 
@@ -645,7 +645,7 @@ interface Al {
   id: number;
   name: string;
   picUrl: string;
-  tns: any[];
+  tns: string[];
   pic_str?: string;
   pic: number;
 }
@@ -653,7 +653,7 @@ interface Al {
 interface Ar {
   id: number;
   name: string;
-  tns: any[];
+  tns: string[];
   alias: string[];
   alia?: string[];
 }

@@ -52,8 +52,8 @@
             />
           </div>
           <div v-if="listInfo?.creator" class="creator-info">
-            <n-avatar round :size="24" :src="getImgUrl(listInfo.creator.avatarUrl, '50y50')" />
-            <span class="creator-name">{{ listInfo.creator.nickname }}</span>
+            <n-avatar round :size="24" :src="getImgUrl((listInfo.creator as any)?.avatarUrl, '50y50')" />
+            <span class="creator-name">{{ (listInfo.creator as any)?.nickname }}</span>
           </div>
           <div v-if="total" class="music-total">{{ t('player.songNum', { num: total }) }}</div>
 
@@ -125,11 +125,11 @@ const props = withDefaults(
     show: boolean;
     name: string;
     zIndex?: number;
-    songList: any[];
+    songList: Array<Record<string, unknown>>;
     loading?: boolean;
     listInfo?: {
       trackIds: { id: number }[];
-      [key: string]: any;
+      [key: string]: unknown;
     };
     cover?: boolean;
     canRemove?: boolean;
@@ -173,11 +173,11 @@ const getCoverImgUrl = computed(() => {
   if (song?.picUrl) {
     return song.picUrl;
   }
-  if (song?.al?.picUrl) {
-    return song.al.picUrl;
+  if ((song as any)?.al?.picUrl) {
+    return (song as any).al.picUrl;
   }
-  if (song?.album?.picUrl) {
-    return song.album.picUrl;
+  if ((song as any)?.album?.picUrl) {
+    return (song as any).album.picUrl;
   }
   return '';
 });
@@ -486,10 +486,10 @@ const loadMoreSongs = async () => {
       }
     } else if (start < props.songList.length) {
       const newSongs = props.songList.slice(start, end);
-      newSongs.forEach((song) => {
-        if (!loadedIds.value.has(song.id)) {
-          loadedIds.value.add(song.id);
-          displayedSongs.value.push(song);
+      newSongs.forEach((song: any) => {
+        if (!loadedIds.value.has(song.id as number)) {
+          loadedIds.value.add(song.id as number);
+          displayedSongs.value.push(song as any);
         }
       });
     }

@@ -35,7 +35,7 @@
             class="cursor-pointer"
             circle
             size="medium"
-            :src="getImgUrl(userStore.user.avatarUrl)"
+            :src="getImgUrl((userStore.user as any)?.avatarUrl)"
             @click="selectItem('user')"
           />
           <div v-else class="mx-2 rounded-full cursor-pointer text-sm" @click="toLogin">
@@ -45,7 +45,7 @@
       </template>
       <div class="user-popover">
         <div v-if="userStore.user" class="user-header" @click="selectItem('user')">
-          <n-avatar circle size="small" :src="getImgUrl(userStore.user?.avatarUrl)" />
+          <n-avatar circle size="small" :src="getImgUrl((userStore.user as any)?.avatarUrl)" />
           <span class="username">{{ userStore.user?.nickname || 'Theodore' }}</span>
         </div>
         <div class="menu-items">

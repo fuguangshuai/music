@@ -1,0 +1,243 @@
+/**
+ * 统一请求工厂函数
+ * 提供一致的请求实例创建逻辑，支持灵活的配置
+ */
+
+import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+
+import type { AppConfig } from '@/types/common';
+import { getSetData, isElectron, isMobile } from '@/utils';
+
+/**
+ * 扩展的请求配置接口
+ */
+export interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  retryCount?: number;
+  noRetry?: boolean;
+}
+
+/**
+ * 请求工厂配置接口
+ */
+export interface RequestConfig {
+  /** 基础URL */
+  baseURL?: string;
+  /** 超时时间 */
+  timeout?: number;
+  /** 是否携带凭证 */
+  withCredentials?: boolean;
+  /** 重试配置 */
+  retryConfig?: {
+    maxRetries?: number;
+    delay?: number;
+    noRetryUrls?: string[];
+  };
+  /** 拦截器配置 */
+  interceptors?: {
+    /** 请求拦截器 */
+    request?: (config: ExtendedAxiosRequestConfig) => ExtendedAxiosRequestConfig | Promise<ExtendedAxiosRequestConfig>;
+    /** 响应拦截器 */
+    response?: (response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
+    /** 错误拦截器 */
+    error?: (error: AxiosError) => Promise<AxiosError>;
+  };
+  /** 是否启用通用参数注入 */
+  enableCommonParams?: boolean;
+  /** 是否启用token处理 */
+  enableTokenHandling?: boolean;
+  /** 是否启用代理配置 */
+  enableProxyConfig?: boolean;
+}
+
+/**
+ * 默认配置
+ */
+const DEFAULT_CONFIG: Partial<RequestConfig> = {
+  timeout: 10000,
+  withCredentials: false,
+  retryConfig: {
+    maxRetries: 1,
+    delay: 500,
+    noRetryUrls: []
+  },
+  enableCommonParams: true,
+  enableTokenHandling: false,
+  enableProxyConfig: false
+};
+
+/**
+ * 通用参数注入
+ */
+const injectCommonParams = (config: ExtendedAxiosRequestConfig): ExtendedAxiosRequestConfig => {
+  // 添加时间戳和设备信息
+  config.params = {
+    ...config.params,
+    timestamp: Date.now(),
+    device: isElectron ? 'pc' : isMobile ? 'mobile' : 'web'
+  };
+
+  return config;
+};
+
+/**
+ * Token处理
+ */
+const handleToken = (config: ExtendedAxiosRequestConfig): ExtendedAxiosRequestConfig => {
+  const token = localStorage.getItem('token');
+  
+  if (token) {
+    if (config.method !== 'post') {
+      config.params = {
+        ...config.params,
+        cookie: config.params?.cookie !== undefined ? config.params.cookie : token
+      };
+    } else {
+      config.data = {
+        ...config.data,
+        cookie: token
+      };
+    }
+  }
+
+  return config;
+};
+
+/**
+ * 代理配置处理
+ */
+const handleProxyConfig = (config: ExtendedAxiosRequestConfig): ExtendedAxiosRequestConfig => {
+  if (isElectron) {
+    const setData = getSetData() as AppConfig;
+    const proxyConfig = setData?.proxyConfig;
+    
+    if (proxyConfig?.enable && ['http', 'https'].includes(proxyConfig?.protocol || '')) {
+      config.params = {
+        ...config.params,
+        proxy: `${proxyConfig.protocol}://${proxyConfig.host}:${proxyConfig.port}`
+      };
+    }
+    
+    if (setData?.enableRealIP && setData?.realIP) {
+      config.params = {
+        ...config.params,
+        realIP: setData.realIP
+      };
+    }
+  }
+
+  return config;
+};
+
+/**
+ * 创建请求实例
+ */
+export const createRequest = (userConfig: RequestConfig = {}): AxiosInstance => {
+  // 合并配置
+  const config = { ...DEFAULT_CONFIG, ...userConfig };
+  
+  // 创建axios实例
+  const instance = axios.create({
+    baseURL: config.baseURL,
+    timeout: config.timeout,
+    withCredentials: config.withCredentials
+  });
+
+  // 请求拦截器
+  instance.interceptors.request.use(
+    async (requestConfig: ExtendedAxiosRequestConfig) => {
+      // 初始化重试计数
+      if (requestConfig.retryCount === undefined) {
+        requestConfig.retryCount = 0;
+      }
+
+      // 动态更新baseURL（用于主API）
+      if (config.baseURL?.includes('127.0.0.1')) {
+        const setData = getSetData() as AppConfig;
+        requestConfig.baseURL = window.electron
+          ? `http://127.0.0.1:${setData?.musicApiPort}`
+          : import.meta.env.VITE_API;
+      }
+
+      // 通用参数注入
+      if (config.enableCommonParams) {
+        requestConfig = injectCommonParams(requestConfig);
+      }
+
+      // Token处理
+      if (config.enableTokenHandling) {
+        requestConfig = handleToken(requestConfig);
+      }
+
+      // 代理配置处理
+      if (config.enableProxyConfig) {
+        requestConfig = handleProxyConfig(requestConfig);
+      }
+
+      // 调用自定义请求拦截器
+      if (config.interceptors?.request) {
+        requestConfig = await config.interceptors.request(requestConfig);
+      }
+
+      return requestConfig;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
+  // 响应拦截器
+  instance.interceptors.response.use(
+    async (response) => {
+      // 调用自定义响应拦截器
+      if (config.interceptors?.response) {
+        response = await config.interceptors.response(response);
+      }
+      return response;
+    },
+    async (error: AxiosError) => {
+      const requestConfig = error.config as ExtendedAxiosRequestConfig;
+
+      if (!requestConfig) {
+        return Promise.reject(error);
+      }
+
+      // 调用自定义错误拦截器
+      if (config.interceptors?.error) {
+        try {
+          await config.interceptors.error(error);
+        } catch (interceptorError) {
+          return Promise.reject(interceptorError);
+        }
+      }
+
+      // 重试逻辑
+      const retryConfig = config.retryConfig!;
+      const shouldRetry = 
+        requestConfig.retryCount !== undefined &&
+        requestConfig.retryCount < retryConfig.maxRetries! &&
+        !retryConfig.noRetryUrls?.includes(requestConfig.url as string) &&
+        !requestConfig.noRetry;
+
+      if (shouldRetry) {
+        requestConfig.retryCount = (requestConfig.retryCount || 0) + 1;
+        console.error(`请求重试第 ${requestConfig.retryCount} 次`);
+
+        // 指数退避延迟
+        const delay = Math.min(
+          retryConfig.delay! * Math.pow(2, requestConfig.retryCount - 1),
+          10000
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+
+        // 重新发起请求
+        return instance(requestConfig);
+      }
+
+      console.error(`重试${retryConfig.maxRetries}次后仍然失败`);
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+};

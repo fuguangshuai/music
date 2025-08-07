@@ -1,72 +1,70 @@
 /**
- * Vue 组合式函数：错误处理
- * 专门用于在 Vue 组件中处理错误
+ * Vue 组合式函数：错误处理适配器
+ * 专门用于在 Vue 组件中处理错误，作为核心错误处理系统的适配器
  */
 
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 
-import { AppError } from '@/utils/errorHandler';
+import type { MessageOptions } from '@/types/common';
+import { AppError, globalErrorHandler } from '@/utils/errorHandler';
 import { ErrorTypes } from '@/utils/errorHandler';
+import { type RetryOptions,withAudioRetry, withNetworkRetry, withRetry } from '@/utils/retry';
 
 /**
- * 错误处理组合式函数
+ * 错误处理组合式函数 - 适配器模式
+ * 作为核心错误处理系统的适配器，提供Vue组件友好的接口
  */
 export const useErrorHandler = () => {
   const message = useMessage();
   const { t } = useI18n();
 
   /**
-   * 处理应用错误
+   * 统一错误处理入口 - 委托给核心错误处理系统
    */
-  const handleAppError = (error: AppError) => {
-    const errorMessage = getErrorMessage(error);
-
-    switch (error.type) {
-      case ErrorTypes.NETWORK_ERROR:
-        message.error(errorMessage, {
-          duration: 5000,
-          closable: true
-        });
-        break;
-
-      case ErrorTypes.AUDIO_ERROR:
-        message.warning(errorMessage, {
-          duration: 3000,
-          closable: true
-        });
-        break;
-
-      case ErrorTypes.PERMISSION_ERROR:
-        message.error(errorMessage, {
-          duration: 0, // 不自动关闭
-          closable: true
-        });
-        break;
-
-      default:
-        message.error(errorMessage);
-    }
-  };
-
-  /**
-   * 处理通用错误
-   */
-  const handleGenericError = (error: Error) => {
-    const errorMessage = error.message || t('error.unknown', '发生了未知错误');
-    message.error(errorMessage);
-  };
-
-  /**
-   * 统一错误处理入口
-   */
-  const handleError = (error: Error | AppError) => {
+  const handleError = (error: Error | AppError): void => {
     console.error('组件错误处理:', error);
 
+    // 委托给全局错误处理器
+    globalErrorHandler.handle(error);
+
+    // 在Vue组件中显示用户友好的错误消息
+    showUserFriendlyMessage(error);
+  };
+
+  /**
+   * 显示用户友好的错误消息
+   */
+  const showUserFriendlyMessage = (error: Error | AppError): void => {
+    let errorMessage: string;
+    let messageOptions: MessageOptions = {};
+
     if (error instanceof AppError) {
-      handleAppError(error);
+      errorMessage = getErrorMessage(error);
+
+      // 根据错误类型设置不同的显示选项
+      switch (error.type) {
+        case ErrorTypes.NETWORK_ERROR:
+          messageOptions = { duration: 5000, closable: true };
+          message.error(errorMessage, messageOptions);
+          break;
+
+        case ErrorTypes.AUDIO_ERROR:
+          messageOptions = { duration: 3000, closable: true };
+          message.warning(errorMessage, messageOptions);
+          break;
+
+        case ErrorTypes.PERMISSION_ERROR:
+          messageOptions = { duration: 0, closable: true }; // 不自动关闭
+          message.error(errorMessage, messageOptions);
+          break;
+
+        default:
+          message.error(errorMessage);
+      }
     } else {
-      handleGenericError(error);
+      errorMessage = error.message || t('error.unknown', '发生了未知错误');
+      message.error(errorMessage);
     }
   };
 
@@ -127,12 +125,46 @@ export const useErrorHandler = () => {
     message.info(msg);
   };
 
+  /**
+   * 重试功能适配器 - 通用重试
+   */
+  const retry = <T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> => {
+    return withRetry(fn, options);
+  };
+
+  /**
+   * 网络请求重试适配器
+   */
+  const retryNetwork = <T>(fn: () => Promise<T>, options?: Omit<RetryOptions, 'shouldRetry'>): Promise<T> => {
+    return withNetworkRetry(fn, options);
+  };
+
+  /**
+   * 音频操作重试适配器
+   */
+  const retryAudio = <T>(fn: () => Promise<T>, options?: Omit<RetryOptions, 'shouldRetry'>): Promise<T> => {
+    return withAudioRetry(fn, options);
+  };
+
   return {
+    // 错误处理
     handleError,
-    handleAppError,
-    handleGenericError,
     showSuccess,
     showWarning,
-    showInfo
+    showInfo,
+
+    // 重试功能
+    retry,
+    retryNetwork,
+    retryAudio,
+
+    // 向后兼容的别名
+    withRetry: retry,
+    withNetworkRetry: retryNetwork,
+    withAudioRetry: retryAudio,
+
+    // 保持原有接口兼容性
+    handleAppError: showUserFriendlyMessage,
+    handleGenericError: (error: Error) => showUserFriendlyMessage(error)
   };
 };

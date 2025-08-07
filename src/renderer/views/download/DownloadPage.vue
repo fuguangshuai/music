@@ -431,6 +431,7 @@ import { getMusicDetail } from '@/api/music';
 import { usePlayerStore } from '@/store/modules/player';
 import type { SongResult } from '@/type/music';
 import { getImgUrl } from '@/utils';
+import { formatFileSize, formatSongName } from '@/utils/formatters';
 
 const { t } = useI18n();
 const playerStore = usePlayerStore();
@@ -492,14 +493,8 @@ const getStatusText = (item: DownloadItem) => {
   }
 };
 
-// 格式化文件大小
-const formatSize = (bytes: number) => {
-  if (!bytes) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${(bytes / k ** i).toFixed(1)} ${sizes[i]}`;
-};
+// 使用统一的文件大小格式化函数
+const formatSize = (bytes: number) => formatFileSize(bytes);
 
 // 复制文件路径
 const copyPath = (path: string) => {
@@ -660,23 +655,10 @@ const clearDownloadRecords = async () => {
 // 添加加载状态
 const isLoadingDownloaded = ref(false);
 
-// 格式化歌曲名称，应用用户设置的格式
-const formatSongName = (songInfo) => {
-  if (!songInfo) return '';
-
-  // 获取格式设置
+// 使用统一的歌曲名称格式化函数
+const formatSongNameLocal = (songInfo: any) => {
   const nameFormat = downloadSettings.value.nameFormat || '{songName} - {artistName}';
-
-  // 准备替换变量
-  const artistName = songInfo.ar?.map((a) => a.name).join('/') || '未知艺术家';
-  const songName = songInfo.name || songInfo.filename || '未知歌曲';
-  const albumName = songInfo.al?.name || '未知专辑';
-
-  // 应用自定义格式
-  return nameFormat
-    .replace(/\{songName\}/g, songName)
-    .replace(/\{artistName\}/g, artistName)
-    .replace(/\{albumName\}/g, albumName);
+  return formatSongName(songInfo, nameFormat);
 };
 
 // 获取已下载音乐列表
@@ -698,7 +680,7 @@ const refreshDownloadedList = async () => {
       // 处理显示格式化文件名
       const updatedList = list.map((item) => ({
         ...item,
-        displayName: formatSongName(item) || item.filename
+        displayName: formatSongNameLocal(item) || item.filename
       }));
 
       downloadedList.value = updatedList;
@@ -723,7 +705,7 @@ const refreshDownloadedList = async () => {
         };
 
         // 添加格式化的显示名称
-        updatedItem.displayName = formatSongName(updatedItem) || updatedItem.filename;
+        updatedItem.displayName = formatSongNameLocal(updatedItem) || updatedItem.filename;
         return updatedItem;
       });
 
@@ -734,7 +716,7 @@ const refreshDownloadedList = async () => {
       // 处理显示格式化文件名
       const updatedList = list.map((item) => ({
         ...item,
-        displayName: formatSongName(item) || item.filename
+        displayName: formatSongNameLocal(item) || item.filename
       }));
 
       downloadedList.value = updatedList;
@@ -1042,7 +1024,7 @@ watch(
       // 更新所有已下载项的显示名称
       downloadedList.value = downloadedList.value.map((item) => ({
         ...item,
-        displayName: formatSongName(item) || item.filename
+        displayName: formatSongNameLocal(item) || item.filename
       }));
 
       // 保存到本地存储

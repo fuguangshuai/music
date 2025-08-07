@@ -67,9 +67,9 @@ export interface IArtist {
   cover: string;
   avatar: string;
   name: string;
-  transNames: any[];
-  alias: any[];
-  identities: any[];
+  transNames: string[];
+  alias: string[];
+  identities: string[];
   identifyTag: string[];
   briefDesc: string;
   rank: Rank;

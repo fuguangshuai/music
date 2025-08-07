@@ -6,7 +6,7 @@ interface IColor {
   primaryColor: string;
 }
 
-interface ITextColors {
+export interface ITextColors {
   primary: string;
   active: string;
   theme: string;

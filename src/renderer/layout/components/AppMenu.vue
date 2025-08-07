@@ -8,24 +8,24 @@
         </div>
       </div>
       <div class="app-menu-list">
-        <div v-for="(item, index) in menus" :key="item.path" class="app-menu-item">
+        <div v-for="(item, index) in menus" :key="String((item as any).path)" class="app-menu-item">
           <n-tooltip :delay="200" :disabled="isText || isMobile" placement="bottom">
             <template #trigger>
-              <router-link class="app-menu-item-link" :to="item.path">
+              <router-link class="app-menu-item-link" :to="(item as any).path">
                 <i
                   class="iconfont app-menu-item-icon"
                   :style="iconStyle(index)"
-                  :class="item.meta.icon"
+                  :class="(item as any).meta?.icon"
                 ></i>
                 <span
                   v-if="isText"
                   class="app-menu-item-text ml-3"
                   :class="isChecked(index) ? 'text-green-500' : ''"
-                  >{{ t(item.meta.title) }}</span
+                  >{{ t((item as any).meta?.title) }}</span
                 >
               </router-link>
             </template>
-            <div v-if="!isText">{{ t(item.meta.title) }}</div>
+            <div v-if="!isText">{{ t((item as any).meta?.title) }}</div>
           </n-tooltip>
         </div>
       </div>
@@ -55,7 +55,7 @@ const props = defineProps({
     default: '#10B981'
   },
   menus: {
-    type: Array as any,
+    type: Array as () => Array<Record<string, unknown>>,
     default: () => []
   }
 });

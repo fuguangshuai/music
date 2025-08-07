@@ -1,5 +1,6 @@
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 import AutoImport from 'unplugin-auto-import/vite';
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
@@ -34,8 +35,15 @@ export default defineConfig({
     }),
     Components({
       resolvers: [NaiveUiResolver()]
+    }),
+    // 性能分析插件（仅在分析模式下启用）
+    process.env.ANALYZE && visualizer({
+      filename: 'dist/stats.html',
+      open: true,
+      gzipSize: true,
+      brotliSize: true
     })
-  ],
+  ].filter(Boolean),
   publicDir: resolve('resources'),
   server: {
     host: '0.0.0.0',

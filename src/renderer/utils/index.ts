@@ -4,11 +4,11 @@ import { computed } from 'vue';
 import { useSettingsStore } from '@/store/modules/settings';
 
 // 设置歌手背景图片
-export const setBackgroundImg = (url: String) => {
+export const setBackgroundImg = (url: string) => {
   return `background-image:url(${url})`;
 };
 // 设置动画类型
-export const setAnimationClass = (type: String) => {
+export const setAnimationClass = (type: string) => {
   const settingsStore = useSettingsStore();
   if (settingsStore.setData && settingsStore.setData.noAnimate) {
     return '';
@@ -33,32 +33,17 @@ export const setAnimationDelay = (index: number = 6, time: number = 50) => {
   return `animation-delay:${(index * time) / (speed * 2)}ms`;
 };
 
-// 将秒转换为分钟和秒
-export const secondToMinute = (s: number) => {
-  if (!s) {
-    return '00:00';
-  }
-  const minute: number = Math.floor(s / 60);
-  const second: number = Math.floor(s % 60);
-  const minuteStr: string = minute > 9 ? minute.toString() : `0${minute.toString()}`;
-  const secondStr: string = second > 9 ? second.toString() : `0${second.toString()}`;
-  return `${minuteStr}:${secondStr}`;
+// 导入统一的格式化函数
+import { formatNumber as formatNum,formatTime } from './formatters';
+
+// 将秒转换为分钟和秒 - 使用统一的formatTime函数
+export const secondToMinute = (s: number): string => {
+  return formatTime(s, 'mm:ss');
 };
 
-// 格式化数字 千,万, 百万, 千万,亿
-const units = [
-  { value: 1e8, symbol: '亿' },
-  { value: 1e4, symbol: '万' }
-];
-
-export const formatNumber = (num: string | number) => {
-  num = Number(num);
-  for (let i = 0; i < units.length; i++) {
-    if (num >= units[i].value) {
-      return `${(num / units[i].value).toFixed(1)}${units[i].symbol}`;
-    }
-  }
-  return num.toString();
+// 格式化数字 - 使用统一的formatNumber函数
+export const formatNumber = (num: string | number): string => {
+  return formatNum(num);
 };
 
 export const getImgUrl = (url: string | undefined, size: string = '') => {
@@ -96,19 +81,19 @@ export const isMobile = computed(() => {
   return isMobileDevice;
 });
 
-export const isElectron = (window as any).electron !== undefined;
+export const isElectron = (window as { electron?: unknown }).electron !== undefined;
 
 export const isLyricWindow = computed(() => {
   return window.location.hash.includes('lyric');
 });
 
-export const getSetData = (): any => {
+export const getSetData = (): Record<string, unknown> | null => {
   let setData = null;
   if (window.electron) {
     setData = window.electron.ipcRenderer.sendSync('get-store-value', 'set');
   } else {
     const settingsStore = useSettingsStore();
-    setData = settingsStore.setData;
+    setData = settingsStore.setData as any;
   }
   return setData;
 };

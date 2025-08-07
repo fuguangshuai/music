@@ -7,40 +7,28 @@ import { computed, ref } from 'vue';
 import i18n from '@/../i18n/renderer';
 import { getLikedList, getMusicLrc, getMusicUrl, getParsingMusicUrl, likeSong } from '@/api/music';
 import { useMusicHistory } from '@/hooks/MusicHistoryHook';
+import { audioPreloadService, smartPreloadService } from '@/services/audioPreloadService'; // 🎵 导入统一的预加载服务
 import { audioService } from '@/services/audioService';
 import type { ILyric, ILyricText, SongResult } from '@/type/music';
 import { type Platform } from '@/types/music';
 import { getImgUrl } from '@/utils';
 import { getImageLinearBackground } from '@/utils/linearColor';
+import { timerManager, TimerType } from '@/utils/timerManager'; // ⏰ 导入统一的定时器管理器
 
 import { useSettingsStore } from './settings';
 import { useUserStore } from './user';
 
-// 全局定时器管理
-declare global {
-  interface Window {
-    playerRetryTimers: NodeJS.Timeout[];
-  }
-}
-
+// ⏰ 使用统一的定时器管理器替代全局定时器数组
 // 清理所有播放器定时器的函数
 export const clearAllPlayerTimers = () => {
-  if (window.playerRetryTimers) {
-    window.playerRetryTimers.forEach((timer) => {
-      try {
-        clearTimeout(timer);
-      } catch (error) {
-        console.error('清理定时器失败:', error);
-      }
-    });
-    window.playerRetryTimers = [];
-  }
+  console.log('🧹 清理所有播放器定时器');
+  timerManager.clearTimersByType(TimerType.PLAYER);
 };
 
 const musicHistory = useMusicHistory();
 const { message } = createDiscreteApi(['message']);
 
-const preloadingSounds = ref<Howl[]>([]);
+// 🗑️ 移除旧的预加载音频数组，现在使用统一的audioPreloadService
 
 function getLocalStorageItem<T>(key: string, defaultValue: T): T {
   try {
@@ -89,14 +77,14 @@ export const getSongUrl = async (
     // 正常获取URL流程
     const { data } = await getMusicUrl(numericId, isDownloaded);
     let url = '';
-    let songDetail = null;
+    let songDetail: unknown = null;
     try {
       if (data.data[0].freeTrialInfo || !data.data[0].url) {
         const res = await getParsingMusicUrl(numericId, cloneDeep(songData));
         url = res.data.data.url;
         songDetail = res.data.data;
       } else {
-        songDetail = data.data[0] as any;
+        songDetail = data.data[0];
       }
     } catch (error) {
       console.error('error', error);
@@ -151,11 +139,12 @@ export const loadLrc = async (id: string | number): Promise<ILyric> => {
   try {
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
     const { data } = await getMusicLrc(numericId);
-    const { lyrics, times } = parseLyrics(data.lrc.lyric);
+    const lrcData = data as any;
+    const { lyrics, times } = parseLyrics(lrcData.lrc.lyric);
     const tlyric: Record<string, string> = {};
 
-    if (data.tlyric && data.tlyric.lyric) {
-      const { lyrics: tLyrics, times: tTimes } = parseLyrics(data.tlyric.lyric);
+    if (lrcData.tlyric && lrcData.tlyric.lyric) {
+      const { lyrics: tLyrics, times: tTimes } = parseLyrics(lrcData.tlyric.lyric);
       tLyrics.forEach((lyric, index) => {
         tlyric[tTimes[index].toString()] = lyric.text;
       });
@@ -204,59 +193,60 @@ const getSongDetail = async (playMusic: SongResult) => {
   }
 };
 
-const preloadNextSong = (nextSongUrl: string) => {
+// 🎵 使用智能预加载服务替代原有逻辑
+const preloadNextSong = async (nextSongUrl: string, songInfo?: SongResult, priority: 'high' | 'medium' | 'low' = 'medium') => {
   try {
-    // 清理多余的预加载实例，确保最多只有2个预加载音频
-    while (preloadingSounds.value.length >= 2) {
-      const oldestSound = preloadingSounds.value.shift();
-      if (oldestSound) {
-        try {
-          oldestSound.stop();
-          oldestSound.unload();
-        } catch (e) {
-          console.error('清理预加载音频实例失败:', e);
-        }
-      }
+    if (!nextSongUrl) {
+      console.warn('🚫 预加载URL为空，跳过预加载');
+      return null;
     }
 
-    // 检查这个URL是否已经在预加载列表中
-    const existingPreload = preloadingSounds.value.find(
-      (sound) => (sound as any)._src === nextSongUrl
-    );
-    if (existingPreload) {
-      console.log('该音频已在预加载列表中，跳过:', nextSongUrl);
-      return existingPreload;
+    console.log('🧠 使用智能预加载服务预加载音频:', nextSongUrl);
+    const sound = await smartPreloadService.smartPreloadAudio(nextSongUrl, songInfo, priority);
+
+    if (sound) {
+      console.log('✅ 智能音频预加载成功:', nextSongUrl);
+    } else {
+      console.warn('⚠️ 智能音频预加载失败或被跳过:', nextSongUrl);
     }
-
-    const sound = new Howl({
-      src: [nextSongUrl],
-      html5: true,
-      preload: true,
-      autoplay: false
-    });
-
-    preloadingSounds.value.push(sound);
-
-    sound.on('loaderror', () => {
-      console.error('预加载音频失败:', nextSongUrl);
-      const index = preloadingSounds.value.indexOf(sound);
-      if (index > -1) {
-        preloadingSounds.value.splice(index, 1);
-      }
-      try {
-        sound.stop();
-        sound.unload();
-      } catch (e) {
-        console.error('卸载预加载音频失败:', e);
-      }
-    });
 
     return sound;
   } catch (error) {
-    console.error('预加载音频出错:', error);
-    return null;
+    console.error('💥 智能预加载音频异常:', error);
+    // 降级到普通预加载
+    return await audioPreloadService.preloadAudio(nextSongUrl);
   }
 };
+
+// 🧠 智能预加载下一首歌曲（暂时未使用）
+/*
+const smartPreloadNextSongs = async (currentSong: SongResult, playHistory: SongResult[]) => {
+  try {
+    // 获取预测的下一首歌曲
+    const predictions = smartPreloadService.predictNextSongs(currentSong, playHistory);
+
+    console.log('🔮 预测到', predictions.length, '首可能的下一首歌曲');
+
+    // 预加载预测的歌曲
+    for (let i = 0; i < predictions.length; i++) {
+      const song = predictions[i];
+      if (song.playMusicUrl) {
+        const priority = i === 0 ? 'high' : i === 1 ? 'medium' : 'low';
+        await preloadNextSong(song.playMusicUrl, song, priority);
+      }
+    }
+
+    // 分析用户行为模式
+    smartPreloadService.analyzeUserBehavior(playHistory);
+
+    // 优化内存使用
+    smartPreloadService.optimizeMemoryUsage();
+
+  } catch (error) {
+    console.error('💥 智能预加载异常:', error);
+  }
+};
+*/
 
 const fetchSongs = async (playList: SongResult[], startIndex: number, endIndex: number) => {
   try {
@@ -292,7 +282,7 @@ const fetchSongs = async (playList: SongResult[], startIndex: number, endIndex: 
     });
 
     if (nextSong && nextSong.playMusicUrl) {
-      preloadNextSong(nextSong.playMusicUrl);
+      preloadNextSong(nextSong.playMusicUrl, nextSong, 'high');
     }
   } catch (error) {
     console.error('获取歌曲列表失败:', error);
@@ -356,7 +346,8 @@ export const usePlayerStore = defineStore('player', () => {
   // 清空播放列表
   const clearPlayAll = async () => {
     audioService.pause();
-    const clearTimer = setTimeout(() => {
+    // ⏰ 使用统一的定时器管理器
+    timerManager.setTimeout(() => {
       playMusic.value = {} as SongResult;
       playMusicUrl.value = '';
       playList.value = [];
@@ -365,13 +356,7 @@ export const usePlayerStore = defineStore('player', () => {
       localStorage.removeItem('currentPlayMusicUrl');
       localStorage.removeItem('playList');
       localStorage.removeItem('playListIndex');
-    }, 500);
-
-    // 存储定时器以便可能的清理
-    if (!window.playerRetryTimers) {
-      window.playerRetryTimers = [];
-    }
-    window.playerRetryTimers.push(clearTimer);
+    }, 500, TimerType.PLAYER, '清空播放列表');
   };
 
   const timerInterval = ref<number | null>(null);
@@ -436,7 +421,7 @@ export const usePlayerStore = defineStore('player', () => {
     let title = music.name;
     if (music.source === 'netease' && music?.song?.artists) {
       title += ` - ${music.song.artists.reduce(
-        (prev: string, curr: any) => `${prev}${curr.name}/`,
+        (prev: string, curr: { name: string }) => `${prev}${curr.name}/`,
         ''
       )}`;
     }
@@ -471,15 +456,10 @@ export const usePlayerStore = defineStore('player', () => {
       // 处理歌曲索引和预加载
       if (songIndex !== -1) {
         // 歌曲在播放列表中，预加载更多歌曲
-        const preloadTimer = setTimeout(() => {
+        // ⏰ 使用统一的定时器管理器
+        timerManager.setTimeout(() => {
           fetchSongs(playList.value, songIndex + 1, songIndex + 2);
-        }, 3000);
-
-        // 存储定时器以便可能的清理
-        if (!window.playerRetryTimers) {
-          window.playerRetryTimers = [];
-        }
-        window.playerRetryTimers.push(preloadTimer);
+        }, 3000, TimerType.PRELOAD, '预加载更多歌曲');
       } else {
         // 歌曲不在播放列表中的处理
         if (playList.value.length === 0) {

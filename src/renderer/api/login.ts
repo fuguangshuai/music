@@ -8,13 +8,13 @@ export function getQrKey() {
 
 // 创建二维码
 // /login/qr/create
-export function createQr(key: any) {
+export function createQr(key: string) {
   return request.get('/login/qr/create', { params: { key, qrimg: true } });
 }
 
 // 获取二维码状态
 //  /login/qr/check
-export function checkQr(key: any) {
+export function checkQr(key: string) {
   return request.get('/login/qr/check', { params: { key, noCookie: true } });
 }
 

@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 导入统一的样式变量和工具类 */
+@import './assets/css/variables.scss';
+@import './assets/css/utilities.scss';
+
 .n-image img {
   background-color: #111111;
   width: 100%;

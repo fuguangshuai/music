@@ -1,0 +1,156 @@
+/**
+ * 统一的格式化工具函数
+ * 提供一致的数据格式化功能，消除项目中的重复实现
+ */
+
+/**
+ * 时间格式化函数
+ * 将秒数转换为时间字符串格式
+ * @param time 时间（秒）
+ * @param format 格式类型
+ * @returns 格式化后的时间字符串
+ */
+export const formatTime = (time: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss'): string => {
+  if (!time || time < 0) {
+    return format === 'hh:mm:ss' ? '00:00:00' : '00:00';
+  }
+
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor((time % 3600) / 60);
+  const seconds = Math.floor(time % 60);
+
+  if (format === 'hh:mm:ss' && hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+/**
+ * 时长格式化函数（毫秒转换）
+ * 将毫秒转换为时间字符串格式
+ * @param ms 时间（毫秒）
+ * @param format 格式类型
+ * @returns 格式化后的时间字符串
+ */
+export const formatDuration = (ms: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss'): string => {
+  if (!ms || ms < 0) {
+    return '--:--';
+  }
+  const totalSeconds = Math.floor(ms / 1000);
+  return formatTime(totalSeconds, format);
+};
+
+/**
+ * 文件大小格式化函数
+ * 将字节数转换为可读的文件大小格式
+ * @param bytes 字节数
+ * @param precision 小数位数，默认1位
+ * @returns 格式化后的文件大小字符串
+ */
+export const formatFileSize = (bytes: number, precision: number = 1): string => {
+  if (!bytes || bytes === 0) return '0 B';
+  
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  if (i >= sizes.length) {
+    return `${(bytes / Math.pow(k, sizes.length - 1)).toFixed(precision)} ${sizes[sizes.length - 1]}`;
+  }
+  
+  return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`;
+};
+
+/**
+ * 数字格式化函数（中文单位）
+ * 将数字转换为中文单位表示
+ * @param num 数字
+ * @returns 格式化后的数字字符串
+ */
+export const formatNumber = (num: string | number): string => {
+  const numValue = Number(num);
+  if (isNaN(numValue)) return '0';
+  
+  const units = [
+    { value: 1e8, symbol: '亿' },
+    { value: 1e4, symbol: '万' }
+  ];
+
+  for (let i = 0; i < units.length; i++) {
+    if (numValue >= units[i].value) {
+      return `${(numValue / units[i].value).toFixed(1)}${units[i].symbol}`;
+    }
+  }
+  return numValue.toString();
+};
+
+/**
+ * 数字格式化函数（英文单位）
+ * 将数字转换为英文单位表示
+ * @param num 数字
+ * @returns 格式化后的数字字符串
+ */
+export const formatNumberEn = (num: number): string => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
+};
+
+/**
+ * 发布时间格式化函数
+ * 将时间戳转换为日期字符串
+ * @param time 时间戳
+ * @param format 格式，默认 'YYYY-MM-DD'
+ * @returns 格式化后的日期字符串
+ */
+export const formatPublishTime = (time: number | string | Date, format: string = 'YYYY-MM-DD'): string => {
+  if (!time) return '';
+  
+  const date = new Date(time);
+  if (isNaN(date.getTime())) return '';
+  
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  
+  switch (format) {
+    case 'YYYY-MM-DD':
+      return `${year}-${month}-${day}`;
+    case 'YYYY.MM.DD':
+      return `${year}.${month}.${day}`;
+    case 'MM/DD/YYYY':
+      return `${month}/${day}/${year}`;
+    default:
+      return `${year}-${month}-${day}`;
+  }
+};
+
+/**
+ * 歌曲名称格式化函数
+ * 根据用户设置的格式模板格式化歌曲名称
+ * @param songInfo 歌曲信息
+ * @param nameFormat 格式模板
+ * @returns 格式化后的歌曲名称
+ */
+export const formatSongName = (songInfo: unknown, nameFormat: string = '{songName} - {artistName}'): string => {
+  if (!songInfo || typeof songInfo !== 'object') return '';
+
+  const song = songInfo as Record<string, unknown>;
+
+  // 准备替换变量
+  const artistName = Array.isArray(song.ar)
+    ? song.ar.map((a: Record<string, unknown>) => a.name).join('/') || '未知艺术家'
+    : '未知艺术家';
+  const songName = (song.name as string) || (song.filename as string) || '未知歌曲';
+  const albumName = ((song.al as Record<string, unknown>)?.name as string) || '未知专辑';
+
+  // 应用自定义格式
+  return nameFormat
+    .replace(/\{songName\}/g, songName)
+    .replace(/\{artistName\}/g, artistName)
+    .replace(/\{albumName\}/g, albumName);
+};

@@ -95,7 +95,11 @@ const createWin = () => {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      contextIsolation: true
+      contextIsolation: true,
+      webSecurity: true, // 🔒 安全修复: 启用webSecurity
+      nodeIntegration: false, // 🔒 安全加固: 禁用nodeIntegration
+      nodeIntegrationInWorker: false, // 🔒 安全加固: 禁用Worker中的Node.js集成
+      allowRunningInsecureContent: false // 🔒 安全加固: 禁止运行不安全内容
     },
     backgroundColor: '#00000000'
   });

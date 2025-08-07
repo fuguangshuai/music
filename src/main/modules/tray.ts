@@ -17,10 +17,10 @@ import { getStore } from './config';
 interface SongInfo {
   name: string;
   song: {
-    artists: Array<{ name: string; [key: string]: any }>;
-    [key: string]: any;
+    artists: Array<{ name: string; [key: string]: unknown }>;
+    [key: string]: unknown;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 let tray: Tray | null = null;
@@ -125,7 +125,7 @@ function updateStatusBarTray() {
     icon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
     playPauseTray.setImage(icon);
     playPauseTray.setToolTip(
-      isPlaying ? i18n.global.t('common.tray.pause') : i18n.global.t('common.tray.play')
+      isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
     );
   }
 }
@@ -155,7 +155,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
     // 在macOS上临时使用文本菜单项替代图标，确保基本功能正常
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.tray.prev'),
+        label: String(i18n.global.t('common.tray.prev')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'prevPlay');
@@ -165,7 +165,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
 
     menu.append(
       new MenuItem({
-        label: i18n.global.t(isPlaying ? 'common.tray.pause' : 'common.tray.play'),
+        label: String(i18n.global.t(isPlaying ? 'common.tray.pause' : 'common.tray.play')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'togglePlay');
@@ -176,7 +176,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
     // 收藏
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.tray.favorite'),
+        label: String(i18n.global.t('common.tray.favorite')),
         type: 'normal',
         click: () => {
           console.log('[Tray] 发送收藏命令 - macOS菜单');
@@ -187,7 +187,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
 
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.tray.next'),
+        label: String(i18n.global.t('common.tray.next')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'nextPlay');
@@ -201,7 +201,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
     // 显示主窗口
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.tray.show'),
+        label: String(i18n.global.t('common.tray.show')),
         type: 'normal',
         click: () => {
           mainWindow.show();
@@ -225,7 +225,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
 
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.language'),
+        label: String(i18n.global.t('common.language')),
         type: 'submenu',
         submenu: languageSubmenu
       })
@@ -234,7 +234,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
     // 退出按钮
     menu.append(
       new MenuItem({
-        label: i18n.global.t('common.tray.quit'),
+        label: String(i18n.global.t('common.tray.quit')),
         type: 'normal',
         click: () => {
           app.quit();
@@ -258,14 +258,14 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
           ]
         : []) as MenuItemConstructorOptions[]),
       {
-        label: i18n.global.t('common.tray.show'),
+        label: String(i18n.global.t('common.tray.show')),
         type: 'normal',
         click: () => {
           mainWindow.show();
         }
       },
       {
-        label: i18n.global.t('common.tray.favorite'),
+        label: String(i18n.global.t('common.tray.favorite')),
         type: 'normal',
         click: () => {
           console.log('[Tray] 发送收藏命令 - Windows/Linux菜单');
@@ -274,21 +274,21 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
       },
       { type: 'separator' },
       {
-        label: i18n.global.t('common.tray.prev'),
+        label: String(i18n.global.t('common.tray.prev')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'prevPlay');
         }
       },
       {
-        label: i18n.global.t(isPlaying ? 'common.tray.pause' : 'common.tray.play'),
+        label: String(i18n.global.t(isPlaying ? 'common.tray.pause' : 'common.tray.play')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'togglePlay');
         }
       },
       {
-        label: i18n.global.t('common.tray.next'),
+        label: String(i18n.global.t('common.tray.next')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'nextPlay');
@@ -296,7 +296,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
       },
       { type: 'separator' },
       {
-        label: i18n.global.t('common.language'),
+        label: String(i18n.global.t('common.language')),
         type: 'submenu',
         submenu: LANGUAGES.map(({ label, value }) => ({
           label,
@@ -311,7 +311,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
       },
       { type: 'separator' },
       {
-        label: i18n.global.t('common.tray.quit'),
+        label: String(i18n.global.t('common.tray.quit')),
         type: 'normal',
         click: () => {
           app.quit();
@@ -337,7 +337,7 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
     .resize(iconSize);
   nextIcon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
   nextTray = new Tray(nextIcon);
-  nextTray.setToolTip(i18n.global.t('common.tray.next'));
+  nextTray.setToolTip(String(i18n.global.t('common.tray.next')));
   nextTray.on('click', () => {
     mainWindow.webContents.send('global-shortcut', 'nextPlay');
   });
@@ -349,7 +349,7 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
   playPauseIcon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
   playPauseTray = new Tray(playPauseIcon);
   playPauseTray.setToolTip(
-    isPlaying ? i18n.global.t('common.tray.pause') : i18n.global.t('common.tray.play')
+    isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
   );
   playPauseTray.on('click', () => {
     mainWindow.webContents.send('global-shortcut', 'togglePlay');
@@ -361,7 +361,7 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
     .resize(iconSize);
   prevIcon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
   prevTray = new Tray(prevIcon);
-  prevTray.setToolTip(i18n.global.t('common.tray.prev'));
+  prevTray.setToolTip(String(i18n.global.t('common.tray.prev')));
   prevTray.on('click', () => {
     mainWindow.webContents.send('global-shortcut', 'prevPlay');
   });

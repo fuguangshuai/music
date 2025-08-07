@@ -3,8 +3,8 @@ export interface IMvItem {
   cover: string;
   name: string;
   playCount: number;
-  briefDesc?: any;
-  desc?: any;
+  briefDesc?: string;
+  desc?: string;
   artistName: string;
   artistId: number;
   duration: number;
@@ -31,11 +31,11 @@ export interface IMvData {
   pic16v9: number;
   caption: number;
   captionLanguage: string;
-  style?: any;
+  style?: string;
   mottos: string;
-  oneword?: any;
+  oneword?: string;
   appword: string;
-  stars?: any;
+  stars?: string;
   desc: string;
   area: string;
   type: string;
@@ -107,6 +107,6 @@ export interface IMvUrlData {
   fee: number;
   mvFee: number;
   st: number;
-  promotionVo: null | any;
+  promotionVo: unknown;
   msg: string;
 }

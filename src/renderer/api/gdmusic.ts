@@ -34,7 +34,7 @@ export interface ParsedMusicResult {
  */
 export const parseFromGDMusic = async (
   id: number,
-  data: any,
+  data: Record<string, unknown>,
   quality: string = '999',
   timeout: number = 15000
 ): Promise<ParsedMusicResult | null> => {
@@ -115,8 +115,8 @@ export const parseFromGDMusic = async (
       })(),
       timeoutPromise
     ]);
-  } catch (error: any) {
-    if (error.message === 'GD音乐台解析超时') {
+  } catch (error: unknown) {
+    if ((error as Error).message === 'GD音乐台解析超时') {
       console.error('GD音乐台解析超时(15秒):', error);
     } else {
       console.error('GD音乐台解析完全失败:', error);

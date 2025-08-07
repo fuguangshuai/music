@@ -1,129 +1,53 @@
-import axios, { InternalAxiosRequestConfig } from 'axios';
-
 import { useUserStore } from '@/store/modules/user';
+import { appConfig } from '@/utils/config';
+import { getApiEnvVars } from '@/utils/env';
 
-import { getSetData, isElectron, isMobile } from '.';
+import { createRequest, type ExtendedAxiosRequestConfig, type RequestConfig } from './requestFactory';
 
-let setData: any = null;
-
-// 扩展请求配置接口
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  retryCount?: number;
-  noRetry?: boolean;
-}
-
-const baseURL = window.electron
-  ? `http://127.0.0.1:${setData?.musicApiPort}`
-  : import.meta.env.VITE_API;
-
-const request = axios.create({
-  baseURL,
+/**
+ * 主API请求配置
+ */
+const mainApiConfig: RequestConfig = {
+  baseURL: window.electron
+    ? `http://127.0.0.1:${appConfig.get('musicApiPort') || 30488}`
+    : getApiEnvVars().mainApi,
   timeout: 15000,
-  withCredentials: true
-});
-
-// 最大重试次数
-const MAX_RETRIES = 1;
-// 重试延迟（毫秒）
-const RETRY_DELAY = 500;
-
-// 请求拦截器
-request.interceptors.request.use(
-  (config: CustomAxiosRequestConfig) => {
-    setData = getSetData();
-    config.baseURL = window.electron
-      ? `http://127.0.0.1:${setData?.musicApiPort}`
-      : import.meta.env.VITE_API;
-    // 只在retryCount未定义时初始化为0
-    if (config.retryCount === undefined) {
-      config.retryCount = 0;
-    }
-
-    // 在请求发送之前做一些处理
-    // 在get请求params中添加timestamp
-    config.params = {
-      ...config.params,
-      timestamp: Date.now(),
-      device: isElectron ? 'pc' : isMobile ? 'mobile' : 'web'
-    };
-    const token = localStorage.getItem('token');
-    if (token && config.method !== 'post') {
-      config.params.cookie = config.params.cookie !== undefined ? config.params.cookie : token;
-    } else if (token && config.method === 'post') {
-      config.data = {
-        ...config.data,
-        cookie: token
-      };
-    }
-    if (isElectron) {
-      const proxyConfig = setData?.proxyConfig;
-      if (proxyConfig?.enable && ['http', 'https'].includes(proxyConfig?.protocol)) {
-        config.params.proxy = `${proxyConfig.protocol}://${proxyConfig.host}:${proxyConfig.port}`;
-      }
-      if (setData.enableRealIP && setData.realIP) {
-        config.params.realIP = setData.realIP;
-      }
-    }
-
-    return config;
+  withCredentials: true,
+  retryConfig: {
+    maxRetries: 1,
+    delay: 500,
+    noRetryUrls: ['暂时没有']
   },
-  (error) => {
-    // 当请求异常时做一些处理
-    return Promise.reject(error);
-  }
-);
+  enableCommonParams: true,
+  enableTokenHandling: true,
+  enableProxyConfig: true,
+  interceptors: {
+    error: async (error) => {
+      const config = error.config as ExtendedAxiosRequestConfig;
 
-const NO_RETRY_URLS = ['暂时没有'];
+      // 处理 301 状态码
+      if (error.response?.status === 301 && config?.params?.noLogin !== true) {
+        // 使用 store mutation 清除用户信息
+        const userStore = useUserStore();
+        userStore.handleLogout();
 
-// 响应拦截器
-request.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async (error) => {
-    console.error('error', error);
-    const config = error.config as CustomAxiosRequestConfig;
+        // 确保配置对象存在
+        if (!config.params) {
+          config.params = {};
+        }
 
-    // 如果没有配置，直接返回错误
-    if (!config) {
+        console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount || 0} 次`);
+        config.retryCount = 3;
+      }
+
       return Promise.reject(error);
     }
-
-    // 处理 301 状态码
-    if (error.response?.status === 301 && config?.params?.noLogin !== true) {
-      // 使用 store mutation 清除用户信息
-      const userStore = useUserStore();
-      userStore.handleLogout();
-
-      // 确保配置对象存在
-      if (!config.params) {
-        config.params = {};
-      }
-
-      console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount || 0} 次`);
-      config.retryCount = 3;
-    }
-
-    // 检查是否还可以重试
-    if (
-      config.retryCount !== undefined &&
-      config.retryCount < MAX_RETRIES &&
-      !NO_RETRY_URLS.includes(config.url as string) &&
-      !config.noRetry
-    ) {
-      config.retryCount++;
-      console.error(`请求重试第 ${config.retryCount} 次`);
-
-      // 延迟重试
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-
-      // 重新发起请求
-      return request(config);
-    }
-
-    console.error(`重试${MAX_RETRIES}次后仍然失败`);
-    return Promise.reject(error);
   }
-);
+};
+
+/**
+ * 创建主API请求实例
+ */
+const request = createRequest(mainApiConfig);
 
 export default request;

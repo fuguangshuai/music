@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import type { RouteRecordRaw } from 'vue-router';
 
 import homeRouter from '@/router/home';
 
 export const useMenuStore = defineStore('menu', () => {
   const menus = ref(homeRouter);
 
-  const setMenus = (newMenus: any[]) => {
-    menus.value = newMenus;
+  const setMenus = (newMenus: RouteRecordRaw[]) => {
+    menus.value = newMenus as any;
   };
 
   return {

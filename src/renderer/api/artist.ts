@@ -1,12 +1,12 @@
 import request from '@/utils/request';
 
 // 获取歌手详情
-export const getArtistDetail = (id) => {
+export const getArtistDetail = (id: number | string) => {
   return request.get('/artist/detail', { params: { id } });
 };
 
 // 获取歌手热门歌曲
-export const getArtistTopSongs = (params) => {
+export const getArtistTopSongs = (params: Record<string, unknown>) => {
   return request.get('/artist/songs', {
     params: {
       ...params,
@@ -16,6 +16,6 @@ export const getArtistTopSongs = (params) => {
 };
 
 // 获取歌手专辑
-export const getArtistAlbums = (params) => {
+export const getArtistAlbums = (params: Record<string, unknown>) => {
   return request.get('/artist/album', { params });
 };

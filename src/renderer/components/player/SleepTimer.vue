@@ -115,6 +115,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { usePlayerStore } from '@/store/modules/player';
+import { formatTime } from '@/utils/formatters';
 
 const { t } = useI18n();
 const playerStore = usePlayerStore();
@@ -174,15 +175,7 @@ const formattedRemainingTime = computed(() => {
   const remaining = Math.max(0, sleepTimer.value.endTime - Date.now());
   const totalSeconds = Math.floor(remaining / 1000);
 
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-
-  const formattedHours = hours.toString().padStart(2, '0');
-  const formattedMinutes = minutes.toString().padStart(2, '0');
-  const formattedSeconds = seconds.toString().padStart(2, '0');
-
-  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  return formatTime(totalSeconds, 'hh:mm:ss');
 });
 
 // 监听剩余时间变化

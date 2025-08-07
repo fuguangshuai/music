@@ -26,7 +26,7 @@ export interface Playlist {
   specialType: number;
   totalDuration: number;
   creator: Creator;
-  tracks?: any;
+  tracks?: Record<string, unknown>[];
   subscribers: Subscriber[];
   subscribed: boolean;
   commentThreadId: string;
@@ -37,7 +37,7 @@ export interface Playlist {
   ordered: boolean;
   anonimous: boolean;
   coverStatus: number;
-  recommendInfo?: any;
+  recommendInfo?: Record<string, unknown>;
   shareCount: number;
   coverImgId_str?: string;
   commentCount: number;
@@ -66,13 +66,13 @@ interface Subscriber {
   backgroundUrl: string;
   authority: number;
   mutual: boolean;
-  expertTags?: any;
-  experts?: any;
+  expertTags?: string[];
+  experts?: Record<string, unknown>;
   djStatus: number;
   vipType: number;
-  remarkName?: any;
+  remarkName?: string;
   authenticationTypes: number;
-  avatarDetail?: any;
+  avatarDetail?: Record<string, unknown>;
   avatarImgIdStr: string;
   backgroundImgIdStr: string;
   anchor: boolean;
@@ -104,7 +104,7 @@ interface Creator {
   experts?: Expert;
   djStatus: number;
   vipType: number;
-  remarkName?: any;
+  remarkName?: string;
   authenticationTypes: number;
   avatarDetail?: AvatarDetail;
   avatarImgIdStr: string;

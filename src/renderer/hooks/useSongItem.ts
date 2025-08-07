@@ -6,6 +6,7 @@ import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store';
 import type { SongResult } from '@/type/music';
 import { getImgUrl } from '@/utils';
+import { formatDuration } from '@/utils/formatters';
 import { getImageBackground } from '@/utils/linearColor';
 
 import { useArtist } from './useArtist';
@@ -110,14 +111,7 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     return 0;
   };
 
-  // 格式化时长
-  const formatDuration = (ms: number): string => {
-    if (!ms) return '--:--';
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+
 
   // 处理右键菜单
   const handleContextMenu = (e: MouseEvent) => {

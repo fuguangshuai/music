@@ -13,7 +13,7 @@ export function navigateToMusicList(
     id?: string | number;
     type?: 'album' | 'playlist' | 'dailyRecommend' | string;
     name: string;
-    songList: any[];
+    songList: Array<any>;
     listInfo?: any;
     canRemove?: boolean;
   }

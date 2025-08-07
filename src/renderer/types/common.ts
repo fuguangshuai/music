@@ -1,0 +1,412 @@
+/**
+ * 通用类型定义
+ * 替换项目中过于宽泛的unknown类型使用
+ */
+
+/**
+ * 代理配置接口
+ */
+export interface ProxyConfig {
+  /** 是否启用代理 */
+  enable?: boolean;
+  /** 代理协议 */
+  protocol?: 'http' | 'https' | 'socks4' | 'socks5';
+  /** 代理主机 */
+  host?: string;
+  /** 代理端口 */
+  port?: number;
+  /** 用户名 */
+  username?: string;
+  /** 密码 */
+  password?: string;
+}
+
+/**
+ * 应用配置接口
+ * 替换 Record<string, unknown> 的配置对象
+ */
+export interface AppConfig {
+  /** 音乐API端口 */
+  musicApiPort?: number;
+  /** 主题设置 */
+  theme?: 'light' | 'dark' | 'auto';
+  /** 语言设置 */
+  language?: 'zh-CN' | 'en-US' | 'ja-JP';
+  /** 音量设置 (0-100) */
+  volume?: number;
+  /** 播放质量 */
+  quality?: 'standard' | 'higher' | 'exhigh' | 'lossless';
+  /** 下载目录 */
+  downloadPath?: string;
+  /** 是否启用歌词显示 */
+  showLyrics?: boolean;
+  /** 是否启用桌面歌词 */
+  desktopLyrics?: boolean;
+  /** 播放模式 */
+  playMode?: 'order' | 'random' | 'single' | 'loop';
+  /** 代理配置 */
+  proxyConfig?: ProxyConfig;
+  /** 是否启用真实IP */
+  enableRealIP?: boolean;
+  /** 真实IP地址 */
+  realIP?: string;
+  /** 是否启用无损音质 */
+  enableFlac?: boolean;
+  /** 其他扩展配置 */
+  [key: string]: unknown;
+}
+
+/**
+ * 消息提示选项
+ * 替换消息组件中的 Record<string, unknown>
+ */
+export interface MessageOptions {
+  /** 显示时长(ms)，0表示不自动关闭 */
+  duration?: number;
+  /** 是否显示关闭按钮 */
+  closable?: boolean;
+  /** 是否显示图标 */
+  showIcon?: boolean;
+  /** 关闭回调 */
+  onClose?: () => void;
+  /** 点击回调 */
+  onClick?: () => void;
+  /** 自定义类名 */
+  className?: string;
+}
+
+/**
+ * 存储操作接口
+ * 替换 Electron store 的 unknown 类型
+ */
+export interface StorageValue {
+  /** 字符串值 */
+  string?: string;
+  /** 数字值 */
+  number?: number;
+  /** 布尔值 */
+  boolean?: boolean;
+  /** 对象值 */
+  object?: Record<string, unknown>;
+  /** 数组值 */
+  array?: unknown[];
+}
+
+/**
+ * 存储操作类型
+ */
+export type StorageKey = 
+  | 'user-config'
+  | 'player-state'
+  | 'download-history'
+  | 'search-history'
+  | 'playlist-cache'
+  | 'theme-config'
+  | 'language-config';
+
+/**
+ * API响应基础结构
+ * 替换API响应中的 unknown 类型
+ */
+export interface BaseResponse<T = unknown> {
+  /** 响应码 */
+  code: number;
+  /** 响应消息 */
+  message?: string;
+  /** 响应数据 */
+  data?: T;
+  /** 时间戳 */
+  timestamp?: number;
+}
+
+/**
+ * 分页响应结构
+ */
+export interface PaginatedResponse<T = unknown> extends BaseResponse<T[]> {
+  /** 总数 */
+  total?: number;
+  /** 当前页 */
+  page?: number;
+  /** 每页大小 */
+  pageSize?: number;
+  /** 是否有更多 */
+  hasMore?: boolean;
+}
+
+/**
+ * 错误详情接口
+ * 替换错误处理中的 Record<string, unknown>
+ */
+export interface ErrorDetails {
+  /** 错误码 */
+  code?: string;
+  /** 请求URL */
+  url?: string;
+  /** 请求方法 */
+  method?: string;
+  /** 响应状态码 */
+  status?: number;
+  /** 错误堆栈 */
+  stack?: string;
+  /** 用户代理 */
+  userAgent?: string;
+  /** 时间戳 */
+  timestamp?: number;
+  /** 额外信息 */
+  extra?: Record<string, string | number | boolean>;
+}
+
+/**
+ * 事件数据接口
+ * 替换事件处理中的 unknown 类型
+ */
+export interface EventData {
+  /** 事件类型 */
+  type: string;
+  /** 事件源 */
+  source?: string;
+  /** 事件数据 */
+  payload?: Record<string, unknown>;
+  /** 时间戳 */
+  timestamp?: number;
+}
+
+/**
+ * 文件信息接口
+ * 替换文件操作中的 unknown 类型
+ */
+export interface FileInfo {
+  /** 文件名 */
+  name: string;
+  /** 文件路径 */
+  path: string;
+  /** 文件大小(字节) */
+  size: number;
+  /** 文件类型 */
+  type: string;
+  /** 修改时间 */
+  lastModified: number;
+  /** 是否为目录 */
+  isDirectory: boolean;
+}
+
+/**
+ * 音频元数据接口
+ * 替换音频处理中的 unknown 类型
+ */
+export interface AudioMetadata {
+  /** 标题 */
+  title?: string;
+  /** 艺术家 */
+  artist?: string;
+  /** 专辑 */
+  album?: string;
+  /** 时长(秒) */
+  duration?: number;
+  /** 比特率 */
+  bitrate?: number;
+  /** 采样率 */
+  sampleRate?: number;
+  /** 格式 */
+  format?: string;
+  /** 封面URL */
+  coverUrl?: string;
+}
+
+/**
+ * 艺术家信息接口
+ */
+export interface Artist {
+  /** 艺术家ID */
+  id: number;
+  /** 艺术家名称 */
+  name: string;
+  /** 艺术家头像 */
+  picUrl?: string;
+  /** 别名 */
+  alias?: string[];
+  /** 简介 */
+  briefDesc?: string;
+}
+
+/**
+ * 专辑信息接口
+ */
+export interface Album {
+  /** 专辑ID */
+  id: number;
+  /** 专辑名称 */
+  name: string;
+  /** 专辑封面 */
+  picUrl?: string;
+  /** 发布时间 */
+  publishTime?: number;
+  /** 艺术家 */
+  artist?: Artist;
+  /** 歌曲数量 */
+  size?: number;
+  /** 唱片公司 */
+  company?: string;
+  /** 描述 */
+  desc?: string;
+}
+
+/**
+ * 歌曲信息接口
+ */
+export interface Song {
+  /** 歌曲ID */
+  id: number;
+  /** 歌曲名称 */
+  name: string;
+  /** 艺术家列表 */
+  ar?: Artist[];
+  /** 艺术家列表(别名) */
+  artists?: Artist[];
+  /** 专辑信息 */
+  al?: Album;
+  /** 专辑信息(别名) */
+  album?: Album;
+  /** 时长(毫秒) */
+  dt?: number;
+  /** 时长(毫秒)(别名) */
+  duration?: number;
+  /** 封面URL */
+  picUrl?: string;
+  /** 播放URL */
+  url?: string;
+  /** 歌词 */
+  lyric?: string;
+  /** VIP标识 */
+  fee?: number;
+  /** 是否可播放 */
+  playable?: boolean;
+  /** 音质信息 */
+  h?: AudioQuality;
+  /** 音质信息 */
+  m?: AudioQuality;
+  /** 音质信息 */
+  l?: AudioQuality;
+}
+
+/**
+ * 音质信息接口
+ */
+export interface AudioQuality {
+  /** 比特率 */
+  br: number;
+  /** 文件大小 */
+  size: number;
+  /** 音频编码 */
+  encodeType?: string;
+}
+
+/**
+ * 滚动事件接口
+ */
+export interface ScrollEvent {
+  /** 事件目标 */
+  target: {
+    /** 滚动位置 */
+    scrollTop: number;
+    /** 滚动高度 */
+    scrollHeight: number;
+    /** 客户端高度 */
+    clientHeight: number;
+  };
+}
+
+/**
+ * 错误对象接口
+ */
+export interface ErrorObject extends Error {
+  /** 错误消息 */
+  message: string;
+  /** 错误码 */
+  code?: string;
+  /** 错误详情 */
+  details?: ErrorDetails;
+}
+
+/**
+ * MV信息接口
+ */
+export interface MV {
+  /** MV ID */
+  id: number;
+  /** MV名称 */
+  name: string;
+  /** 封面URL */
+  cover?: string;
+  /** 封面URL(别名) */
+  picUrl?: string;
+  /** 播放次数 */
+  playCount?: number;
+  /** 描述 */
+  desc?: string;
+  /** 艺术家列表 */
+  artists?: Artist[];
+  /** 类型 */
+  type?: string;
+}
+
+/**
+ * 播放列表信息接口
+ */
+export interface Playlist {
+  /** 播放列表ID */
+  id: number;
+  /** 播放列表名称 */
+  name: string;
+  /** 封面URL */
+  coverImgUrl?: string;
+  /** 封面URL(别名) */
+  picUrl?: string;
+  /** 播放次数 */
+  playCount?: number;
+  /** 描述 */
+  desc?: string;
+  /** 创建者 */
+  creator?: {
+    /** 用户ID */
+    userId: number;
+    /** 昵称 */
+    nickname: string;
+    /** 头像 */
+    avatarUrl?: string;
+  };
+  /** 类型 */
+  type?: string;
+}
+
+/**
+ * 类型守卫函数
+ */
+export const isAppConfig = (value: unknown): value is AppConfig => {
+  return typeof value === 'object' && value !== null;
+};
+
+export const isMessageOptions = (value: unknown): value is MessageOptions => {
+  return typeof value === 'object' && value !== null;
+};
+
+export const isErrorDetails = (value: unknown): value is ErrorDetails => {
+  return typeof value === 'object' && value !== null;
+};
+
+/**
+ * 类型断言辅助函数
+ */
+export const assertAppConfig = (value: unknown): AppConfig => {
+  if (!isAppConfig(value)) {
+    throw new Error('Invalid AppConfig');
+  }
+  return value;
+};
+
+export const assertMessageOptions = (value: unknown): MessageOptions => {
+  if (!isMessageOptions(value)) {
+    throw new Error('Invalid MessageOptions');
+  }
+  return value;
+};

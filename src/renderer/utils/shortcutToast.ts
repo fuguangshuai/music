@@ -3,7 +3,7 @@ import { createVNode, render } from 'vue';
 import ShortcutToast from '@/components/ShortcutToast.vue';
 
 let container: HTMLDivElement | null = null;
-let toastInstance: any = null;
+let toastInstance: { show: (message: string, iconName: string, options: { showIcon?: boolean }) => void } | null = null;
 
 interface ToastOptions {
   position?: 'top' | 'center' | 'bottom';
@@ -38,7 +38,7 @@ export function showShortcutToast(message: string, iconName = '', options: Toast
 
   // 渲染 toast
   render(vnode, container);
-  toastInstance = vnode.component?.exposed;
+  toastInstance = vnode.component?.exposed as any;
 
   // 显示 toast
   if (toastInstance) {

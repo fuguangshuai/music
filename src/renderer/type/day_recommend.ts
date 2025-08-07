@@ -1,6 +1,6 @@
 export interface IDayRecommend {
   dailySongs: DailySong[];
-  orderSongs: any[];
+  orderSongs: Record<string, unknown>[];
   recommendReasons: RecommendReason[];
   mvResourceInfos: null;
 }
@@ -38,7 +38,7 @@ interface DailySong {
   no: number;
   rtUrl: null;
   ftype: number;
-  rtUrls: any[];
+  rtUrls: string[];
   djId: number;
   copyright: number;
   s_id: number;
@@ -163,6 +163,6 @@ interface Al {
 interface Ar {
   id: number;
   name: string;
-  tns: any[];
-  alias: any[];
+  tns: string[];
+  alias: string[];
 }

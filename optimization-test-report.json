@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-08-04T16:40:11.319Z",
+  "results": {
+    "eslint": {
+      "passed": false,
+      "errors": 38,
+      "warnings": 493
+    },
+    "typescript": {
+      "passed": true,
+      "errors": 0
+    },
+    "build": {
+      "passed": true,
+      "time": 9568
+    },
+    "security": {
+      "passed": false,
+      "vulnerabilities": 1
+    },
+    "performance": {
+      "buildSize": 0,
+      "startTime": 0,
+      "memoryUsage": 5458360,
+      "bundleAnalysis": null,
+      "runtimeMetrics": {
+        "timestamp": "2025-08-04T16:40:11.167Z",
+        "buildTime": 9568,
+        "memoryEfficiency": "good"
+      }
+    }
+  },
+  "summary": {
+    "totalTests": 4,
+    "passedTests": 2,
+    "passRate": "50.0"
+  }
+}

@@ -61,7 +61,7 @@ export const getMusicLrc = async (id: number) => {
   try {
     // 尝试获取缓存的歌词
     const cachedLyric = await getData('music_lyric', id);
-    if (cachedLyric?.createTime && Date.now() - cachedLyric.createTime < TEN_DAYS_MS) {
+    if (cachedLyric?.createTime && Date.now() - (cachedLyric.createTime as number) < TEN_DAYS_MS) {
       return { ...cachedLyric };
     }
 
@@ -91,7 +91,7 @@ export const getMusicLrc = async (id: number) => {
  */
 const getGDMusicAudio = async (id: number, data: SongResult) => {
   try {
-    const gdResult = await parseFromGDMusic(id, data, '999');
+    const gdResult = await parseFromGDMusic(id, data as unknown as Record<string, unknown>, '999');
     if (gdResult) {
       return gdResult;
     }
@@ -108,7 +108,7 @@ const getGDMusicAudio = async (id: number, data: SongResult) => {
  * @param sources 音源列表
  * @returns 解析结果
  */
-const getUnblockMusicAudio = (id: number, data: SongResult, sources: any[]) => {
+const getUnblockMusicAudio = (id: number, data: SongResult, sources: string[]) => {
   const filteredSources = sources.filter(
     (source) => !['gdmusic', 'stellar', 'cloud'].includes(source)
   );
@@ -133,7 +133,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
   // 1. 确定使用的音源列表(自定义或全局)
   const songId = String(id);
   const savedSourceStr = localStorage.getItem(`song_source_${songId}`);
-  let musicSources: any[] = [];
+  let musicSources: string[] = [];
 
   try {
     if (savedSourceStr) {
@@ -142,7 +142,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
       console.log(`使用歌曲 ${id} 自定义音源:`, musicSources);
     } else {
       // 使用全局音源设置
-      musicSources = settingStore.setData.enabledMusicSources || [];
+      musicSources = (settingStore.setData.enabledMusicSources as string[]) || [];
       console.log(`使用全局音源设置:`, musicSources);
       if (isElectron && musicSources.length > 0) {
         return getUnblockMusicAudio(id, data, musicSources);
@@ -150,7 +150,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
     }
   } catch (e) {
     console.error('解析音源设置失败，使用全局设置', e);
-    musicSources = settingStore.setData.enabledMusicSources || [];
+    musicSources = (settingStore.setData.enabledMusicSources as string[]) || [];
   }
 
   // 2. 按优先级解析：UnblockMusic → 星辰音乐 → 云端音乐 → GD音乐台
@@ -181,12 +181,25 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
    * @param data 歌曲元数据
    * @returns axios响应或null
    */
-  async function tryParseMusic(apiIndex: number, apiName: string, id: string, data: any) {
+  async function tryParseMusic(apiIndex: number, apiName: string, id: string, data: SongResult) {
     console.log(`🎵 使用${apiName}音乐解析 (API索引: ${apiIndex})`);
     try {
       // 使用指定的API索引，不进行自动切换
-      const result = await requestMusic(apiIndex).get<any>('/music', { params: { id } });
-
+      const result = apiIndex === 0
+      ? await requestMusic(apiIndex).get<any>(`?songs=${encodeURIComponent(songId)}`)
+      : await requestMusic(apiIndex).get<any>('/music', { params: { id } });
+      if (apiIndex === 0 && result.data.解锁成功 > 0) {
+          result.data = {
+            params: {},
+            data: {
+              size: result.data.成功列表.文件大小 || 0,
+              br: result.data.成功列表.音质 || 320000,
+              url: result.data.成功列表.播放链接 || '',
+              md5: '',
+              source: result.data.成功列表.音源ID || result.data.成功列表.音源名称 || apiName
+            }
+          };
+      }
       if (result?.data) {
         console.log(
           `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${data.name || '未知'}, 音源: ${result.data.data?.source || apiName}`

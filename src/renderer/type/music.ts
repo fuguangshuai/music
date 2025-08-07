@@ -17,11 +17,11 @@ export interface SongResult {
   name: string;
   picUrl: string;
   playCount?: number;
-  song?: any;
+  song?: SongResult;
   copywriter?: string;
   type?: number;
   canDislike?: boolean;
-  program?: any;
+  program?: unknown;
   alg?: string;
   ar: Artist[];
   artists?: Artist[];
@@ -65,26 +65,26 @@ export interface Song {
   dayPlays: number;
   hearTime: number;
   ringtone: string;
-  crbt?: any;
-  audition?: any;
+  crbt?: unknown;
+  audition?: unknown;
   copyFrom: string;
   commentThreadId: string;
-  rtUrl?: any;
+  rtUrl?: string | null;
   ftype: number;
-  rtUrls: any[];
+  rtUrls: string[];
   copyright: number;
-  transName?: any;
-  sign?: any;
+  transName?: string | null;
+  sign?: string | null;
   mark: number;
   originCoverType: number;
-  originSongSimpleData?: any;
+  originSongSimpleData?: unknown;
   single: number;
-  noCopyrightRcmd?: any;
+  noCopyrightRcmd?: unknown;
   rtype: number;
-  rurl?: any;
+  rurl?: string | null;
   mvid: number;
   bMusic: BMusic;
-  mp3Url?: any;
+  mp3Url?: string | null;
   hMusic: BMusic;
   mMusic: BMusic;
   lMusic: BMusic;
@@ -114,15 +114,15 @@ interface Privilege {
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: any;
+  rscl?: unknown;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }
 
 interface ChargeInfoList {
   rate: number;
-  chargeUrl?: any;
-  chargeMessage?: any;
+  chargeUrl?: string | null;
+  chargeMessage?: string | null;
   chargeType: number;
 }
 
@@ -132,7 +132,7 @@ interface FreeTrialPrivilege {
 }
 
 interface BMusic {
-  name?: any;
+  name?: string;
   id: number;
   size: number;
   extension: string;
@@ -159,14 +159,14 @@ interface Album {
   company: string;
   briefDesc: string;
   artist: Artist;
-  songs: any[];
+  songs: Record<string, unknown>[];
   alias: string[];
   status: number;
   copyrightId: number;
   commentThreadId: string;
   artists: Artist[];
   subType: string;
-  transName?: any;
+  transName?: string;
   onSale: boolean;
   mark: number;
   picId_str: string;
@@ -181,7 +181,7 @@ export interface Artist {
   picUrl: string;
   img1v1Url: string;
   albumSize: number;
-  alias: any[];
+  alias: string[];
   trans: string;
   musicSize: number;
   topicPerson: number;
@@ -203,11 +203,11 @@ interface Datum {
   type: string;
   gain: number;
   fee: number;
-  uf?: any;
+  uf?: unknown;
   payed: number;
   flag: number;
   canExtend: boolean;
-  freeTrialInfo?: any;
+  freeTrialInfo?: unknown;
   level: string;
   encodeType: string;
   freeTrialPrivilege: FreeTrialPrivilege;

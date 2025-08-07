@@ -183,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDateFormat } from '@vueuse/core';
+// import { useDateFormat } from '@vueuse/core'; // 暂时未使用
 import { useMessage } from 'naive-ui';
 import PinyinMatch from 'pinyin-match';
 import {
@@ -207,6 +207,7 @@ import SongItem from '@/components/common/SongItem.vue';
 import { usePlayerStore } from '@/store';
 import { IArtist } from '@/type/artist';
 import { getImgUrl, isMobile } from '@/utils';
+import { formatPublishTime } from '@/utils/formatters';
 
 defineOptions({
   name: 'ArtistDetail'
@@ -391,11 +392,6 @@ const loadAlbums = async () => {
   } finally {
     albumLoading.value = false;
   }
-};
-
-// 格式化发布时间
-const formatPublishTime = (time: number) => {
-  return useDateFormat(time, 'YYYY-MM-DD').value;
 };
 
 // 搜索相关方法

@@ -1,11 +1,11 @@
 export interface IListDetail {
   code: number;
-  relatedVideos?: any;
+  relatedVideos?: Record<string, unknown>[];
   playlist: Playlist;
-  urls?: any;
+  urls?: Record<string, unknown>[];
   privileges: Privilege[];
-  sharedPrivilege?: any;
-  resEntrance?: any;
+  sharedPrivilege?: Record<string, unknown>;
+  resEntrance?: Record<string, unknown>;
 }
 
 interface Privilege {
@@ -22,22 +22,22 @@ interface Privilege {
   cs: boolean;
   maxbr: number;
   fl: number;
-  pc?: any;
+  pc?: unknown;
   toast: boolean;
   flag: number;
   paidBigBang: boolean;
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: any;
+  rscl?: unknown;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }
 
 interface ChargeInfoList {
   rate: number;
-  chargeUrl?: any;
-  chargeMessage?: any;
+  chargeUrl?: string;
+  chargeMessage?: string;
   chargeType: number;
 }
 
@@ -72,25 +72,25 @@ export interface Playlist {
   ordered: boolean;
   description: string;
   tags: string[];
-  updateFrequency?: any;
+  updateFrequency?: string;
   backgroundCoverId: number;
-  backgroundCoverUrl?: any;
+  backgroundCoverUrl?: string;
   titleImage: number;
-  titleImageUrl?: any;
-  englishTitle?: any;
-  officialPlaylistType?: any;
+  titleImageUrl?: string;
+  englishTitle?: string;
+  officialPlaylistType?: string;
   subscribers: Subscriber[];
   subscribed: boolean;
   creator: Subscriber;
   tracks: Track[];
-  videoIds?: any;
-  videos?: any;
+  videoIds?: number[];
+  videos?: Record<string, unknown>[];
   trackIds: TrackId[];
   shareCount: number;
   commentCount: number;
-  remixVideo?: any;
-  sharedUsers?: any;
-  historySharedUsers?: any;
+  remixVideo?: Record<string, unknown>;
+  sharedUsers?: Record<string, unknown>[];
+  historySharedUsers?: Record<string, unknown>[];
 }
 
 interface TrackId {
@@ -98,7 +98,7 @@ interface TrackId {
   v: number;
   t: number;
   at: number;
-  alg?: any;
+  alg?: string;
   uid: number;
   rcmdReason: string;
 }
@@ -115,32 +115,32 @@ interface Track {
   rt?: string;
   fee: number;
   v: number;
-  crbt?: any;
+  crbt?: string;
   cf: string;
   al: Al;
   dt: number;
   h: H;
   m: H;
   l?: H;
-  a?: any;
+  a?: Record<string, unknown>;
   cd: string;
   no: number;
-  rtUrl?: any;
+  rtUrl?: string;
   ftype: number;
-  rtUrls: any[];
+  rtUrls: string[];
   djId: number;
   copyright: number;
   s_id: number;
   mark: number;
   originCoverType: number;
-  originSongSimpleData?: any;
+  originSongSimpleData?: Record<string, unknown>;
   single: number;
-  noCopyrightRcmd?: any;
+  noCopyrightRcmd?: Record<string, unknown>;
   mst: number;
   cp: number;
   mv: number;
   rtype: number;
-  rurl?: any;
+  rurl?: string;
   publishTime: number;
   tns?: string[];
 }
@@ -156,7 +156,7 @@ interface Al {
   id: number;
   name: string;
   picUrl: string;
-  tns: any[];
+  tns: string[];
   pic_str?: string;
   pic: number;
 }
@@ -164,8 +164,8 @@ interface Al {
 interface Ar {
   id: number;
   name: string;
-  tns: any[];
-  alias: any[];
+  tns: string[];
+  alias: string[];
 }
 
 interface Subscriber {
@@ -189,13 +189,13 @@ interface Subscriber {
   backgroundUrl: string;
   authority: number;
   mutual: boolean;
-  expertTags?: any;
-  experts?: any;
+  expertTags?: string[];
+  experts?: Record<string, unknown>;
   djStatus: number;
   vipType: number;
-  remarkName?: any;
+  remarkName?: string;
   authenticationTypes: number;
-  avatarDetail?: any;
+  avatarDetail?: Record<string, unknown>;
   backgroundImgIdStr: string;
   anchor: boolean;
   avatarImgIdStr: string;

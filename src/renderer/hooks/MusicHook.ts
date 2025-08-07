@@ -16,7 +16,7 @@ import type { usePlayerStore } from '@/store';
 import { getSongUrl } from '@/store/modules/player';
 import type { Artist, ILyricText, SongResult } from '@/type/music';
 import { isElectron } from '@/utils';
-import { getTextColors } from '@/utils/linearColor';
+import { getTextColors, type ITextColors } from '@/utils/linearColor';
 
 // 全局定时器管理
 declare global {
@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-const windowData = window as any;
+const windowData = window as Window & { musicHookTimers?: NodeJS.Timeout[] };
 
 // 全局 playerStore 引用，通过 initMusicHook 函数注入
 let playerStore: ReturnType<typeof usePlayerStore> | null = null;
@@ -63,7 +63,7 @@ export const nowIndex = ref(0); // 当前播放歌词
 export const currentLrcProgress = ref(0); // 来存储当前歌词的进度
 export const sound = ref<Howl | null>(audioService.getCurrentSound());
 export const isLyricWindowOpen = ref(false); // 新增状态
-export const textColors = ref<any>(getTextColors());
+export const textColors = ref<ITextColors>(getTextColors());
 
 // 这些 computed 属性需要在初始化后创建
 export let playMusic: ComputedRef<SongResult>;
@@ -333,7 +333,7 @@ const setupMusicWatchers = () => {
 };
 
 const setupAudioListeners = () => {
-  let interval: any = null;
+  let interval: number | null = null;
 
   const clearInterval = () => {
     if (interval) {
@@ -784,7 +784,7 @@ export const sendLyricToWin = () => {
 };
 
 // 歌词同步定时器
-let lyricSyncInterval: any = null;
+let lyricSyncInterval: NodeJS.Timeout | null = null;
 
 // 开始歌词同步
 const startLyricSync = () => {
@@ -1011,13 +1011,13 @@ audioService.on('url_expired', async (expiredTrack) => {
       // 处理网易云音乐，重新获取URL
       console.log('重新获取网易云音乐URL');
       try {
-        const newUrl = await getSongUrl(expiredTrack.id, expiredTrack as any);
+        const newUrl = await getSongUrl(expiredTrack.id, expiredTrack as unknown as SongResult);
 
         if (newUrl) {
           console.log('成功获取新的网易云URL:', newUrl);
 
           // 更新存储
-          (expiredTrack as any).playMusicUrl = newUrl;
+          (expiredTrack as { playMusicUrl?: string }).playMusicUrl = newUrl;
           getPlayerStore().playMusicUrl = newUrl;
 
           // 重新播放并设置进度

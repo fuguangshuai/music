@@ -4,6 +4,7 @@ import { join } from 'path';
 
 import type { Language } from '../i18n/main';
 import i18n from '../i18n/main';
+import type { Song } from '../renderer/types/api-responses';
 import { loadLyricWindow } from './lyric';
 import { initializeConfig } from './modules/config';
 import { initializeFileManager } from './modules/fileManager';
@@ -116,8 +117,24 @@ if (!isSingleInstance) {
   });
 
   // 监听当前歌曲变化
-  ipcMain.on('update-current-song', (_, song: any) => {
-    updateCurrentSong(song);
+  ipcMain.on('update-current-song', (_, song: Song) => {
+    // 转换Song类型到SongInfo类型
+    const artists = (song.artists || (song as any).ar || []).map((artist: any) => ({
+      name: artist.name || '',
+      ...artist
+    }));
+
+    const songInfo = {
+      name: song.name,
+      song: {
+        artists,
+        id: song.id,
+        name: song.name,
+        album: song.album || (song as any).al,
+        duration: song.duration || (song as any).dt
+      }
+    };
+    updateCurrentSong(songInfo);
   });
 
   // 所有窗口关闭时的处理

@@ -17,7 +17,7 @@ interface SortAll {
   name: string;
   resourceCount?: number;
   imgId?: number;
-  imgUrl?: any;
+  imgUrl?: string;
   type?: number;
   category?: number;
   resourceType?: number;

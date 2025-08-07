@@ -19,7 +19,7 @@ export interface Album {
   company: string;
   briefDesc: string;
   artist: Artist;
-  songs?: any;
+  songs?: Record<string, unknown>[];
   alias: string[];
   status: number;
   copyrightId: number;
@@ -39,7 +39,7 @@ interface Artist2 {
   picUrl: string;
   img1v1Url: string;
   albumSize: number;
-  alias: any[];
+  alias: string[];
   trans: string;
   musicSize: number;
   topicPerson: number;

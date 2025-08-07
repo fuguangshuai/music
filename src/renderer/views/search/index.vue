@@ -123,6 +123,8 @@ import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSearchStore } from '@/store/modules/search';
 import type { IHotSearch } from '@/type/search';
+import type { SongResult } from '@/type/music';
+import type { Album, Artist, MV, Playlist, Song } from '@/types/common';
 import { isMobile, setAnimationClass, setAnimationDelay } from '@/utils';
 
 defineOptions({
@@ -202,7 +204,7 @@ onMounted(() => {
 
 const hotKeyword = ref(route.query.keyword || t('search.title.searchList'));
 
-const loadSearch = async (keywords: any, type: any = null, isLoadMore = false) => {
+const loadSearch = async (keywords: string, type: number | null = null, isLoadMore = false) => {
   if (!keywords) return;
 
   // 使用传入的类型或当前类型
@@ -240,31 +242,35 @@ const loadSearch = async (keywords: any, type: any = null, isLoadMore = false) =
       offset: page.value * ITEMS_PER_PAGE
     });
 
-    const songs = data.result.songs || [];
-    const albums = data.result.albums || [];
-    const mvs = (data.result.mvs || []).map((item: any) => ({
-      ...item,
-      picUrl: item.cover,
-      playCount: item.playCount,
-      desc: item.artists.map((artist: any) => artist.name).join('/'),
-      type: 'mv'
-    }));
+    const songs = (data as any).result.songs || [];
+    const albums = (data as any).result.albums || [];
+    const mvs = ((data as any).result.mvs || []).map(
+      (item: MV): MV => ({
+        ...item,
+        picUrl: item.cover,
+        playCount: item.playCount,
+        desc: item.artists?.map((artist: Artist) => artist.name).join('/'),
+        type: 'mv'
+      })
+    );
 
-    const playlists = (data.result.playlists || []).map((item: any) => ({
-      ...item,
-      picUrl: item.coverImgUrl,
-      playCount: item.playCount,
-      desc: item.creator.nickname,
-      type: 'playlist'
-    }));
+    const playlists = ((data as any).result.playlists || []).map(
+      (item: Playlist): Playlist => ({
+        ...item,
+        picUrl: item.coverImgUrl,
+        playCount: item.playCount,
+        desc: item.creator?.nickname,
+        type: 'playlist'
+      })
+    );
 
     // songs map 替换属性
-    songs.forEach((item: any) => {
-      item.picUrl = item.al.picUrl;
+    songs.forEach((item: Song) => {
+      item.picUrl = item.al?.picUrl;
       item.artists = item.ar;
     });
-    albums.forEach((item: any) => {
-      item.desc = `${item.artist.name} ${item.company} ${dateFormat(item.publishTime)}`;
+    albums.forEach((item: Album) => {
+      item.desc = `${item.artist?.name} ${item.company} ${item.publishTime ? dateFormat(item.publishTime) : ''}`;
     });
 
     if (isLoadMore && searchDetail.value) {
@@ -321,12 +327,13 @@ if (searchStore.searchValue) {
 // 修改 store.state 的设置
 searchStore.searchValue = route.query.keyword as string;
 
-const dateFormat = (time: any) => useDateFormat(time, 'YYYY.MM.DD').value;
+const dateFormat = (time: number | string | Date) => useDateFormat(time, 'YYYY.MM.DD').value;
 
 // 添加滚动处理函数 (用于模板中的@scroll事件)
-// @ts-ignore - 用于模板中的@scroll事件
-const handleScroll = (e: any) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+// 用于模板中的@scroll事件
+const handleScroll = (e: Event) => {
+  const target = e.target as any;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   // 距离底部100px时加载更多
   if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoadingMore.value && hasMore.value) {
     loadSearch(currentKeyword.value, null, true);
@@ -352,10 +359,17 @@ watch(
 );
 
 // 播放单首歌曲 (用于模板中的@play事件)
-// @ts-ignore - 用于模板中的@play事件
-const handlePlay = async (item: any) => {
+const handlePlay = async (item: Song) => {
+  // 转换为SongResult类型
+  const songResult = {
+    ...item,
+    count: 0,
+    ar: item.artists || [],
+    al: item.album || { name: '', id: 0 }
+  } as SongResult;
+
   // 使用统一的播放控制服务立即播放歌曲
-  await playControl(item, 'SearchPage-SongItem');
+  await playControl(songResult, 'SearchPage-SongItem');
 };
 
 // 点击搜索历史

@@ -1,9 +1,8 @@
-import { Howl } from 'howler';
 import { cloneDeep } from 'lodash';
-import { ref } from 'vue';
 
 import { getMusicLrc, getMusicUrl, getParsingMusicUrl } from '@/api/music';
 import { useMusicHistory } from '@/hooks/MusicHistoryHook';
+import { audioPreloadService, smartPreloadService } from '@/services/audioPreloadService'; // 🎵 导入统一的预加载服务
 import { audioService } from '@/services/audioService';
 import { useSettingsStore } from '@/store';
 import type { ILyric, ILyricText, SongResult } from '@/type/music';
@@ -13,13 +12,13 @@ import { getImageLinearBackground } from '@/utils/linearColor';
 const musicHistory = useMusicHistory();
 
 // 获取歌曲url
-export const getSongUrl = async (id: any, songData: any, isDownloaded: boolean = false) => {
+export const getSongUrl = async (id: number, songData: SongResult, isDownloaded: boolean = false) => {
   const settingsStore = useSettingsStore();
-  const { unlimitedDownload } = settingsStore.setData;
+  const unlimitedDownload = (settingsStore.setData as any).unlimitedDownload;
 
   const { data } = await getMusicUrl(id, !unlimitedDownload);
   let url = '';
-  let songDetail = null;
+  let songDetail: unknown = null;
 
   try {
     if (data.data[0].freeTrialInfo || !data.data[0].url) {
@@ -27,7 +26,7 @@ export const getSongUrl = async (id: any, songData: any, isDownloaded: boolean =
       url = res.data.data.url;
       songDetail = res.data.data;
     } else {
-      songDetail = data.data[0] as any;
+      songDetail = data.data[0] as unknown;
     }
   } catch (error) {
     console.error('error', error);
@@ -41,8 +40,8 @@ export const getSongUrl = async (id: any, songData: any, isDownloaded: boolean =
 
 const getSongDetail = async (playMusic: SongResult) => {
   playMusic.playLoading = true;
-  const playMusicUrl =
-    playMusic.playMusicUrl || (await getSongUrl(playMusic.id, cloneDeep(playMusic)));
+  const songUrl = await getSongUrl(playMusic.id as number, cloneDeep(playMusic));
+  const playMusicUrl = playMusic.playMusicUrl || (typeof songUrl === 'string' ? songUrl : undefined);
   const { backgroundColor, primaryColor } =
     playMusic.backgroundColor && playMusic.primaryColor
       ? playMusic
@@ -53,8 +52,17 @@ const getSongDetail = async (playMusic: SongResult) => {
 };
 
 // 加载 当前歌曲 歌曲列表数据 下一首mp3预加载 歌词数据
+interface PlayerState {
+  playMusic: SongResult;
+  playMusicUrl: string | undefined;
+  play: boolean;
+  playList: SongResult[];
+  playListIndex: number;
+  [key: string]: any;
+}
+
 export const useMusicListHook = () => {
-  const handlePlayMusic = async (state: any, playMusic: SongResult, isPlay: boolean = true) => {
+  const handlePlayMusic = async (state: PlayerState, playMusic: SongResult, isPlay: boolean = true) => {
     const updatedPlayMusic = await getSongDetail(playMusic);
     state.playMusic = updatedPlayMusic;
     state.playMusicUrl = updatedPlayMusic.playMusicUrl;
@@ -64,12 +72,12 @@ export const useMusicListHook = () => {
 
     // 每次设置新歌曲时，立即更新 localStorage
     localStorage.setItem('currentPlayMusic', JSON.stringify(state.playMusic));
-    localStorage.setItem('currentPlayMusicUrl', state.playMusicUrl);
+    localStorage.setItem('currentPlayMusicUrl', state.playMusicUrl || '');
     localStorage.setItem('isPlaying', state.play.toString());
 
     // 设置网页标题
     document.title = `${updatedPlayMusic.name} - ${updatedPlayMusic?.song?.artists?.reduce((prev, curr) => `${prev}${curr.name}/`, '')}`;
-    loadLrcAsync(state, updatedPlayMusic.id);
+    loadLrcAsync(state, updatedPlayMusic.id as number);
     musicHistory.addMusic(state.playMusic);
     const playListIndex = state.playList.findIndex((item: SongResult) => item.id === playMusic.id);
     state.playListIndex = playListIndex;
@@ -77,46 +85,34 @@ export const useMusicListHook = () => {
     fetchSongs(state, playListIndex + 1, playListIndex + 6);
   };
 
-  const preloadingSounds = ref<Howl[]>([]);
+  // 🗑️ 移除旧的预加载音频数组，现在使用统一的audioPreloadService
 
-  // 用于预加载下一首歌曲的 MP3 数据
-  const preloadNextSong = (nextSongUrl: string) => {
+  // 🧠 使用智能预加载服务替代原有逻辑
+  const preloadNextSong = async (nextSongUrl: string, songInfo?: SongResult, priority: 'high' | 'medium' | 'low' = 'medium') => {
     try {
-      // 限制同时预加载的数量
-      if (preloadingSounds.value.length >= 2) {
-        const oldestSound = preloadingSounds.value.shift();
-        if (oldestSound) {
-          oldestSound.unload();
-        }
+      if (!nextSongUrl) {
+        console.warn('🚫 预加载URL为空，跳过预加载');
+        return null;
       }
 
-      const sound = new Howl({
-        src: [nextSongUrl],
-        html5: true,
-        preload: true,
-        autoplay: false
-      });
+      console.log('🧠 MusicListHook使用智能预加载服务:', nextSongUrl);
+      const sound = await smartPreloadService.smartPreloadAudio(nextSongUrl, songInfo, priority);
 
-      preloadingSounds.value.push(sound);
-
-      // 添加加载错误处理
-      sound.on('loaderror', () => {
-        console.error('预加载音频失败:', nextSongUrl);
-        const index = preloadingSounds.value.indexOf(sound);
-        if (index > -1) {
-          preloadingSounds.value.splice(index, 1);
-        }
-        sound.unload();
-      });
+      if (sound) {
+        console.log('✅ MusicListHook智能音频预加载成功:', nextSongUrl);
+      } else {
+        console.warn('⚠️ MusicListHook智能音频预加载失败或被跳过:', nextSongUrl);
+      }
 
       return sound;
     } catch (error) {
-      console.error('预加载音频出错:', error);
-      return null;
+      console.error('💥 MusicListHook智能预加载音频异常:', error);
+      // 降级到普通预加载
+      return await audioPreloadService.preloadAudio(nextSongUrl);
     }
   };
 
-  const fetchSongs = async (state: any, startIndex: number, endIndex: number) => {
+  const fetchSongs = async (state: PlayerState, startIndex: number, endIndex: number) => {
     try {
       const songs = state.playList.slice(
         Math.max(0, startIndex),
@@ -142,7 +138,7 @@ export const useMusicListHook = () => {
       const nextSong = detailedSongs[0];
       if (nextSong && !(nextSong.lyric && nextSong.lyric.lrcTimeArray.length > 0)) {
         try {
-          nextSong.lyric = await loadLrc(nextSong.id);
+          nextSong.lyric = await loadLrc(nextSong.id as number);
         } catch (error) {
           console.error('加载歌词失败:', error);
         }
@@ -157,14 +153,14 @@ export const useMusicListHook = () => {
 
       // 只预加载下一首歌曲
       if (nextSong && nextSong.playMusicUrl) {
-        preloadNextSong(nextSong.playMusicUrl);
+        preloadNextSong(nextSong.playMusicUrl, nextSong, 'high');
       }
     } catch (error) {
       console.error('获取歌曲列表失败:', error);
     }
   };
 
-  const nextPlay = async (state: any) => {
+  const nextPlay = async (state: PlayerState) => {
     if (state.playList.length === 0) {
       state.play = true;
       return;
@@ -186,7 +182,7 @@ export const useMusicListHook = () => {
     await handlePlayMusic(state, state.playList[playListIndex]);
   };
 
-  const prevPlay = async (state: any) => {
+  const prevPlay = async (state: PlayerState) => {
     if (state.playList.length === 0) {
       state.play = true;
       return;
@@ -225,11 +221,11 @@ export const useMusicListHook = () => {
   const loadLrc = async (playMusicId: number): Promise<ILyric> => {
     try {
       const { data } = await getMusicLrc(playMusicId);
-      const { lyrics, times } = parseLyrics(data.lrc.lyric);
+      const { lyrics, times } = parseLyrics((data as any).lrc.lyric);
       const tlyric: Record<string, string> = {};
 
-      if (data.tlyric && data.tlyric.lyric) {
-        const { lyrics: tLyrics, times: tTimes } = parseLyrics(data.tlyric.lyric);
+      if ((data as any).tlyric && (data as any).tlyric.lyric) {
+        const { lyrics: tLyrics, times: tTimes } = parseLyrics((data as any).tlyric.lyric);
         tLyrics.forEach((lyric, index) => {
           tlyric[tTimes[index].toString()] = lyric.text;
         });
@@ -252,7 +248,7 @@ export const useMusicListHook = () => {
   };
 
   // 异步加载歌词的方法
-  const loadLrcAsync = async (state: any, playMusicId: any) => {
+  const loadLrcAsync = async (state: PlayerState, playMusicId: number) => {
     if (state.playMusic.lyric && state.playMusic.lyric.lrcTimeArray.length > 0) {
       return;
     }
@@ -269,10 +265,7 @@ export const useMusicListHook = () => {
   };
 
   // 在组件卸载时清理预加载的音频
-  onUnmounted(() => {
-    preloadingSounds.value.forEach((sound) => sound.unload());
-    preloadingSounds.value = [];
-  });
+  // 注意：现在使用统一的音频服务，清理工作由服务层处理
 
   return {
     handlePlayMusic,

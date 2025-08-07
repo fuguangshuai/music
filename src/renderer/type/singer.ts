@@ -17,18 +17,18 @@ export interface Artist {
   trans: string;
   musicSize: number;
   topicPerson: number;
-  showPrivateMsg?: any;
-  isSubed?: any;
+  showPrivateMsg?: boolean;
+  isSubed?: boolean;
   accountId?: number;
   picId_str?: string;
   img1v1Id_str: string;
   transNames?: string[];
   followed: boolean;
-  mvSize?: any;
-  publishTime?: any;
-  identifyTag?: any;
-  alg?: any;
-  fansCount?: any;
+  mvSize?: number;
+  publishTime?: number;
+  identifyTag?: string;
+  alg?: string;
+  fansCount?: number;
   cover?: string;
   avatar?: string;
 }

@@ -30,7 +30,7 @@ export interface IUserFollow {
 
 interface ProfileVillageInfo {
   title: string;
-  imageUrl?: any;
+  imageUrl?: string | null;
   targetUrl: string;
 }
 
@@ -40,14 +40,14 @@ interface Binding {
   expiresIn: number;
   refreshTime: number;
   bindingTime: number;
-  tokenJsonStr?: any;
+  tokenJsonStr?: string | null;
   expired: boolean;
   id: number;
   type: number;
 }
 
 interface Profile {
-  avatarDetail?: any;
+  avatarDetail?: Record<string, unknown>;
   userId: number;
   avatarImgIdStr: string;
   backgroundImgIdStr: string;
@@ -57,8 +57,8 @@ interface Profile {
   createTime: number;
   nickname: string;
   avatarUrl: string;
-  experts: any;
-  expertTags?: any;
+  experts: Record<string, unknown> | null;
+  expertTags?: Record<string, unknown> | null;
   djStatus: number;
   accountStatus: number;
   birthday: number;
@@ -71,7 +71,7 @@ interface Profile {
   backgroundUrl: string;
   mutual: boolean;
   followed: boolean;
-  remarkName?: any;
+  remarkName?: string | null;
   authStatus: number;
   detailDescription: string;
   signature: string;
@@ -83,9 +83,9 @@ interface Profile {
   allSubscribedCount: number;
   playlistBeSubscribedCount: number;
   avatarImgId_str: string;
-  followTime?: any;
+  followTime?: number;
   followMe: boolean;
-  artistIdentity: any[];
+  artistIdentity: Record<string, unknown>[];
   cCount: number;
   sDJPCount: number;
   playlistCount: number;

@@ -11,8 +11,8 @@
 
         <!-- 时间显示 -->
         <div class="time-display">
-          <span class="current-time">{{ formatTime(nowTime) }}</span>
-          <span class="total-time">{{ formatTime(allTime) }}</span>
+          <span class="current-time">{{ secondToMinute(nowTime) }}</span>
+          <span class="total-time">{{ secondToMinute(allTime) }}</span>
         </div>
       </div>
 
@@ -173,10 +173,7 @@ const handleProgressClick = (e: MouseEvent) => {
   nowTime.value = allTime.value * percent;
 };
 
-// 格式化时间
-const formatTime = (seconds: number) => {
-  return secondToMinute(seconds);
-};
+// 使用统一的时间格式化函数（通过secondToMinute调用）
 
 // 打开播放列表抽屉
 const openPlayListDrawer = () => {

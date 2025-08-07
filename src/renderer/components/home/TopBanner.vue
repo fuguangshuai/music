@@ -63,7 +63,7 @@
                     <div class="user-play-item-list">
                       <div
                         v-for="song in item.tracks"
-                        :key="song.id"
+                        :key="String(song.id)"
                         class="user-play-item-list-name"
                       >
                         {{ song.name }}

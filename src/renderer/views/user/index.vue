@@ -4,12 +4,12 @@
       v-if="userDetail && user"
       class="left"
       :class="setAnimationClass('animate__fadeInLeft')"
-      :style="{ backgroundImage: `url(${getImgUrl(user.backgroundUrl)})` }"
+      :style="{ backgroundImage: `url(${getImgUrl((user as any)?.backgroundUrl)})` }"
     >
       <div class="page">
         <div class="user-name">{{ user.nickname }}</div>
         <div class="user-info">
-          <n-avatar round :size="50" :src="getImgUrl(user.avatarUrl, '50y50')" />
+          <n-avatar round :size="50" :src="getImgUrl((user as any)?.avatarUrl, '50y50')" />
           <div class="user-info-list">
             <div class="user-info-item">
               <div class="label">{{ userDetail.profile.followeds }}</div>

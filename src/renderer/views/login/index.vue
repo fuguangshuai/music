@@ -184,12 +184,14 @@ const loginPhone = async () => {
 
   .content {
     @apply absolute w-full h-full p-4 flex flex-col items-center justify-center pb-20 text-center;
+
     .qr-img {
       @apply rounded-2xl cursor-pointer transition-opacity;
     }
 
     .phone {
       animation-duration: 0.5s;
+
       &-page {
         @apply bg-light dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90;
         width: 250px;
@@ -208,6 +210,7 @@ const loginPhone = async () => {
         }
       }
     }
+
     .btn-login {
       width: 250px;
       height: 40px;

@@ -64,9 +64,18 @@ class AudioService {
     // 页面加载时立即强制重置操作锁
     this.forceResetOperationLock();
 
-    // 添加页面卸载事件，确保离开页面时清除锁
+    // 🧹 添加页面卸载事件，确保离开页面时清理所有资源
     window.addEventListener('beforeunload', () => {
       this.forceResetOperationLock();
+      this.disposeEQ(); // 强制清理EQ资源
+    });
+
+    // 🧹 添加页面隐藏事件，在页面不可见时清理资源
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        console.log('🧹 页面隐藏，清理EQ资源');
+        this.disposeEQ(true); // 保持上下文，但清理其他资源
+      }
     });
   }
 
@@ -120,8 +129,8 @@ class AudioService {
 
     const artists = track.ar
       ? track.ar.map((artist) => artist.name)
-      : track.song.artists?.map((artist) => artist.name);
-    const album = track.al ? track.al.name : track.song.album.name;
+      : track.song?.artists?.map((artist) => artist.name);
+    const album = track.al ? track.al.name : track.song?.album?.name;
     const artwork = ['96', '128', '192', '256', '384', '512'].map((size) => ({
       src: `${track.picUrl}?param=${size}y${size}`,
       type: 'image/jpg',
@@ -159,7 +168,7 @@ class AudioService {
   // 事件处理相关
   private callbacks: { [key: string]: Function[] } = {};
 
-  private emit(event: string, ...args: any[]) {
+  private emit(event: string, ...args: unknown[]) {
     const eventCallbacks = this.callbacks[event];
     if (eventCallbacks) {
       eventCallbacks.forEach((callback) => callback(...args));
@@ -192,7 +201,7 @@ class AudioService {
   // 类型安全的音频节点获取方法
   private getAudioNodeInfo(sound: Howl): AudioNodeInfo | null {
     try {
-      const howlWithSounds = sound as any;
+      const howlWithSounds = sound as { _sounds?: { _node?: HTMLMediaElement; _id?: string }[] };
       const audioNode = howlWithSounds._sounds?.[0]?._node;
 
       if (!audioNode || !(audioNode instanceof HTMLMediaElement)) {
@@ -201,7 +210,7 @@ class AudioService {
 
       return {
         node: audioNode,
-        id: howlWithSounds._sounds?.[0]?._id
+        id: howlWithSounds._sounds?.[0]?._id as number | undefined
       };
     } catch (error) {
       console.error('获取音频节点信息失败:', error);
@@ -253,41 +262,84 @@ class AudioService {
     return savedSettings ? JSON.parse(savedSettings) : { ...this.defaultEQSettings };
   }
 
-  private async disposeEQ(keepContext = false) {
+  // 🧹 改进的EQ资源清理机制
+  private async disposeEQ(keepContext = false): Promise<void> {
     try {
-      // 清理音频节点连接
+      console.log('🧹 开始清理EQ资源, keepContext:', keepContext);
+
+      // 🔗 清理音频节点连接
       if (this.source) {
-        this.source.disconnect();
-        this.source = null;
-      }
-
-      // 清理滤波器
-      this.filters.forEach((filter) => {
         try {
-          filter.disconnect();
+          this.source.disconnect();
+          console.log('✅ 音频源节点已断开连接');
         } catch (e) {
-          console.warn('清理滤波器时出错:', e);
+          console.warn('⚠️ 断开音频源节点连接时出错:', e);
+        } finally {
+          this.source = null;
         }
-      });
-      this.filters = [];
-
-      // 清理增益节点
-      if (this.gainNode) {
-        this.gainNode.disconnect();
-        this.gainNode = null;
       }
 
-      // 如果不需要保持上下文，则关闭它
+      // 🎛️ 清理滤波器节点
+      if (this.filters.length > 0) {
+        console.log(`🎛️ 清理${this.filters.length}个滤波器节点`);
+        this.filters.forEach((filter, index) => {
+          try {
+            filter.disconnect();
+            // 清理滤波器的所有参数
+            filter.frequency.cancelScheduledValues(0);
+            filter.Q.cancelScheduledValues(0);
+            filter.gain.cancelScheduledValues(0);
+            console.log(`✅ 滤波器${index}已清理`);
+          } catch (e) {
+            console.warn(`⚠️ 清理滤波器${index}时出错:`, e);
+          }
+        });
+        this.filters = [];
+      }
+
+      // 🔊 清理增益节点
+      if (this.gainNode) {
+        try {
+          this.gainNode.disconnect();
+          // 清理增益节点的参数
+          this.gainNode.gain.cancelScheduledValues(0);
+          console.log('✅ 增益节点已清理');
+        } catch (e) {
+          console.warn('⚠️ 清理增益节点时出错:', e);
+        } finally {
+          this.gainNode = null;
+        }
+      }
+
+      // 🎵 清理音频上下文（如果不需要保持）
       if (!keepContext && this.context) {
         try {
-          await this.context.close();
-          this.context = null;
+          // 检查上下文状态，避免重复关闭
+          if (this.context.state !== 'closed') {
+            await this.context.close();
+            console.log('✅ 音频上下文已关闭');
+          }
         } catch (e) {
-          console.warn('关闭音频上下文时出错:', e);
+          console.warn('⚠️ 关闭音频上下文时出错:', e);
+        } finally {
+          this.context = null;
         }
       }
+
+      // 🔄 重置重试计数
+      this.retryCount = 0;
+
+      console.log('✅ EQ资源清理完成');
     } catch (error) {
-      console.error('清理EQ资源时出错:', error);
+      console.error('💥 清理EQ资源时发生异常:', error);
+      // 即使出错也要确保资源被重置
+      this.source = null;
+      this.filters = [];
+      this.gainNode = null;
+      if (!keepContext) {
+        this.context = null;
+      }
+      this.retryCount = 0;
     }
   }
 
@@ -343,7 +395,7 @@ class AudioService {
 
       try {
         // 检查节点是否已经有源
-        const existingSource = (audioNode as any).source as MediaElementAudioSourceNode;
+        const existingSource = (audioNode as HTMLMediaElement & { source?: MediaElementAudioSourceNode }).source;
         if (existingSource?.context === this.context) {
           console.log('复用现有音频源节点');
           this.source = existingSource;
@@ -351,7 +403,7 @@ class AudioService {
           // 创建新的源节点
           console.log('创建新的音频源节点');
           this.source = this.context.createMediaElementSource(audioNode);
-          (audioNode as any).source = this.source;
+          (audioNode as HTMLMediaElement & { source?: MediaElementAudioSourceNode }).source = this.source;
         }
       } catch (e) {
         console.error('创建音频源节点失败:', e);
@@ -577,13 +629,13 @@ class AudioService {
           // 确保 Howler 上下文已初始化
           if (!Howler.ctx) {
             console.log('audioService: 初始化 Howler 上下文');
-            Howler.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            Howler.ctx = new (window.AudioContext || (window as { webkitAudioContext?: new() => AudioContext }).webkitAudioContext)();
           }
 
           // 确保使用同一个音频上下文
           if (Howler.ctx.state === 'closed') {
             console.log('audioService: 重新创建音频上下文');
-            Howler.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            Howler.ctx = new (window.AudioContext || (window as { webkitAudioContext?: new() => AudioContext }).webkitAudioContext)();
             this.context = Howler.ctx;
             Howler.masterGain = this.context.createGain();
             Howler.masterGain.connect(this.context.destination);
@@ -849,8 +901,9 @@ class AudioService {
     this.currentSound.rate(rate);
 
     // 取出底层 HTMLAudioElement，改原生 playbackRate
-    const sounds = (this.currentSound as any)._sounds as any[];
-    sounds.forEach(({ _node }) => {
+    const sounds = (this.currentSound as { _sounds?: unknown[] })._sounds || [];
+    sounds.forEach((sound) => {
+      const _node = (sound as { _node?: unknown })._node;
       if (_node instanceof HTMLAudioElement) {
         _node.playbackRate = rate;
       }
@@ -899,7 +952,7 @@ class AudioService {
 
     // 检查Howl对象的内部状态
     // 如果状态为1表示已经加载但未完成，状态为2表示正在加载
-    const state = (this.currentSound as any)._state;
+    const state = (this.currentSound as { _state?: unknown })._state;
     // 如果操作锁激活也认为是加载状态
     return this.operationLock || state === 'loading' || state === 1;
   }

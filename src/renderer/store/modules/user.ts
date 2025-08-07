@@ -6,7 +6,7 @@ import { getLikedList } from '@/api/music';
 
 interface UserData {
   userId: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 function getLocalStorageItem<T>(key: string, defaultValue: T): T {

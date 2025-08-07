@@ -294,7 +294,10 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
     preload: join(__dirname, '../preload/index.js'),
     sandbox: false,
     contextIsolation: true,
-    webSecurity: false
+    webSecurity: true, // 🔒 安全修复: 启用webSecurity以符合Electron安全最佳实践
+    nodeIntegration: false, // 🔒 安全加固: 明确禁用nodeIntegration
+    nodeIntegrationInWorker: false, // 🔒 安全加固: 禁用Worker中的Node.js集成
+    allowRunningInsecureContent: false // 🔒 安全加固: 禁止运行不安全内容
   };
 
   console.log(
@@ -310,6 +313,24 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
 
   // 创建窗口
   const mainWindow = new BrowserWindow(options);
+
+  // 🔒 安全配置: 设置内容安全策略 (CSP)
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+          "style-src 'self' 'unsafe-inline'; " +
+          "img-src 'self' data: https: http:; " +
+          "media-src 'self' data: https: http: blob:; " +
+          "connect-src 'self' https: http: ws: wss:; " +
+          "font-src 'self' data:;"
+        ]
+      }
+    });
+  });
 
   // 移除菜单
   mainWindow.removeMenu();

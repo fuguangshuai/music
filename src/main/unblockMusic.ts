@@ -1,5 +1,7 @@
 import match from '@unblockneteasemusic/server';
 
+import { withRetry } from '../renderer/utils/retry';
+
 type Platform = 'qq' | 'migu' | 'kugou' | 'pyncmd' | 'joox' | 'gdmusic' | 'stellar' | 'cloud';
 
 interface SongData {
@@ -37,7 +39,7 @@ export const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];
  * 确保对象数据结构完整，处理null或undefined的情况
  * @param data 需要处理的数据对象
  */
-function ensureDataStructure(data: any): any {
+function ensureDataStructure(data: Record<string, unknown>): Record<string, unknown> {
   // 如果数据本身为空，则返回一个基本结构
   if (!data) {
     return {
@@ -58,9 +60,10 @@ function ensureDataStructure(data: any): any {
   }
 
   // 确保artists中的每个元素都有name属性
-  if (data.artists.length > 0) {
-    data.artists = data.artists.map((artist) => {
-      return artist ? { name: artist.name || '' } : { name: '' };
+  if (Array.isArray(data.artists) && data.artists.length > 0) {
+    data.artists = (data.artists as unknown[]).map((artist: unknown) => {
+      const artistObj = artist as Record<string, unknown>;
+      return artistObj ? { name: (artistObj.name as string) || '' } : { name: '' };
     });
   }
 
@@ -69,8 +72,9 @@ function ensureDataStructure(data: any): any {
     data.album = data.al && typeof data.al === 'object' ? data.al : { name: '' };
   }
 
-  if (!data.album.name) {
-    data.album.name = '';
+  const album = data.album as Record<string, unknown>;
+  if (!album.name) {
+    album.name = '';
   }
 
   return data;
@@ -96,14 +100,12 @@ const unblockMusic = async (
     : ALL_PLATFORMS;
 
   // 处理歌曲数据，确保数据结构完整
-  const processedSongData = ensureDataStructure(songData);
+  const processedSongData = ensureDataStructure(songData as unknown as Record<string, unknown>);
 
-  // ✅ 使用循环替代递归，避免栈溢出
-  const retryWithLoop = async (): Promise<UnblockResult> => {
-    let lastError: Error | undefined;
-
-    for (let attempt = 1; attempt <= retryCount; attempt++) {
-      try {
+  // ✅ 使用统一的重试函数
+  const executeWithRetry = async (): Promise<UnblockResult> => {
+    return withRetry(
+      async () => {
         const data = await match(parseInt(String(id), 10), filteredPlatforms, processedSongData);
         const result: UnblockResult = {
           data: {
@@ -115,21 +117,20 @@ const unblockMusic = async (
           }
         };
         return result;
-      } catch (err) {
-        lastError = err as Error;
-
-        if (attempt < retryCount) {
-          // 指数退避延迟，避免过于频繁的重试
-          const delay = Math.min(100 * Math.pow(2, attempt - 1), 5000);
-          await new Promise((resolve) => setTimeout(resolve, delay));
+      },
+      {
+        maxRetries: retryCount - 1, // withRetry的maxRetries是额外重试次数
+        delay: 100,
+        backoff: 'exponential',
+        maxDelay: 5000,
+        onRetry: (error, attempt) => {
+          console.log(`音乐解析重试第 ${attempt + 1} 次:`, error.message);
         }
       }
-    }
-
-    throw new Error(`音乐解析失败 (ID: ${id}): ${lastError?.message || '未知错误'}`);
+    );
   };
 
-  return retryWithLoop();
+  return executeWithRetry();
 };
 
 export { type Platform, type ResponseData, type SongData, unblockMusic, type UnblockResult };

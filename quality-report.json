@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-08-04T16:40:36.927Z",
+  "score": 60,
+  "results": {
+    "typescript": {
+      "passed": true,
+      "errors": 0
+    },
+    "eslint": {
+      "passed": false,
+      "warnings": 493,
+      "errors": 38
+    },
+    "build": {
+      "passed": true,
+      "time": 9616
+    },
+    "fileStructure": {
+      "passed": true,
+      "issues": []
+    },
+    "dependencies": {
+      "passed": false,
+      "vulnerabilities": 0
+    }
+  },
+  "summary": {
+    "total": 5,
+    "passed": 3,
+    "failed": 2
+  }
+}

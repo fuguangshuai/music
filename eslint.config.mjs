@@ -63,7 +63,7 @@ export default [
       'simple-import-sort': simpleImportSort
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'error', // 🔧 启用any类型检查，使用error强制修复
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -78,7 +78,11 @@ export default [
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/ban-types': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-function-return-type': ['warn', {
+        allowExpressions: true, // 允许表达式不需要返回类型
+        allowTypedFunctionExpressions: true, // 允许已类型化的函数表达式
+        allowHigherOrderFunctions: true // 允许高阶函数
+      }], // 🔧 启用函数返回类型检查
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       'no-console': 'off',
@@ -110,8 +114,8 @@ export default [
       'no-setter-return': 'off',
       'no-this-before-super': 'off',
       'no-undef': 'off',
-      'no-unreachable': 'off',
-      'no-unsafe-negation': 'off',
+      'no-unreachable': 'warn', // 🔧 启用不可达代码检查
+      'no-unsafe-negation': 'warn', // 🔧 启用不安全否定检查
       'no-var': 'error',
       'prefer-const': 'error',
       'prefer-rest-params': 'error',
@@ -184,8 +188,8 @@ export default [
           allows: ['scoped']
         }
       ],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off', // Vue组件中关闭，避免过于严格
+      '@typescript-eslint/no-explicit-any': 'warn', // Vue文件中使用warn，逐步改进
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       'prettier/prettier': 'error',
       'simple-import-sort/imports': 'error',

@@ -8,7 +8,7 @@ interface IParams {
 }
 // 搜索内容
 export const getSearch = (params: IParams) => {
-  return request.get<any>('/cloudsearch', {
+  return request.get<unknown>('/cloudsearch', {
     params
   });
 };

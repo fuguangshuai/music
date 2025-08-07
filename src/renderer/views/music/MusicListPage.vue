@@ -233,6 +233,7 @@ import SongItem from '@/components/common/SongItem.vue';
 import { useDownload } from '@/hooks/useDownload';
 import { useMusicStore, usePlayerStore } from '@/store';
 import { SongResult } from '@/type/music';
+import type { Artist, ErrorObject, Song } from '@/types/common';
 import { getImgUrl, isElectron, isMobile, setAnimationClass } from '@/utils';
 
 const { t } = useI18n();
@@ -362,9 +363,11 @@ const loadDataByType = async (type: string, id: string) => {
     if (type === 'album') {
       const { songs, album } = result.data;
       name.value = album.name;
-      songList.value = songs.map((song: any) => {
-        song.al.picUrl = song.al.picUrl || album.picUrl;
-        song.picUrl = song.al.picUrl || album.picUrl || song.picUrl;
+      songList.value = songs.map((song: Song) => {
+        if (song.al) {
+          song.al.picUrl = song.al.picUrl || album.picUrl;
+        }
+        song.picUrl = song.al?.picUrl || album.picUrl || song.picUrl;
         return song;
       });
       listInfo.value = {
@@ -435,14 +438,14 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: any) => {
+    const artistsMatch = artists.some((artist: Artist) => {
       return artist.name?.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: any) => {
+    const artistsPinyinMatch = artists.some((artist: Artist) => {
       return artist.name && PinyinMatch.match(artist.name, keyword);
     });
 
@@ -457,20 +460,31 @@ const filteredSongs = computed(() => {
   });
 });
 
-// 格式化歌曲数据
-const formatSong = (item: any) => {
+// 格式化歌曲数据 - 灵活版本，接受任何歌曲类型
+const formatSong = (item: any): SongResult => {
   if (!item) {
-    return null;
+    return {
+      id: 0,
+      name: '',
+      picUrl: '',
+      ar: [],
+      al: { name: '', id: 0 },
+      count: 0
+    } as unknown as SongResult;
   }
+
   return {
     ...item,
-    picUrl: item.al?.picUrl || item.picUrl,
+    count: item.count || 0, // 添加必需的count属性
+    picUrl: item.al?.picUrl || item.album?.picUrl || item.picUrl || '',
+    ar: item.artists || item.ar || [],
+    al: item.album || item.al || { name: '', id: 0 },
     song: {
       artists: item.ar || item.artists,
-      name: item.al?.name || item.name,
-      id: item.al?.id || item.id
+      name: item.al?.name || item.album?.name || item.name,
+      id: item.al?.id || item.album?.id || item.id
     }
-  };
+  } as SongResult;
 };
 
 /**
@@ -497,12 +511,12 @@ const loadSongs = async (ids: number[], appendToList = true, updateComplete = fa
       let newSongs = songs;
       if (!updateComplete) {
         // 在普通加载模式下继续过滤已加载的歌曲，避免重复
-        newSongs = songs.filter((song: any) => !loadedIds.value.has(song.id));
+        newSongs = songs.filter((song: Song) => !loadedIds.value.has(song.id));
         console.log(`过滤已加载ID后剩余歌曲数量: ${newSongs.length}`);
       }
 
       // 更新已加载ID集合
-      songs.forEach((song: any) => {
+      songs.forEach((song: Song) => {
         loadedIds.value.add(song.id);
       });
 
@@ -546,7 +560,7 @@ const loadFullPlaylist = async () => {
     }
 
     // 获取所有trackIds
-    const allIds = listInfo.value.trackIds.map((item) => item.id);
+    const allIds = listInfo.value.trackIds.map((item: any) => item.id);
     console.log(`歌单共有歌曲ID: ${allIds.length}首`);
 
     // 重置completePlaylist和当前显示歌曲ID集合，保证不会重复添加歌曲
@@ -567,7 +581,7 @@ const loadFullPlaylist = async () => {
     );
 
     // 过滤出尚未加载的歌曲ID
-    const unloadedIds = allIds.filter((id) => !loadedSongIds.has(id));
+    const unloadedIds = allIds.filter((id: any) => !loadedSongIds.has(id));
     console.log(`还需要加载的歌曲ID数量: ${unloadedIds.length}`);
 
     if (unloadedIds.length === 0) {
@@ -591,10 +605,10 @@ const loadFullPlaylist = async () => {
       // 添加新加载的歌曲到displayedSongs
       if (loadedBatch.length > 0) {
         // 过滤掉已有的歌曲，确保不会重复添加
-        const newSongs = loadedBatch.filter((song) => !loadedSongIds.has(song.id as number));
+        const newSongs = loadedBatch.filter((song: any) => !loadedSongIds.has(song.id as number));
 
         // 更新已加载ID集合
-        newSongs.forEach((song) => {
+        newSongs.forEach((song: any) => {
           loadedSongIds.add(song.id as number);
         });
 
@@ -647,7 +661,7 @@ const loadFullPlaylist = async () => {
       // 如果数量不符，可能是API未返回所有歌曲，打印缺失的歌曲ID
       if (displayedSongs.value.length < allIds.length) {
         const loadedIds = new Set(displayedSongs.value.map((song) => song.id));
-        const missingIds = allIds.filter((id) => !loadedIds.has(id));
+        const missingIds = allIds.filter((id: any) => !loadedIds.has(id));
         console.warn(`缺失的歌曲ID: ${missingIds.join(', ')}`);
       }
     }
@@ -718,9 +732,10 @@ const handleRemoveSong = async (songId: number) => {
     } else {
       throw new Error(res.data?.msg || t('user.message.deleteFailed'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('删除歌曲失败:', error);
-    message.error(error.message || t('user.message.deleteFailed'));
+    const errorObj = error as ErrorObject;
+    message.error(errorObj.message || t('user.message.deleteFailed'));
   }
 };
 
@@ -749,8 +764,8 @@ const loadMoreSongs = async () => {
     if (listInfo.value?.trackIds) {
       const trackIdsToLoad = listInfo.value.trackIds
         .slice(start, end)
-        .map((item) => item.id)
-        .filter((id) => !loadedIds.value.has(id));
+        .map((item: any) => item.id)
+        .filter((id: any) => !loadedIds.value.has(id));
 
       if (trackIdsToLoad.length > 0) {
         await loadSongs(trackIdsToLoad, true, false);
@@ -775,10 +790,11 @@ const loadMoreSongs = async () => {
 };
 
 // 处理虚拟列表滚动事件
-const handleVirtualScroll = (e: any) => {
+const handleVirtualScroll = (e: Event) => {
   if (!e || !e.target) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+  const target = e.target as any;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   const threshold = 200;
 
   if (
@@ -792,9 +808,9 @@ const handleVirtualScroll = (e: any) => {
 };
 
 // 初始化歌曲列表
-const initSongList = (songs: any[]) => {
+const initSongList = (songs: Song[]) => {
   if (songs.length > 0) {
-    displayedSongs.value = [...songs];
+    displayedSongs.value = songs.map(formatSong);
     songs.forEach((song) => loadedIds.value.add(song.id));
     page.value = Math.ceil(songs.length / pageSize);
   }

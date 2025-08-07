@@ -7,7 +7,7 @@ export interface StoreConfig<T extends string> {
 }
 
 // 创建一个使用 IndexedDB 的组合函数
-const useIndexedDB = async <T extends string, S extends Record<T, Record<string, any>>>(
+const useIndexedDB = async <T extends string, S extends Record<T, Record<string, unknown>>>(
   dbName: string,
   stores: StoreConfig<T>[],
   version: number = 1
@@ -19,8 +19,8 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
     return new Promise<void>((resolve, reject) => {
       const request = indexedDB.open(dbName, version);
 
-      request.onupgradeneeded = (event: any) => {
-        const db = event.target.result;
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        const db = (event.target as IDBOpenDBRequest).result;
         stores.forEach((store) => {
           if (!db.objectStoreNames.contains(store.name)) {
             db.createObjectStore(store.name, {
@@ -31,13 +31,13 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         });
       };
 
-      request.onsuccess = (event: any) => {
-        db.value = event.target.result;
+      request.onsuccess = (event: Event) => {
+        db.value = (event.target as IDBOpenDBRequest).result;
         resolve();
       };
 
-      request.onerror = (event: any) => {
-        reject(event.target.error);
+      request.onerror = (event: Event) => {
+        reject((event.target as IDBOpenDBRequest).error);
       };
     });
   };
@@ -158,8 +158,8 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       let index = 0;
       const skip = (page - 1) * pageSize;
 
-      request.onsuccess = (event: any) => {
-        const cursor = event.target?.result;
+      request.onsuccess = (event: Event) => {
+        const cursor = (event.target as IDBRequest).result;
         if (!cursor) {
           resolve(results);
           return;
@@ -187,8 +187,8 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         cursor.continue();
       };
 
-      request.onerror = (event: any) => {
-        reject(event.target.error);
+      request.onerror = (event: Event) => {
+        reject((event.target as IDBRequest).error);
       };
     });
   };

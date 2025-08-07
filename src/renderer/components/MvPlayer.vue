@@ -194,6 +194,7 @@ import { useI18n } from 'vue-i18n';
 
 import { getMvUrl } from '@/api/mv';
 import { IMvItem } from '@/type/mv';
+import { formatTime } from '@/utils/formatters';
 
 const { t } = useI18n();
 type PlayMode = 'single' | 'auto';
@@ -233,12 +234,6 @@ const bufferedProgress = ref(0);
 const volume = ref(100);
 const showControls = ref(true);
 let controlsTimer: NodeJS.Timeout | null = null;
-
-const formatTime = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
 
 const togglePlay = () => {
   if (!videoRef.value) return;
