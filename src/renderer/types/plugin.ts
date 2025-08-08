@@ -10,8 +10,8 @@ export type { Plugin, PluginApp } from '@/core/pluginSystem';
  * 插件元数据
  */
 export interface PluginMetadata {
-  id: string;
-  name: string;
+id: string,
+  name: string,
   version: string;
   description?: string;
   author?: string;
@@ -21,23 +21,25 @@ export interface PluginMetadata {
   keywords?: string[];
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+
 }
 
 /**
  * 插件状态
  */
 export interface PluginStatus {
-  registered: boolean;
-  installed: boolean;
-  active: boolean;
+registered: boolean,
+  installed: boolean,
+  active: boolean,
   enabled: boolean;
   error?: string;
+
 }
 
 /**
  * 插件事件类型
  */
-export type PluginEventType = 
+export type PluginEventType =
   | 'plugin:registered'
   | 'plugin:installed'
   | 'plugin:uninstalled'
@@ -56,31 +58,33 @@ export type PluginEventType =
  * 插件事件数据
  */
 export interface PluginEventData {
-  type: PluginEventType;
+type: PluginEventType;
   plugin?: Plugin;
-  data?: any; // 简化类型
+  data?: unknown; // 简化类型
   timestamp: number;
+
 }
 
 /**
  * 插件配置项
  */
 export interface PluginConfigItem {
-  key: string;
-  label: string;
+key: string,
+  label: string,
   type: 'string' | 'number' | 'boolean' | 'select' | 'textarea';
-  defaultValue?: any;
-  options?: Array<{ label: string; value: any }>;
+  defaultValue?: unknown;
+  options?: Array<{ label: string, value: unknown 
+}>;
   description?: string;
   required?: boolean;
-  validation?: (value: any) => boolean | string;
+  validation?: (value: unknown) => boolean | string;
 }
 
 /**
  * 插件配置模式
  */
 export interface PluginConfigSchema {
-  title: string;
+title: string;
   description?: string;
   items: PluginConfigItem[];
 }
@@ -89,34 +93,33 @@ export interface PluginConfigSchema {
  * 插件API权限
  */
 export interface PluginPermissions {
-  player?: boolean;
+player?: boolean;
   ui?: boolean;
   storage?: boolean;
   network?: boolean;
   filesystem?: boolean;
   system?: boolean;
+
 }
 
 /**
  * 插件加载选项
  */
 export interface PluginLoadOptions {
-  autoInstall?: boolean;
+autoInstall?: boolean;
   autoActivate?: boolean;
   permissions?: PluginPermissions;
   timeout?: number;
+
 }
 
 /**
  * 插件错误类型
  */
 export class PluginError extends Error {
-  constructor(
-    message: string,
-    public pluginId: string,
-    public code?: string
+  constructor(_message: string, public pluginId: string, public code?: string
   ) {
-    super(message);
+    super(_message);
     this.name = 'PluginError';
   }
 }
@@ -125,37 +128,38 @@ export class PluginError extends Error {
  * 插件工具函数类型
  */
 export interface PluginUtils {
-  /**
+/**
    * 创建插件实例
    */
   createPlugin: (metadata: PluginMetadata) => Plugin;
-  
+
   /**
    * 验证插件
    */
   validatePlugin: (plugin: Plugin) => boolean;
-  
+
   /**
    * 格式化插件版本
    */
   formatVersion: (version: string) => string;
-  
+
   /**
    * 比较插件版本
    */
   compareVersions: (v1: string, v2: string) => number;
-  
+
   /**
    * 生成插件ID
    */
   generatePluginId: (name: string, author?: string) => string;
+
 }
 
 /**
  * 插件生命周期钩子
  */
 export interface PluginLifecycleHooks {
-  beforeInstall?: (plugin: Plugin) => void | Promise<void>;
+beforeInstall?: (plugin: Plugin) => void | Promise<void>;
   afterInstall?: (plugin: Plugin) => void | Promise<void>;
   beforeUninstall?: (plugin: Plugin) => void | Promise<void>;
   afterUninstall?: (plugin: Plugin) => void | Promise<void>;
@@ -163,37 +167,40 @@ export interface PluginLifecycleHooks {
   afterActivate?: (plugin: Plugin) => void | Promise<void>;
   beforeDeactivate?: (plugin: Plugin) => void | Promise<void>;
   afterDeactivate?: (plugin: Plugin) => void | Promise<void>;
+
 }
 
 /**
  * 插件管理器配置
  */
 export interface PluginManagerConfig {
-  autoLoad?: boolean;
+autoLoad?: boolean;
   pluginDir?: string;
   maxPlugins?: number;
   timeout?: number;
   hooks?: PluginLifecycleHooks;
   permissions?: PluginPermissions;
+
 }
 
 /**
  * 插件注册表项
  */
 export interface PluginRegistryEntry {
-  plugin: Plugin;
-  metadata: PluginMetadata;
+plugin: Plugin,
+  metadata: PluginMetadata,
   status: PluginStatus;
   loadTime?: number;
   activateTime?: number;
   error?: PluginError;
+
 }
 
 /**
  * 插件搜索过滤器
  */
 export interface PluginFilter {
-  name?: string;
+name?: string;
   author?: string;
   version?: string;
   status?: keyof PluginStatus;
@@ -204,57 +211,60 @@ export interface PluginFilter {
  * 插件排序选项
  */
 export interface PluginSortOptions {
-  field: 'name' | 'version' | 'author' | 'loadTime' | 'activateTime';
+field: 'name' | 'version' | 'author' | 'loadTime' | 'activateTime',
   order: 'asc' | 'desc';
+
 }
 
 /**
  * 插件统计信息
  */
 export interface PluginStats {
-  total: number;
-  registered: number;
-  installed: number;
-  active: number;
-  enabled: number;
+total: number,
+  registered: number,
+  installed: number,
+  active: number,
+  enabled: number,
   errors: number;
+
 }
 
 /**
  * 插件开发工具类型
  */
 export interface PluginDevTools {
-  /**
+/**
    * 热重载插件
    */
   hotReload: (pluginId: string) => Promise<boolean>;
-  
+
   /**
    * 调试插件
    */
   debug: (pluginId: string, enabled: boolean) => void;
-  
+
   /**
    * 获取插件日志
    */
-  getLogs: (pluginId: string) => string[];
-  
+  getLogs: (pluginId: string) => string[]
+
   /**
    * 清理插件日志
    */
   clearLogs: (pluginId: string) => void;
-  
+
   /**
    * 插件性能分析
    */
-  profile: (pluginId: string) => Promise<any>;
+  profile: (pluginId: string) => Promise<unknown>;
+
 }
 
 /**
  * 简化的插件构建器
  */
 export class PluginBuilder {
-  private plugin: any = {};
+  private plugin: unknown = {}
 
   id(id: string): this {
     this.plugin.id = id;
@@ -281,32 +291,32 @@ export class PluginBuilder {
     return this;
   }
 
-  onInstall(handler: (app: any) => void | Promise<void>): this {
+  onInstall(handler: (app: unknown) => void | Promise<void>): this {
     this.plugin.install = handler;
     return this;
   }
 
-  onUninstall(handler: () => void | Promise<void>): this {
+  onUninstall(handler: (): () => void | Promise<void>): this {
     this.plugin.uninstall = handler;
     return this;
   }
 
-  onActivate(handler: () => void | Promise<void>): this {
+  onActivate(handler: (): () => void | Promise<void>): this {
     this.plugin.activate = handler;
     return this;
   }
 
-  onDeactivate(handler: () => void | Promise<void>): this {
+  onDeactivate(handler: (): () => void | Promise<void>): this {
     this.plugin.deactivate = handler;
     return this;
   }
 
-  settings(settings: Record<string, any>): this {
+  settings(settings: Record<string, unknown>): this {
     this.plugin.settings = settings;
     return this;
   }
 
-  defaultSettings(settings: Record<string, any>): this {
+  defaultSettings(settings: Record<string, unknown>): this {
     this.plugin.defaultSettings = settings;
     return this;
   }
@@ -324,4 +334,4 @@ export class PluginBuilder {
  */
 export const createPlugin = (): PluginBuilder => {
   return new PluginBuilder();
-};
+}

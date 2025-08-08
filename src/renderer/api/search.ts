@@ -1,14 +1,22 @@
 import request from '@/utils/request';
 
-interface IParams {
-  keywords: string;
+/**
+ * 搜索参数接口
+ */
+export interface SearchParams {
+keywords: string,
   type: number;
   limit?: number;
   offset?: number;
+
 }
-// 搜索内容
-export const getSearch = (params: IParams) => {
-  return request.get<unknown>('/cloudsearch', {
-    params
-  });
-};
+
+/**
+ * 🔍 搜索内容
+ * @param params 搜索参数
+ * @returns 搜索结果
+ */
+export const getSearch = (params: SearchParams) => {
+  return request.get('/cloudsearch', {
+    params, });
+}

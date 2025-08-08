@@ -39,9 +39,17 @@
     "perf:all": "node scripts/performance-monitor.js all",
     "bench": "vitest bench",
     "test:e2e": "vitest run tests/e2e",
+    "test:security": "vitest run tests/security/security-system.test.ts",
+    "test:i18n": "vitest run tests/i18n/i18n-system.test.ts",
     "build:incremental": "node scripts/incremental-build.js build",
     "build:watch": "node scripts/incremental-build.js watch",
-    "build:clean": "node scripts/incremental-build.js clean"
+    "build:clean": "node scripts/incremental-build.js clean",
+    "quality:check": "tsx scripts/quality-check.ts",
+    "quality:fix": "tsx scripts/fix-code-quality.ts",
+    "quality:report": "tsx scripts/quality-check.ts && echo 'Quality report generated'",
+    "code:format": "prettier --write src/renderer/**/*.{ts,vue}",
+    "code:lint": "eslint src/renderer/**/*.{ts,vue}",
+    "code:lint:fix": "eslint src/renderer/**/*.{ts,vue} --fix"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -129,9 +137,7 @@
       {
         "from": "resources/html",
         "to": "html",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       }
     ],
     "mac": {
@@ -139,9 +145,7 @@
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "universal"
-          ]
+          "arch": ["universal"]
         }
       ],
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}",
@@ -153,20 +157,14 @@
       "notarize": false,
       "identity": null,
       "type": "distribution",
-      "binaries": [
-        "Contents/MacOS/SizeMusicPlayer"
-      ]
+      "binaries": ["Contents/MacOS/SizeMusicPlayer"]
     },
     "win": {
       "icon": "resources/icon.ico",
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
+          "arch": ["x64", "ia32", "arm64"]
         }
       ],
       "artifactName": "${productName}-${version}-win-${arch}.${ext}",
@@ -177,24 +175,15 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         },
         {
           "target": "deb",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         },
         {
           "target": "rpm",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
       ],
       "artifactName": "${productName}-${version}-linux-${arch}.${ext}",

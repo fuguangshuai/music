@@ -36,7 +36,7 @@ export default {
     selectRequired: 'Please select an option',
     numberRange: 'Please enter a number between {min} and {max}',
     ipAddress: 'Please enter a valid IP address',
-    portNumber: 'Please enter a valid port number (1-65535)'
+    portNumber: 'Please enter a valid port number (1-65535)',
   },
   viewMore: 'View More',
   noMore: 'No more',
@@ -51,7 +51,7 @@ export default {
     next: 'Next',
     pause: 'Pause',
     play: 'Play',
-    favorite: 'Favorite'
+    favorite: 'Favorite',
   },
-  language: 'Language'
+  language: 'Language',
 };

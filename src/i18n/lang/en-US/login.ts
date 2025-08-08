@@ -2,7 +2,7 @@ export default {
   title: {
     qr: 'QR Code Login',
     phone: 'Phone Login',
-    token: 'Cookie Login'
+    token: 'Cookie Login',
   },
   qrTip: 'Scan with NetEase Cloud Music APP',
   phoneTip: 'Login with NetEase Cloud account',
@@ -10,7 +10,7 @@ export default {
   placeholder: {
     phone: 'Phone Number',
     password: 'Password',
-    token: 'Please enter NetEase Cloud Music Cookie (token)'
+    token: 'Please enter NetEase Cloud Music Cookie (token)',
   },
   button: {
     login: 'Login',
@@ -19,7 +19,7 @@ export default {
     switchToToken: 'Use Cookie Login',
     backToQr: 'Back to QR Code Login',
     tokenLogin: 'Cookie Login',
-    autoGetCookie: 'Auto Get Cookie'
+    autoGetCookie: 'Auto Get Cookie',
   },
   message: {
     loginSuccess: 'Login successful',
@@ -30,7 +30,8 @@ export default {
     tokenInvalid: 'Invalid Cookie, please check and try again',
     autoGetCookieSuccess: 'Auto get Cookie successful',
     autoGetCookieFailed: 'Auto get Cookie failed',
-    autoGetCookieTip: 'Will open NetEase Cloud Music login page, please complete login and close the window'
+    autoGetCookieTip:
+      'Will open NetEase Cloud Music login page, please complete login and close the window',
   },
-  qrTitle: 'NetEase Cloud Music QR Code Login'
+  qrTitle: 'NetEase Cloud Music QR Code Login',
 };

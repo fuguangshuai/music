@@ -1,7 +1,10 @@
 <template>
   <div class="settings-container">
     <!-- 右侧内容区 -->
-    <n-scrollbar ref="scrollbarRef" class="settings-content">
+    <n-scrollbar
+      ref="scrollbarRef"
+      class="settings-content"
+    >
       <div class="set-page">
         <!-- 基础设置 -->
         <div class="settings-section">
@@ -15,7 +18,10 @@
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex items-center gap-2">
-                  <n-switch v-model:value="setData.autoTheme" @update:value="handleAutoThemeChange">
+                  <n-switch
+                    v-model:value="setData.autoTheme"
+                    @update:value="handleAutoThemeChange"
+                  >
                     <template #checked><i class="ri-smartphone-line"></i></template>
                     <template #unchecked><i class="ri-settings-line"></i></template>
                   </n-switch>
@@ -47,19 +53,29 @@
               <language-switcher />
             </div>
 
-            <div class="set-item" v-if="isElectron">
+            <div
+              class="set-item"
+              v-if="isElectron"
+            >
               <div>
                 <div class="set-item-title">{{ t('settings.basic.font') }}</div>
                 <div class="set-item-content">{{ t('settings.basic.fontDesc') }}</div>
               </div>
               <div class="flex gap-2">
-                <n-radio-group v-model:value="setData.fontScope" class="mt-2">
-                  <n-radio key="global" value="global">{{
-                    t('settings.basic.fontScope.global')
-                  }}</n-radio>
-                  <n-radio key="lyric" value="lyric">{{
-                    t('settings.basic.fontScope.lyric')
-                  }}</n-radio>
+                <n-radio-group
+                  v-model:value="setData.fontScope"
+                  class="mt-2"
+                >
+                  <n-radio
+                    key="global"
+                    value="global"
+                    >{{ t('settings.basic.fontScope.global') }}</n-radio
+                  >
+                  <n-radio
+                    key="lyric"
+                    value="lyric"
+                    >{{ t('settings.basic.fontScope.lyric') }}</n-radio
+                  >
                 </n-radio-group>
                 <n-select
                   v-model:value="selectedFonts"
@@ -74,9 +90,15 @@
               </div>
             </div>
 
-            <div v-if="selectedFonts.length > 0" class="font-preview-container">
+            <div
+              v-if="selectedFonts.length > 0"
+              class="font-preview-container"
+            >
               <div class="font-preview-title">{{ t('settings.basic.fontPreview.title') }}</div>
-              <div class="font-preview" :style="{ fontFamily: setData.fontFamily }">
+              <div
+                class="font-preview"
+                :style="{ fontFamily: setData.fontFamily }"
+              >
                 <div class="preview-item">
                   <div class="preview-label">{{ t('settings.basic.fontPreview.chinese') }}</div>
                   <div class="preview-text">{{ t('settings.basic.fontPreview.chineseText') }}</div>
@@ -107,18 +129,29 @@
                       currentToken ? t('settings.basic.tokenSet') : t('settings.basic.tokenNotSet')
                     }}
                   </div>
-                  <div v-if="currentToken" class="text-xs text-gray-400 mb-2 font-mono break-all">
+                  <div
+                    v-if="currentToken"
+                    class="text-xs text-gray-400 mb-2 font-mono break-all"
+                  >
                     {{ currentToken.substring(0, 50) }}...
                   </div>
                 </div>
               </div>
               <div class="flex gap-2">
-                <n-button size="small" @click="showTokenModal = true">
+                <n-button
+                  size="small"
+                  @click="showTokenModal = true"
+                >
                   {{
                     currentToken ? t('settings.basic.modifyToken') : t('settings.basic.setToken')
                   }}
                 </n-button>
-                <n-button v-if="currentToken" size="small" type="error" @click="clearToken">
+                <n-button
+                  v-if="currentToken"
+                  size="small"
+                  type="error"
+                  @click="clearToken"
+                >
                   {{ t('settings.basic.clearToken') }}
                 </n-button>
               </div>
@@ -138,7 +171,9 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-400" v-if="!isMobile"
+                <span
+                  class="text-sm text-gray-400"
+                  v-if="!isMobile"
                   >{{ setData.animationSpeed }}x</span
                 >
                 <div class="w-40 flex justify-end">
@@ -151,7 +186,7 @@
                       :marks="{
                         0.1: t('settings.basic.animationSpeed.slow'),
                         1: t('settings.basic.animationSpeed.normal'),
-                        3: t('settings.basic.animationSpeed.fast')
+                        3: t('settings.basic.animationSpeed.fast'),
                       }"
                       :disabled="setData.noAnimate"
                   /></template>
@@ -196,7 +231,7 @@
                     { label: t('settings.playback.qualityOptions.jyeffect'), value: 'jyeffect' },
                     { label: t('settings.playback.qualityOptions.sky'), value: 'sky' },
                     { label: t('settings.playback.qualityOptions.dolby'), value: 'dolby' },
-                    { label: t('settings.playback.qualityOptions.jymaster'), value: 'jymaster' }
+                    { label: t('settings.playback.qualityOptions.jymaster'), value: 'jymaster' },
                   ]"
                   style="width: 160px"
                 />
@@ -213,15 +248,24 @@
                     </n-switch>
                     <span>{{ t('settings.playback.musicUnblockEnableDesc') }}</span>
                   </div>
-                  <div v-if="setData.enableMusicUnblock" class="mt-2">
+                  <div
+                    v-if="setData.enableMusicUnblock"
+                    class="mt-2"
+                  >
                     <div class="text-sm">
                       <span class="text-gray-500">{{
                         t('settings.playback.selectedMusicSources')
                       }}</span>
-                      <span v-if="musicSources.length > 0" class="text-gray-400">
+                      <span
+                        v-if="musicSources.length > 0"
+                        class="text-gray-400"
+                      >
                         {{ musicSources.join(', ') }}
                       </span>
-                      <span v-else class="text-red-500 text-xs">
+                      <span
+                        v-else
+                        class="text-red-500 text-xs"
+                      >
                         {{ t('settings.playback.noMusicSources') }}
                       </span>
                     </div>
@@ -237,7 +281,10 @@
               </n-button>
             </div>
 
-            <div class="set-item" v-if="platform === 'darwin'">
+            <div
+              class="set-item"
+              v-if="platform === 'darwin'"
+            >
               <div>
                 <div class="set-item-title">{{ t('settings.playback.showStatusBar') }}</div>
                 <div class="set-item-content">
@@ -264,7 +311,10 @@
         </div>
 
         <!-- 应用设置 -->
-        <div v-if="isElectron" class="settings-section">
+        <div
+          v-if="isElectron"
+          class="settings-section"
+        >
           <div class="settings-section-title">{{ t('settings.sections.application') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -277,7 +327,7 @@
                 :options="[
                   { label: t('settings.application.closeOptions.ask'), value: 'ask' },
                   { label: t('settings.application.closeOptions.minimize'), value: 'minimize' },
-                  { label: t('settings.application.closeOptions.close'), value: 'close' }
+                  { label: t('settings.application.closeOptions.close'), value: 'close' },
                 ]"
                 style="width: 160px"
               />
@@ -288,16 +338,24 @@
                 <div class="set-item-title">{{ t('settings.application.shortcut') }}</div>
                 <div class="set-item-content">{{ t('settings.application.shortcutDesc') }}</div>
               </div>
-              <n-button size="small" @click="showShortcutModal = true">{{
-                t('common.configure')
-              }}</n-button>
+              <n-button
+                size="small"
+                @click="showShortcutModal = true"
+                >{{ t('common.configure') }}</n-button
+              >
             </div>
 
-            <div v-if="isElectron" class="set-item">
+            <div
+              v-if="isElectron"
+              class="set-item"
+            >
               <div>
                 <div class="set-item-title">{{ t('settings.application.download') }}</div>
                 <div class="set-item-content">
-                  <n-switch v-model:value="setData.alwaysShowDownloadButton" class="mr-2">
+                  <n-switch
+                    v-model:value="setData.alwaysShowDownloadButton"
+                    class="mr-2"
+                  >
                     <template #checked>{{ t('common.show') }}</template>
                     <template #unchecked>{{ t('common.hide') }}</template>
                   </n-switch>
@@ -305,7 +363,10 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <n-button size="small" @click="settingsStore.showDownloadDrawer = true">
+                <n-button
+                  size="small"
+                  @click="settingsStore.showDownloadDrawer = true"
+                >
                   {{ t('settings.application.download') }}
                 </n-button>
               </div>
@@ -315,7 +376,10 @@
               <div>
                 <div class="set-item-title">{{ t('settings.application.unlimitedDownload') }}</div>
                 <div class="set-item-content">
-                  <n-switch v-model:value="setData.unlimitedDownload" class="mr-2">
+                  <n-switch
+                    v-model:value="setData.unlimitedDownload"
+                    class="mr-2"
+                  >
                     <template #checked>{{ t('common.on') }}</template>
                     <template #unchecked>{{ t('common.off') }}</template>
                   </n-switch>
@@ -332,17 +396,26 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <n-button size="small" @click="openDownloadPath">{{ t('common.open') }}</n-button>
-                <n-button size="small" @click="selectDownloadPath">{{
-                  t('common.modify')
-                }}</n-button>
+                <n-button
+                  size="small"
+                  @click="openDownloadPath"
+                  >{{ t('common.open') }}</n-button
+                >
+                <n-button
+                  size="small"
+                  @click="selectDownloadPath"
+                  >{{ t('common.modify') }}</n-button
+                >
               </div>
             </div>
           </div>
         </div>
 
         <!-- 网络设置 -->
-        <div v-if="isElectron" class="settings-section">
+        <div
+          v-if="isElectron"
+          class="settings-section"
+        >
           <div class="settings-section-title">{{ t('settings.sections.network') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -363,9 +436,11 @@
                   <template #checked>{{ t('common.on') }}</template>
                   <template #unchecked>{{ t('common.off') }}</template>
                 </n-switch>
-                <n-button size="small" @click="showProxyModal = true">{{
-                  t('common.configure')
-                }}</n-button>
+                <n-button
+                  size="small"
+                  @click="showProxyModal = true"
+                  >{{ t('common.configure') }}</n-button
+                >
               </div>
             </div>
 
@@ -392,7 +467,10 @@
         </div>
 
         <!-- 系统管理 -->
-        <div v-if="isElectron" class="settings-section">
+        <div
+          v-if="isElectron"
+          class="settings-section"
+        >
           <div class="settings-section-title">{{ t('settings.sections.system') }}</div>
           <div class="settings-section-content">
             <div class="set-item">
@@ -400,7 +478,10 @@
                 <div class="set-item-title">{{ t('settings.system.cache') }}</div>
                 <div class="set-item-content">{{ t('settings.system.cacheDesc') }}</div>
               </div>
-              <n-button size="small" @click="showClearCacheModal = true">
+              <n-button
+                size="small"
+                @click="showClearCacheModal = true"
+              >
                 {{ t('settings.system.cacheDesc') }}
               </n-button>
             </div>
@@ -410,9 +491,11 @@
                 <div class="set-item-title">{{ t('settings.system.restart') }}</div>
                 <div class="set-item-content">{{ t('settings.system.restartDesc') }}</div>
               </div>
-              <n-button size="small" @click="restartApp">{{
-                t('settings.system.restart')
-              }}</n-button>
+              <n-button
+                size="small"
+                @click="restartApp"
+                >{{ t('settings.system.restart') }}</n-button
+              >
             </div>
           </div>
         </div>
@@ -422,7 +505,10 @@
 
     <template v-if="isElectron">
       <!-- 快捷键设置弹窗 -->
-      <shortcut-settings v-model:show="showShortcutModal" @change="handleShortcutsChange" />
+      <shortcut-settings
+        v-model:show="showShortcutModal"
+        @change="handleShortcutsChange"
+      />
 
       <!-- 代理设置弹窗 -->
       <proxy-settings
@@ -433,10 +519,17 @@
     </template>
 
     <!-- 音源设置弹窗 -->
-    <music-source-settings v-model:show="showMusicSourcesModal" v-model:sources="musicSources" />
+    <music-source-settings
+      v-model:show="showMusicSourcesModal"
+      v-model:sources="musicSources"
+    />
 
     <!-- Token设置弹窗 -->
-    <n-modal v-model:show="showTokenModal" preset="dialog" title="Cookie设置">
+    <n-modal
+      v-model:show="showTokenModal"
+      preset="dialog"
+      title="Cookie设置"
+    >
       <template #header>
         <div class="flex items-center gap-2">
           <i class="ri-key-line"></i>
@@ -466,7 +559,11 @@
       <template #action>
         <div class="flex gap-2">
           <n-button @click="showTokenModal = false">取消</n-button>
-          <n-button type="primary" @click="saveToken" :disabled="!tokenInput.trim()">
+          <n-button
+            type="primary"
+            @click="saveToken"
+            :disabled="!tokenInput.trim()"
+          >
             保存Cookie
           </n-button>
         </div>
@@ -474,485 +571,483 @@
     </n-modal>
 
     <!-- 清除缓存弹窗 -->
-    <clear-cache-settings v-model:show="showClearCacheModal" @confirm="clearCache" />
+    <clear-cache-settings
+      v-model:show="showClearCacheModal"
+      @confirm="clearCache"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core';
-import { useMessage } from 'naive-ui';
-import { computed, h, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { useDebounceFn } from '@vueuse/core';
+  import { useMessage } from 'naive-ui';
+  import { computed, h, onMounted, onUnmounted, ref, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-import localData from '@/../main/set.json';
-import { getUserDetail } from '@/api/login';
-import PlayBottom from '@/components/common/PlayBottom.vue';
-import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
-import ClearCacheSettings from '@/components/settings/ClearCacheSettings.vue';
-import MusicSourceSettings from '@/components/settings/MusicSourceSettings.vue';
-import ProxySettings from '@/components/settings/ProxySettings.vue';
-import ShortcutSettings from '@/components/settings/ShortcutSettings.vue';
-import { useSettingsStore } from '@/store/modules/settings';
-import { useUserStore } from '@/store/modules/user';
-import { type Platform } from '@/types/music';
-import { isElectron, isMobile } from '@/utils';
-import { openDirectory, selectDirectory } from '@/utils/fileOperation';
+  import localData from '@/../main/set.json';
+  import { getUserDetail } from '@/api/login';
+  import PlayBottom from '@/components/common/PlayBottom.vue';
+  import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+  import ClearCacheSettings from '@/components/settings/ClearCacheSettings.vue';
+  import MusicSourceSettings from '@/components/settings/MusicSourceSettings.vue';
+  import ProxySettings from '@/components/settings/ProxySettings.vue';
+  import ShortcutSettings from '@/components/settings/ShortcutSettings.vue';
+  import { useSettingsStore } from '@/store/modules/settings';
+  import { useUserStore } from '@/store/modules/user';
+  import { type, Platform  } from '@/types/music';
+  import { isElectron, isMobile } from '@/utils';
+  import { openDirectory, selectDirectory } from '@/utils/fileOperation';
 
-const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];
+  const ALL_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd']
 
-const platform = window.electron ? window.electron.ipcRenderer.sendSync('get-platform') : 'web';
+  const platform = window.electron ? window.electron.ipcRenderer.sendSync('get-platform') : 'web';
 
-const settingsStore = useSettingsStore();
-const userStore = useUserStore();
+  const settingsStore = useSettingsStore();
+  const userStore = useUserStore();
 
-// 创建一个本地缓存的setData，避免频繁更新
-const localSetData = ref({ ...settingsStore.setData });
+  // 创建一个本地缓存的setData，避免频繁更新
+  const localSetData = ref({ ...settingsStore.setData, });
 
-// 在组件卸载时保存设置
-onUnmounted(() => {
-  // 确保最终设置被保存
-  settingsStore.setSetData(localSetData.value);
+  // 在组件卸载时保存设置
+  onUnmounted(() => {
+    // 确保最终设置被保存
+    settingsStore.setSetData(localSetData.value);
 
-  // 清理所有 watch 监听器
-  watchStopFunctions.forEach((stopFn) => {
-    try {
-      stopFn();
-    } catch (error) {
-      console.error('清理 watch 监听器失败:', error);
-    }
+    // 清理所有 watch 监听器
+    watchStopFunctions.forEach(stopFn => {
+      try {
+       , stopFn();
+      } catch (error) {
+        console.error('清理 watch 监听器失败:', error);
+      }
+    });
+    watchStopFunctions.length = 0;
   });
-  watchStopFunctions.length = 0;
-});
 
-const { t } = useI18n();
+  const { t } = useI18n();
 
-const saveSettings = useDebounceFn((data) => {
-  settingsStore.setSetData(data);
-}, 500);
+  const saveSettings = useDebounceFn(data => {
+   , settingsStore.setSetData(data);
+  }, 500);
 
-// 使用计算属性来管理设置数据
-const setData = computed({
-  get: () => localSetData.value,
-  set: (newData) => {
-    localSetData.value = newData;
+  // 使用计算属性来管理设置数据
+  const setData = computed({
+    get:()=> localSetData.value,
+    set: newData => {;
+      localSetData.value = newData;
+    },
+  });
+
+  // 存储 watch 停止函数
+  const watchStopFunctions: Array<() => void> = [0]
+
+  // 监听localSetData变化，保存设置
+  const stopLocalSetDataWatch = watch(() => localSetData.value,
+    newValue => {
+      saveSettings(newValue);
+    },
+    { deep: true }
+  );
+  watchStopFunctions.push(stopLocalSetDataWatch);
+
+  // 监听store中setData的变化，同步到本地
+  const stopStoreSetDataWatch = watch(() => settingsStore.setData,
+    newValue => {
+      // 只在初始加载时更新本地数据，避免循环更新
+      if (JSON.stringify(localSetData.value) !== JSON.stringify(newValue)) {
+        localSetData.value = { ...newValue }
+      }
+    },
+    { deep: true, immediate: true }
+  );
+  watchStopFunctions.push(stopStoreSetDataWatch);
+
+  const isDarkTheme = computed({
+    get:()=> settingsStore.theme === 'dark',
+    set: ()=> settingsStore.toggleTheme(),
+  });
+
+  const handleAutoThemeChange = (value: boolean) => {
+    settingsStore.setAutoTheme(value);
   }
-});
 
-// 存储 watch 停止函数
-const watchStopFunctions: Array<() => void> = [];
-
-// 监听localSetData变化，保存设置
-const stopLocalSetDataWatch = watch(
-  () => localSetData.value,
-  (newValue) => {
-    saveSettings(newValue);
-  },
-  { deep: true }
-);
-watchStopFunctions.push(stopLocalSetDataWatch);
-
-// 监听store中setData的变化，同步到本地
-const stopStoreSetDataWatch = watch(
-  () => settingsStore.setData,
-  (newValue) => {
-    // 只在初始加载时更新本地数据，避免循环更新
-    if (JSON.stringify(localSetData.value) !== JSON.stringify(newValue)) {
-      localSetData.value = { ...newValue };
-    }
-  },
-  { deep: true, immediate: true }
-);
-watchStopFunctions.push(stopStoreSetDataWatch);
-
-const isDarkTheme = computed({
-  get: () => settingsStore.theme === 'dark',
-  set: () => settingsStore.toggleTheme()
-});
-
-const handleAutoThemeChange = (value: boolean) => {
-  settingsStore.setAutoTheme(value);
-};
-
-const restartApp = () => {
-  window.electron.ipcRenderer.send('restart');
-};
-const message = useMessage();
-
-const selectDownloadPath = async () => {
-  const path = await selectDirectory(message);
-  if (path) {
-    setData.value = {
-      ...setData.value,
-      downloadPath: path
-    };
+  const restartApp = () => {
+    window.electron.ipcRenderer.send('restart');
   }
-};
+  const message = useMessage();
 
-const openDownloadPath = () => {
-  openDirectory(setData.value.downloadPath, message);
-};
-
-const showProxyModal = ref(false);
-const proxyForm = ref({
-  protocol: 'http',
-  host: '127.0.0.1',
-  port: 7890
-});
-
-// 使用 store 中的字体列表
-const systemFonts = computed(() => settingsStore.systemFonts);
-
-// 已选择的字体列表
-const selectedFonts = ref<string[]>([]);
-
-// 自定义渲染函数
-const renderFontLabel = (option: { label: string; value: string }) => {
-  return h('span', { style: { fontFamily: option.value } }, option.label);
-};
-
-// 监听字体选择变化
-watch(
-  selectedFonts,
-  (newFonts) => {
-    // 如果没有选择任何字体，使用系统默认字体
-    if (newFonts.length === 0) {
+  const selectDownloadPath = async () => {
+    const path = await selectDirectory(_message);
+    if (path) {
       setData.value = {
         ...setData.value,
-        fontFamily: 'system-ui'
-      };
-      return;
-    }
-    // 将选择的字体组合成字体列表
-    setData.value = {
-      ...setData.value,
-      fontFamily: newFonts.join(',')
-    };
-  },
-  { deep: true }
-);
-
-// 初始化已选择的字体
-watch(
-  () => setData.value.fontFamily,
-  (newFont) => {
-    if (newFont) {
-      if (newFont === 'system-ui') {
-        selectedFonts.value = [];
-      } else {
-        selectedFonts.value = newFont.split(',');
+        downloadPath: path,
       }
     }
-  },
-  { immediate: true }
-);
-
-// 初始化时从store获取配置
-onMounted(async () => {
-  if (setData.value.proxyConfig) {
-    proxyForm.value = { ...setData.value.proxyConfig };
   }
-  // 确保enableRealIP有默认值
-  if (setData.value.enableRealIP === undefined) {
+
+  const openDownloadPath = () => {
+    openDirectory(setData.value.downloadPath, _message);
+  }
+
+  const showProxyModal = ref(false);
+  const proxyForm = ref({
+    protocol: 'http',
+    host: '127.0.0.1',
+    port: 7890,
+  });
+
+  // 使用 store 中的字体列表
+  const systemFonts = computed(() => settingsStore.systemFonts);
+
+  // 已选择的字体列表
+  const selectedFonts = ref<string[]>([0]);
+
+  // 自定义渲染函数
+  const renderFontLabel = (option: { label: string, value: string, }) => {
+    return h('span', { style: { fontFamily: option.value } }, option.label);
+  }
+
+  // 监听字体选择变化
+  watch(() => 
+    selectedFonts,
+    newFonts => {
+      // 如果没有选择任何字体，使用系统默认字体
+      if (newFonts.length === 0) {
+        setData.value = {
+          ...setData.value,
+          fontFamily: 'system-ui',
+        }
+        return;
+      }
+      // 将选择的字体组合成字体列表
+      setData.value = {
+        ...setData.value,
+        fontFamily: newFonts.join(','),
+      }
+    },
+    { deep: true }
+  );
+
+  // 初始化已选择的字体
+  watch(() => setData.value.fontFamily,
+    newFont => {
+      if (newFont) {
+        if (newFont === 'system-ui') {
+          selectedFonts.value = [0]
+        } else {
+          selectedFonts.value = newFont.split(',');
+        }
+      }
+    },
+    { immediate: true }
+  );
+
+  // 初始化时从store获取配置
+  onMounted(async() => {
+    if (setData.value.proxyConfig) {
+      proxyForm.value = { ...setData.value.proxyConfig }
+    }
+    // 确保enableRealIP有默认值
+    if (setData.value.enableRealIP === undefined) {
+      setData.value = {
+        ...setData.value,
+        enableRealIP: false,
+      }
+    }
+  });
+
+  // 监听代理配置变化
+  watch(() => setData.value.proxyConfig,
+    newVal => {
+      if (newVal) {
+        proxyForm.value = {
+          protocol: newVal.protocol || 'http',
+          host: newVal.host || '127.0.0.1',
+          port: newVal.port || 7890,
+        }
+      }
+    },
+    { immediate: true, deep: true }
+  );
+
+  const handleProxyConfirm = async proxyConfig => {
+    // 保存代理配置时保留enable状态
     setData.value = {
       ...setData.value,
-      enableRealIP: false
-    };
+      proxyConfig: {
+  enable: setData.value.proxyConfig?.enable || false,
+        ...proxyConfig,
+      },
+    }
+    message.success(t('settings.network.messages.proxySuccess'));
   }
-});
 
-// 监听代理配置变化
-watch(
-  () => setData.value.proxyConfig,
-  (newVal) => {
-    if (newVal) {
-      proxyForm.value = {
-        protocol: newVal.protocol || 'http',
-        host: newVal.host || '127.0.0.1',
-        port: newVal.port || 7890
-      };
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-const handleProxyConfirm = async (proxyConfig) => {
-  // 保存代理配置时保留enable状态
-  setData.value = {
-    ...setData.value,
-    proxyConfig: {
-      enable: setData.value.proxyConfig?.enable || false,
-      ...proxyConfig
-    }
-  };
-  message.success(t('settings.network.messages.proxySuccess'));
-};
-
-const validateAndSaveRealIP = () => {
-  const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-  if (!setData.value.realIP || ipRegex.test(setData.value.realIP)) {
-    setData.value = {
-      ...setData.value,
-      realIP: setData.value.realIP,
-      enableRealIP: true
-    };
-    if (setData.value.realIP) {
-      message.success(t('settings.network.messages.realIPSuccess'));
-    }
-  } else {
-    message.error(t('settings.network.messages.realIPError'));
-    setData.value = {
-      ...setData.value,
-      realIP: ''
-    };
-  }
-};
-
-// 监听enableRealIP变化，当关闭时清空realIP
-watch(
-  () => setData.value.enableRealIP,
-  (newVal) => {
-    if (!newVal) {
+  const validateAndSaveRealIP = () => {
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!setData.value.realIP || ipRegex.test(setData.value.realIP)) {
+      setData.value = {
+        ...setData.value,
+        realIP: setData.value.realIP,
+        enableRealIP: true,
+      }
+      if (setData.value.realIP) {
+        message.success(t('settings.network.messages.realIPSuccess'));
+      }
+    } else {
+      message.error(t('settings.network.messages.realIPError'));
       setData.value = {
         ...setData.value,
         realIP: '',
-        enableRealIP: false
-      };
+      }
     }
   }
-);
 
-// 清除缓存相关
-const showClearCacheModal = ref(false);
-
-const clearCache = async (selectedCacheTypes) => {
-  const clearTasks = selectedCacheTypes.map(async (type) => {
-    switch (type) {
-      case 'history':
-        localStorage.removeItem('musicHistory');
-        break;
-      case 'favorite':
-        localStorage.removeItem('favoriteList');
-        break;
-      case 'user':
-        userStore.handleLogout();
-        break;
-      case 'settings':
-        if (window.electron) {
-          window.electron.ipcRenderer.send('set-store-value', 'set', localData);
+  // 监听enableRealIP变化，当关闭时清空realIP
+  watch(() => setData.value.enableRealIP,
+    newVal => {
+      if (!newVal) {
+        setData.value = {
+          ...setData.value,
+          realIP: '',
+          enableRealIP: false,
         }
-        localStorage.removeItem('appSettings');
-        localStorage.removeItem('theme');
-        localStorage.removeItem('lyricData');
-        localStorage.removeItem('lyricFontSize');
-        localStorage.removeItem('playMode');
-        break;
-      case 'downloads':
-        if (window.electron) {
-          window.electron.ipcRenderer.send('clear-downloads-history');
-        }
-        break;
-      case 'resources':
-        // 清除音频资源缓存
-        if (window.electron) {
-          window.electron.ipcRenderer.send('clear-audio-cache');
-        }
-        // 清除歌词缓存
-        localStorage.removeItem('lyricCache');
-        // 清除音乐URL缓存
-        localStorage.removeItem('musicUrlCache');
-        // 清除图片缓存
-        if (window.caches) {
-          try {
-            const cache = await window.caches.open('music-images');
-            await cache.keys().then((keys) => {
-              keys.forEach((key) => {
-                cache.delete(key);
-              });
-            });
-          } catch (error) {
-            console.error('清除图片缓存失败:', error);
-          }
-        }
-        break;
-      case 'lyrics':
-        window.api.invoke('clear-lyrics-cache');
-        break;
-      default:
-        break;
+      }
     }
+  );
+
+  // 清除缓存相关
+  const showClearCacheModal = ref(false);
+
+  const clearCache = async selectedCacheTypes => {
+    const clearTasks = selectedCacheTypes.map(async type => {
+      switch(type) {
+        case 'history':
+          localStorage.removeItem('musicHistory');
+          break;
+        case 'favorite':
+          localStorage.removeItem('favoriteList');
+          break;
+        case 'user':
+          userStore.handleLogout();
+          break;
+        case 'settings':
+          if (window.electron) {
+            window.electron.ipcRenderer.send('set-store-value', 'set', localData);
+          }
+          localStorage.removeItem('appSettings');
+          localStorage.removeItem('theme');
+          localStorage.removeItem('lyricData');
+          localStorage.removeItem('lyricFontSize');
+          localStorage.removeItem('playMode');
+          break;
+        case 'downloads':
+          if (window.electron) {
+            window.electron.ipcRenderer.send('clear-downloads-history');
+          }
+          break;
+        case 'resources':
+          // 清除音频资源缓存
+          if (window.electron) {
+            window.electron.ipcRenderer.send('clear-audio-cache');
+          }
+          // 清除歌词缓存
+          localStorage.removeItem('lyricCache');
+          // 清除音乐URL缓存
+          localStorage.removeItem('musicUrlCache');
+          // 清除图片缓存
+          if (window.caches) {
+            try {
+              const cache = await window.caches.open('music-images');
+              await cache.keys().then(keys => {
+                keys.forEach(key => {
+                 , cache.delete(_key);
+                });
+              });
+            } catch (error) {
+              console.error('清除图片缓存失败:', error);
+            }
+          }
+          break;
+        case 'lyrics':
+          window.api.invoke('clear-lyrics-cache');
+          break;
+        default:
+      break;
+          break;
+      }
+    });
+
+    await Promise.all(clearTasks);
+    message.success(t('settings.system.messages.clearSuccess'));
+  }
+
+  const showShortcutModal = ref(false);
+
+  const handleShortcutsChange = (shortcuts: unknown) => {
+    console.log('快捷键已更新:', shortcuts);
+  }
+
+  // 音源设置相关
+  const musicSources = computed({
+    get:() => {
+      if (!setData.value.enabledMusicSources) {
+        return ALL_PLATFORMS;
+      }
+      return setData.value.enabledMusicSources as Platform[]
+    },
+    set: (newValue: Platform[]) => {
+      // 确保至少选择一个音源
+      const valuesToSet = newValue.length > 0 ? [...new Set(newValue)] : ALL_PLATFORMS;
+      setData.value = {
+        ...setData.value,
+        enabledMusicSources: valuesToSet,
+      }
+    },
   });
 
-  await Promise.all(clearTasks);
-  message.success(t('settings.system.messages.clearSuccess'));
-};
+  const showMusicSourcesModal = ref(false);
 
-const showShortcutModal = ref(false);
+  // Token管理相关
+  const showTokenModal = ref(false);
+  const tokenInput = ref('');
+  const currentToken = ref(localStorage.getItem('token') || '');
 
-const handleShortcutsChange = (shortcuts: any) => {
-  console.log('快捷键已更新:', shortcuts);
-};
-
-// 音源设置相关
-const musicSources = computed({
-  get: () => {
-    if (!setData.value.enabledMusicSources) {
-      return ALL_PLATFORMS;
+  // 保存Token
+  const saveToken = async () => {
+    if (!tokenInput.value.trim()) {
+      message.error('请输入Token');
+      return;
     }
-    return setData.value.enabledMusicSources as Platform[];
-  },
-  set: (newValue: Platform[]) => {
-    // 确保至少选择一个音源
-    const valuesToSet = newValue.length > 0 ? [...new Set(newValue)] : ALL_PLATFORMS;
-    setData.value = {
-      ...setData.value,
-      enabledMusicSources: valuesToSet
-    };
-  }
-});
 
-const showMusicSourcesModal = ref(false);
+    try {
+      // 临时保存原有token
+      const originalToken = localStorage.getItem('token');
 
-// Token管理相关
-const showTokenModal = ref(false);
-const tokenInput = ref('');
-const currentToken = ref(localStorage.getItem('token') || '');
+      // 设置新token
+      localStorage.setItem('token', tokenInput.value.trim());
 
-// 保存Token
-const saveToken = async () => {
-  if (!tokenInput.value.trim()) {
-    message.error('请输入Token');
-    return;
-  }
+      // 验证token有效性
+      const user = await getUserDetail();
+      if (user.data && user.data.profile) {
+        // token有效，更新用户信息
+        userStore.setUser(user.data.profile);
+        currentToken.value = tokenInput.value.trim();
+        message.success('Token设置成功');
+        showTokenModal.value = false;
+        tokenInput.value = '';
 
-  try {
-    // 临时保存原有token
-    const originalToken = localStorage.getItem('token');
-
-    // 设置新token
-    localStorage.setItem('token', tokenInput.value.trim());
-
-    // 验证token有效性
-    const user = await getUserDetail();
-    if (user.data && user.data.profile) {
-      // token有效，更新用户信息
-      userStore.setUser(user.data.profile);
-      currentToken.value = tokenInput.value.trim();
-      message.success('Token设置成功');
-      showTokenModal.value = false;
-      tokenInput.value = '';
-
-      // 刷新当前页面
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } else {
+        // 刷新当前页面
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        // token无效，恢复原有token
+        if (originalToken) {
+          localStorage.setItem('token', originalToken);
+        } else {
+          localStorage.removeItem('token');
+        }
+        message.error('Token无效，请检查后重试');
+      }
+    } catch (error) {
       // token无效，恢复原有token
+      const originalToken = localStorage.getItem('token');
       if (originalToken) {
         localStorage.setItem('token', originalToken);
       } else {
         localStorage.removeItem('token');
       }
       message.error('Token无效，请检查后重试');
+      console.error('Token验证失败:', error);
     }
-  } catch (error) {
-    // token无效，恢复原有token
-    const originalToken = localStorage.getItem('token');
-    if (originalToken) {
-      localStorage.setItem('token', originalToken);
-    } else {
-      localStorage.removeItem('token');
-    }
-    message.error('Token无效，请检查后重试');
-    console.error('Token验证失败:', error);
   }
-};
 
-// 清除Token
-const clearToken = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  currentToken.value = '';
-  userStore.user = null;
-  message.success('Token已清除');
+  // 清除Token
+  const clearToken = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    currentToken.value = '';
+    userStore.user = null;
+    message.success('Token已清除');
 
-  // 刷新页面
-  setTimeout(() => {
-    window.location.reload();
-  }, 1000);
-};
+    // 刷新页面
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
 
-// 监听localStorage中token的变化
-watch(
-  () => localStorage.getItem('token'),
-  (newToken) => {
-    currentToken.value = newToken || '';
-  },
-  { immediate: true }
-);
+  // 监听localStorage中token的变化
+  watch(() => localStorage.getItem('token'),
+    newToken => {
+      currentToken.value = newToken || '';
+    },
+    { immediate: true }
+  );
 </script>
 
 <style lang="scss" scoped>
-.settings-container {
-  @apply flex h-full;
-}
-
-.settings-content {
-  @apply flex-1 h-full;
-}
-
-.set-page {
-  @apply p-4 pb-20;
-}
-
-.set-item {
-  @apply flex items-center justify-between p-4 rounded-lg transition-all;
-  @apply bg-light dark:bg-dark text-gray-900 dark:text-white;
-  @apply border border-gray-200 dark:border-gray-700;
-
-  &-title {
-    @apply text-base font-medium mb-1;
+  .settings-container {
+    @apply flex h-full;
   }
 
-  &-content {
-    @apply text-sm text-gray-500 dark:text-gray-400;
+  .settings-content {
+    @apply flex-1 h-full;
   }
 
-  &:hover {
-    @apply bg-gray-50 dark:bg-gray-800;
-  }
-}
-
-.font-preview-container {
-  @apply mt-4 p-4 rounded-lg;
-  @apply bg-gray-50 dark:bg-dark-100;
-  @apply border border-gray-200 dark:border-gray-700;
-
-  .font-preview-title {
-    @apply text-sm font-medium mb-3;
-    @apply text-gray-600 dark:text-gray-300;
+  .set-page {
+    @apply p-4 pb-20;
   }
 
-  .font-preview {
-    @apply space-y-3;
+  .set-item {
+    @apply flex items-center justify-between p-4 rounded-lg transition-all;
+    @apply bg-light dark:bg-dark text-gray-900 dark:text-white;
+    @apply border border-gray-200 dark:border-gray-700;
 
-    .preview-item {
-      @apply flex flex-col gap-1;
+    &-title {
+      @apply text-base font-medium mb-1;
+    }
 
-      .preview-label {
-        @apply text-xs text-gray-500 dark:text-gray-400;
-      }
+    &-content {
+      @apply text-sm text-gray-500 dark:text-gray-400;
+    }
 
-      .preview-text {
-        @apply text-base text-gray-900 dark:text-gray-100;
-        @apply p-2 rounded;
-        @apply bg-white dark:bg-dark;
-        @apply border border-gray-200 dark:border-gray-700;
+    &:hover {
+      @apply bg-gray-50 dark:bg-gray-800;
+    }
+  }
+
+  .font-preview-container {
+    @apply mt-4 p-4 rounded-lg;
+    @apply bg-gray-50 dark:bg-dark-100;
+    @apply border border-gray-200 dark:border-gray-700;
+
+    .font-preview-title {
+      @apply text-sm font-medium mb-3;
+      @apply text-gray-600 dark:text-gray-300;
+    }
+
+    .font-preview {
+      @apply space-y-3;
+
+      .preview-item {
+        @apply flex flex-col gap-1;
+
+        .preview-label {
+          @apply text-xs text-gray-500 dark:text-gray-400;
+        }
+
+        .preview-text {
+          @apply text-base text-gray-900 dark:text-gray-100;
+          @apply p-2 rounded;
+          @apply bg-white dark:bg-dark;
+          @apply border border-gray-200 dark:border-gray-700;
+        }
       }
     }
   }
-}
 
-:deep(.n-select) {
-  width: 200px;
-}
+  :deep(.n-select) {
+    width: 200px;
+  }
 </style>

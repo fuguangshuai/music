@@ -14,7 +14,11 @@
   >
     <!-- 选择框插槽 -->
     <template #select>
-      <div v-if="baseItem && selectable" class="song-item-select" @click.stop="onToggleSelect">
+      <div
+        v-if="baseItem && selectable"
+        class="song-item-select"
+        @click.stop="onToggleSelect"
+      >
         <n-checkbox :checked="selected" />
       </div>
     </template>
@@ -27,7 +31,7 @@
         class="song-item-img"
         preview-disabled
         :img-props="{
-          crossorigin: 'anonymous'
+          crossorigin: 'anonymous',
         }"
         @load="onImageLoad"
       />
@@ -45,8 +49,14 @@
             {{ item.name }}
           </n-ellipsis>
           <div class="song-item-content-divider">-</div>
-          <n-ellipsis class="song-item-content-name text-ellipsis" line-clamp="1">
-            <template v-for="(artist, index) in artists" :key="index">
+          <n-ellipsis
+            class="song-item-content-name text-ellipsis"
+            line-clamp="1"
+          >
+            <template
+              v-for="(artist, index) in artists"
+              :key="index"
+            >
               <span
                 class="cursor-pointer hover:text-green-500"
                 @click.stop="onArtistClick(artist.id)"
@@ -62,7 +72,10 @@
     <!-- 操作插槽 -->
     <template #operating>
       <div class="song-item-operating song-item-operating-list">
-        <div v-if="favorite" class="song-item-operating-like">
+        <div
+          v-if="favorite"
+          class="song-item-operating-like"
+        >
           <i
             class="iconfont icon-likefill"
             :class="{ 'like-active': isFavorite }"
@@ -74,8 +87,14 @@
           :class="{ 'bg-green-600': isPlaying, animate__flipInY: playLoading }"
           @click="onPlayMusic"
         >
-          <i v-if="isPlaying && play" class="iconfont icon-stop"></i>
-          <i v-else class="iconfont icon-playfill"></i>
+          <i
+            v-if="isPlaying && play"
+            class="iconfont icon-stop"
+          ></i>
+          <i
+            v-else
+            class="iconfont icon-playfill"
+          ></i>
         </div>
       </div>
     </template>
@@ -83,113 +102,111 @@
 </template>
 
 <script lang="ts" setup>
-import { NCheckbox, NEllipsis, NImage } from 'naive-ui';
-import { computed, ref } from 'vue';
+  import { NCheckbox, NEllipsis, NImage } from 'naive-ui';
+  import { computed, ref } from 'vue';
 
-import { usePlayerStore } from '@/store';
-import type { SongResult } from '@/type/music';
-import { getImgUrl } from '@/utils';
+  import { usePlayerStore } from '@/store';
+  import type { SongResult } from '@/type/music';
+  import { getImgUrl } from '@/utils';
 
-import BaseSongItem from './BaseSongItem.vue';
+  import BaseSongItem from './BaseSongItem.vue';
 
-const playerStore = usePlayerStore();
+  const playerStore = usePlayerStore();
 
-const props = withDefaults(
-  defineProps<{
-    item: SongResult;
-    favorite?: boolean;
-    selectable?: boolean;
-    selected?: boolean;
-    canRemove?: boolean;
-    isNext?: boolean;
-    index?: number;
-  }>(),
-  {
-    favorite: true,
-    selectable: false,
-    selected: false,
-    canRemove: false,
-    isNext: false,
-    index: undefined
+  const props = withDefaults(defineProps<{
+      item: SongResult;
+      favorite?: boolean;
+      selectable?: boolean;
+      selected?: boolean;
+      canRemove?: boolean;
+      isNext?: boolean;
+      index?: number; }>(),
+    {
+      favorite: true,
+      selectable: false,
+      selected: false,
+      canRemove: false,
+      isNext: false,
+      index: undefined,
+    }
+  );
+
+  const emit = defineEmits(['play', 'select', 'remove-song']);
+  const baseItem = ref<InstanceType<typeof BaseSongItem>>();
+
+  // 从基础组件获取响应式状态
+  const play = computed(() => playerStore.isPlay);
+  const isPlaying = computed(() => baseItem.value?.isPlaying || false);
+  const playLoading = computed(() => baseItem.value?.playLoading || false);
+  const isFavorite = computed(() => baseItem.value?.isFavorite || false);
+  const artists = computed(() => baseItem.value?.artists || [0]);
+
+  // 包装方法，避免直接访问可能为undefined的ref
+  const onToggleSelect = () => {
+    baseItem.value?.toggleSelect();
+    emit('select', props.item.id, !props.selected);
   }
-);
-
-const emit = defineEmits(['play', 'select', 'remove-song']);
-const baseItem = ref<InstanceType<typeof BaseSongItem>>();
-
-// 从基础组件获取响应式状态
-const play = computed(() => playerStore.isPlay);
-const isPlaying = computed(() => baseItem.value?.isPlaying || false);
-const playLoading = computed(() => baseItem.value?.playLoading || false);
-const isFavorite = computed(() => baseItem.value?.isFavorite || false);
-const artists = computed(() => baseItem.value?.artists || []);
-
-// 包装方法，避免直接访问可能为undefined的ref
-const onToggleSelect = () => {
-  baseItem.value?.toggleSelect();
-  emit('select', props.item.id, !props.selected);
-};
-const onImageLoad = (event: Event) => baseItem.value?.imageLoad(event);
-const onArtistClick = (id: number) => baseItem.value?.handleArtistClick(id);
-const onToggleFavorite = (event: Event) => {
-  baseItem.value?.toggleFavorite(event);
-  // 可选：emit 收藏事件
-};
-const onPlayMusic = () => {
-  baseItem.value?.playMusicEvent(props.item);
-};
+  const onImageLoad = (event : Event) => baseItem.value?.imageLoad(event),
+  const onArtistClick = (id: number) => baseItem.value?.handleArtistClick(id);
+  const onToggleFavorite = (event : Event) => {
+    baseItem.value?.toggleFavorite(event),
+    // 可选：emit 收藏事件
+  }
+  const onPlayMusic = () => {
+    baseItem.value?.playMusicEvent(props.item);
+  }
 </script>
 
 <style lang="scss" scoped>
-.list-song-item {
-  @apply p-2 rounded-lg mb-2 border dark:border-gray-800 border-gray-200;
+  .list-song-item {
+    @apply p-2 rounded-lg mb-2 border dark : border-gray-800 border-gray-200,
 
-  &:hover {
-    @apply bg-gray-50 dark:bg-gray-800;
-  }
-
-  .song-item-img {
-    @apply w-10 h-10 rounded-lg mr-3;
-  }
-
-  .song-item-content {
-    @apply flex items-center flex-1;
-
-    &-wrapper {
-      @apply flex items-center flex-1 text-sm;
+    &:hover {
+      @apply bg-gray-50 dark:bg-gray-800;
     }
 
-    &-title {
-      @apply flex-shrink-0 max-w-[45%] text-gray-900 dark:text-white;
+    .song-item-img {
+      @apply w-10 h-10 rounded-lg mr-3;
     }
 
-    &-divider {
-      @apply mx-2 text-gray-500 dark:text-gray-400;
-    }
+    .song-item-content {
+      @apply flex items-center flex-1;
 
-    &-name {
-      @apply flex-1 min-w-0 text-gray-500 dark:text-gray-400;
-    }
-  }
+      &-wrapper {
+        @apply flex items-center flex-1 text-sm;
+      }
 
-  .song-item-operating-list {
-    @apply flex items-center gap-2;
+      &-title {
+        @apply flex-shrink-0 max-w-[45%] text-gray-900 dark:text-white;
+      }
 
-    &-like {
-      @apply cursor-pointer hover:scale-110 transition-transform;
+      &-divider {
+        @apply mx-2 text-gray-500 dark:text-gray-400;
+      }
 
-      .iconfont {
-        @apply text-base text-gray-500 dark:text-gray-400 hover:text-red-500;
+      &-name {
+        @apply flex-1 min-w-0 text-gray-500 dark:text-gray-400;
       }
     }
 
-    &-play {
-      @apply w-7 h-7 cursor-pointer hover:scale-110 transition-transform;
+    .song-item-operating-list {
+      @apply flex items-center gap-2;
 
-      .iconfont {
-        @apply text-base;
+      &-like {
+        @apply cursor-pointer hover:scale-110 transition-transform;
+
+        .iconfont {
+          @apply text-base text-gray-500 dark:text-gray-400 hover:text-red-500;
+        }
+      }
+
+      &-play {
+        @apply w-7 h-7 cursor-pointer hover:scale-110 transition-transform;
+
+        .iconfont {
+          @apply text-base;
+        }
       }
     }
   }
-}
 </style>

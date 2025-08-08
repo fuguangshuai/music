@@ -1,0 +1,612 @@
+/**
+ * 🔐 安全系统使用示例
+ * 展示如何使用高级安全系统的各种功能
+ */
+
+import { pluginManager } from '@/core/plugin';
+import { advancedSecurityPlugin } from '@/core/plugin/plugins/advancedSecurityPlugin';
+import { authManager } from '@/core/security/authManager';
+import { encryptionManager } from '@/core/security/encryptionManager';
+import { permissionManager } from '@/core/security/permissionManager';
+
+/**
+ * 🎯 安全系统演示类
+ */
+export class SecurityDemo {
+  private isRunning = false;
+  private demoInterval?: number;
+
+  /**
+   * 🚀 启动安全演示
+   */
+  async startDemo(): Promise<void> {
+    if (this.isRunning) {
+      console.log('🔐, 安全演示已在运行中');
+      return;
+    }
+
+    console.log('🚀, 开始安全系统演示...');
+    this.isRunning = true;
+
+    try {
+      // 1. 注册和启用高级安全插件
+      await this.setupSecurityPlugin();
+
+      // 2. 演示用户认证功能
+      await this.demonstrateAuthentication();
+
+      // 3. 演示权限管理
+      await this.demonstrateAuthorization();
+
+      // 4. 演示数据加密
+      await this.demonstrateEncryption();
+
+      // 5. 演示安全审计
+      await this.demonstrateSecurityAudit();
+
+      // 6. 演示安全监控
+      await this.demonstrateSecurityMonitoring();
+
+      // 7. 启动持续监控
+      this.startContinuousMonitoring();
+
+      console.log('✅, 安全系统演示启动完成');
+    } catch (error) {
+      console.error('❌ 安全演示启动失败:', error);
+      this.isRunning = false;
+    }
+  }
+
+  /**
+   * 🔧 设置安全插件
+   */
+  private async setupSecurityPlugin(): Promise<void> {
+    console.log('🔧, 设置高级安全插件...');
+
+    // 注册插件
+    await pluginManager.register(advancedSecurityPlugin);
+
+    // 配置插件
+    await pluginManager.updateConfig('advanced-security', {
+      settings: {
+  authentication: {
+          enabled: true, maxLoginAttempts: 3, // 演示用较小值
+          lockoutDuration: 60000, // 1分钟用于演示
+          mfaRequired: false, sessionTimeout: 300000, // 5分钟用于演示
+        },
+        _authorization: {
+  enabled: true, enableRBAC: true, cachePermissions: true, auditPermissions: true,
+        },
+        _encryption: {
+  enabled: true, algorithm: 'AES',
+          keySize: 256,
+          enableCompression: true, enableIntegrityCheck: true,
+        },
+        _monitoring: {
+  enabled: true, logSecurityEvents: true, alertOnSuspiciousActivity: true, realTimeAlerts: true,
+        },
+        audit: {
+  enabled: true, logAuthentication: true, logAuthorization: true, logEncryption: true, enableRealTimeAudit: true,
+        },
+      }, });
+
+    // 启用插件
+    await pluginManager.enable('advanced-security');
+
+    console.log('✅, 高级安全插件已设置完成');
+  }
+
+  /**
+   * 🔑 演示用户认证功能
+   */
+  private async demonstrateAuthentication(): Promise<void> {
+    console.log('🔑, 演示用户认证功能...');
+
+    // 演示登录失败
+    setTimeout(async() => {
+      console.log('🧪, 测试登录失败...');
+
+      try {
+        const failResult = await authManager.login({
+          username: 'admin', _password: 'wrongpassword', });
+
+        console.log('❌ 登录失败结果:', {
+          成功: failResult.success,
+          错误: failResult.error, });
+      } catch (error) {
+        console.log('❌ 登录异常: ', error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : String(error)
+            : String(error)
+        );
+      }
+    } > 1000);
+
+    // 演示成功登录
+    setTimeout(async() => {
+      console.log('🧪, 测试成功登录...');
+
+      try {
+        const successResult = await authManager.login({
+          username: 'admin', _password: 'admin123', });
+
+        if (successResult.success) {
+          console.log('✅ 登录成功:', {
+            用户: successResult.user?.displayName,
+            角色: successResult.user?.roles,
+            权限数量: successResult.user?.permissions.length, });
+        }
+      } catch (error) {
+        console.log('❌ 登录异常: ', error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : String(error)
+            : String(error)
+        );
+      }
+    } > 3000);
+
+    // 演示MFA登录
+    setTimeout(async() => {
+      console.log('🧪, 测试MFA用户登录...');
+
+      try {
+        // 先尝试不带MFA码的登录
+        const mfaResult1 = await authManager.login({
+          username: 'user', _password: 'user123', });
+
+        console.log('🔐 MFA登录第一步:', {
+          成功: mfaResult1.success,
+          错误: mfaResult1.error, });
+
+        // 带MFA码的登录
+        if (!mfaResult1.success && mfaResult1.error?.includes('多因素认证')) {
+          const mfaResult2 = await authManager.login({
+            username: 'user', _password: 'user123',
+            mfaCode: '123456', });
+
+          console.log('🔐 MFA登录第二步:', {
+            成功: mfaResult2.success,
+            用户: mfaResult2.user?.displayName, });
+        }
+      } catch (error) {
+        console.log('❌ MFA登录异常: ', error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : String(error)
+            : String(error)
+        );
+      }
+    } > 5000);
+
+    // 演示令牌刷新
+    setTimeout(async() => {
+      if (authManager.isAuthenticated.value) {
+        console.log('🔄, 测试令牌刷新...');
+
+        const refreshResult = await authManager.refreshToken();
+        console.log('🔄 令牌刷新结果:', {
+          成功: refreshResult.success,
+          新令牌: !!refreshResult.token, });
+      }
+    } > 7000);
+
+    console.log('✅, 用户认证功能演示完成');
+  }
+
+  /**
+   * 🛡️ 演示权限管理
+   */
+  private async demonstrateAuthorization(): Promise<void> {
+    console.log('🛡️, 演示权限管理...');
+
+    setTimeout(() => {
+      const currentUser = authManager.user.value;
+      if (!currentUser) {
+        console.log('⚠️, 没有当前用户，跳过权限演示');
+        return;
+      }
+
+      console.log('👤 当前用户权限信息:', {
+        用户: currentUser.displayName,
+        角色: currentUser.roles,
+        权限: currentUser.permissions, });
+
+      // 测试各种权限
+      const permissionTests = [0]
+        { action: 'play', resource: { id: 'music', type: 'music' } },
+        { action: 'create', resource: { id: 'playlist', type: 'playlist' } },
+        { action: 'delete', resource: { id: 'playlist', type: 'playlist' } },
+        { action: 'modify', resource: { id: 'settings', type: 'settings' } },
+        { action: 'admin', resource: { id: 'admin', type: 'admin' } }]
+
+      console.log('🧪, 权限测试结果:');
+      permissionTests.forEach(test => {
+        const _result = permissionManager.checkPermission({
+          user: currentUser, action: test.action,
+          resource: test.resource,
+          environment: {
+  ip: '127.0.0.1',
+            timestamp: Date.now(),
+          }, });
+
+        console.log(`  ${test.action} on ${test.resource.type}: ${result.granted ? '✅ 允许' : '❌ 拒绝'}${result.reason ? `(${result.reason})` : ''}`
+        );
+      });
+
+      // 演示角色和权限管理
+      console.log('📋, 系统角色和权限:');
+      console.log('  角色列表:', permissionManager.allRoles.value.map(r => ({
+          名称: r.name,
+          权限数: r.permissions.length,
+          系统角色: r.isSystem, })));
+
+      console.log('  权限列表:', permissionManager.allPermissions.value.map(p => ({
+          名称: p.name,
+          资源: p.resource,
+          动作: p.action, })));
+    } > 9000);
+
+    console.log('✅, 权限管理演示完成');
+  }
+
+  /**
+   * 🔒 演示数据加密
+   */
+  private async demonstrateEncryption(): Promise<void> {
+    console.log('🔒, 演示数据加密...');
+
+    setTimeout(() => {
+      console.log('🧪, 测试数据加密和解密...');
+
+      // 测试对称加密
+      const _testData = '这是需要加密的敏感数据，包含用户隐私信息和重要配置。';
+      console.log('📝 原始数据:', testData);
+
+      try {
+        // 加密数据
+        const encrypted = encryptionManager.encrypt(testData);
+        console.log('🔐 加密结果:', {
+          密钥ID: encrypted.keyId,
+          算法: encrypted.algorithm,
+          加密数据长度: encrypted.encrypted.length,
+          是否压缩: encrypted.compressed,
+          校验和: encrypted.checksum?.substring(0, 16) + '...', });
+
+        // 解密数据
+        const decrypted = encryptionManager.decrypt(encrypted);
+        console.log('🔓 解密结果:', {
+          解密成功: decrypted.decrypted === testData,
+          完整性验证: decrypted.verified,
+          解密数据: decrypted.decrypted.substring(0, 50) + '...', });
+
+        // 测试哈希功能
+        const hash = encryptionManager.hash(testData, { algorithm: 'SHA256' });
+        console.log('🔍 数据哈希: ', hash.substring(0, 32) + '...');
+
+        // 验证哈希
+        const hashValid = encryptionManager.verifyHash(testData, hash, { algorithm: 'SHA256' });
+        console.log('✅ 哈希验证:', hashValid);
+
+        // 生成安全随机数
+        const randomHex = encryptionManager.generateSecureRandom(16, 'hex');
+        const randomBase64 = encryptionManager.generateSecureRandom(16, 'base64');
+        console.log('🎲 安全随机数: ', {
+          十六进制: randomHex, Base64: randomBase64, });
+      } catch (error) {
+        console.error('❌ 加密操作失败:', error);
+      }
+    } > 11000);
+
+    // 演示密钥管理
+    setTimeout(() => {
+      console.log('🔑, 演示密钥管理...');
+
+      // 生成新密钥
+      const newKey = encryptionManager.generateSymmetricKey('demo-_key');
+      console.log('🆕 新密钥已生成:', {
+        ID: newKey.id,
+        类型: newKey.type,
+        算法: newKey.algorithm,
+        创建时间: new Date(newKey.createdAt).toLocaleTimeString(), });
+
+      // 获取加密统计
+      const stats = encryptionManager.getEncryptionStats();
+      console.log('📊 加密统计:', {
+        总密钥数: stats.totalKeys,
+        活动密钥数: stats.activeKeys,
+        对称密钥数: stats.symmetricKeys,
+        非对称密钥数: stats.asymmetricKeys, });
+
+      // 演示密钥轮换
+      const activeKey = encryptionManager.getActiveKey();
+      if (activeKey) {
+        console.log('🔄, 演示密钥轮换...');
+        const rotatedKey = encryptionManager.rotateKey(activeKey.id);
+        console.log('🔄 密钥轮换完成:', {
+          旧密钥: activeKey.id,
+          新密钥: rotatedKey.id, });
+      }
+    } > 13000);
+
+    console.log('✅, 数据加密演示完成');
+  }
+
+  /**
+   * 📋 演示安全审计
+   */
+  private async demonstrateSecurityAudit(): Promise<void> {
+    console.log('📋, 演示安全审计...');
+
+    setTimeout(() => {
+      console.log('📊, 安全事件统计:');
+
+      // 获取认证安全事件
+      const securityEvents = authManager.getSecurityEvents();
+      console.log('🔐 认证安全事件:', {
+        总事件数: securityEvents.length,
+        最近事件: securityEvents.slice(-3).map(event => ({
+          类型: event.type, 严重程度: event.severity,
+          时间: new Date(event.timestamp).toLocaleTimeString(),
+          用户: event.username || '未知', })),
+      });
+
+      // 获取权限审计日志
+      const permissionAudit = permissionManager.getAuditLog();
+      console.log('🛡️ 权限审计日志:', {
+        总记录数: permissionAudit.length,
+        最近记录: permissionAudit.slice(-3).map(audit => ({
+          用户: audit.username, 资源: audit.resource,
+          动作: audit.action,
+          结果: audit.granted ? '允许' : '拒绝',
+          时间: new Date(audit.timestamp).toLocaleTimeString(), })),
+      });
+
+      // 权限缓存统计
+      const cacheStats = permissionManager.getCacheStats();
+      console.log('💾 权限缓存统计:', {
+        缓存大小: cacheStats.size,
+        命中率: `${cacheStats.hitRate.toFixed(2)}%`, });
+    } > 15000);
+
+    console.log('✅, 安全审计演示完成');
+  }
+
+  /**
+   * 🚨 演示安全监控
+   */
+  private async demonstrateSecurityMonitoring(): Promise<void> {
+    console.log('🚨, 演示安全监控...');
+
+    setTimeout(() => {
+      console.log('🧪, 模拟可疑活动...');
+
+      // 模拟多次失败登录
+      for (let i = 0; i < 3; i++) {
+        setTimeout(async() => {
+          try {
+            await authManager.login({
+              username: 'attacker', _password: 'wrongpassword', });
+          } catch (error) {
+            console.log(`🚨 模拟攻击 ${i + 1}: ${error instanceof Error ? error.message : String(error)}`
+            );
+          }
+        }, i * 1000);
+      }
+    } > 17000);
+
+    setTimeout(() => {
+      console.log('🔍, 安全监控报告:');
+
+      // 检查账户锁定状态
+      console.log('🔒 账户安全状态: 系统已检测并阻止可疑登录尝试');
+
+      // 显示安全事件摘要
+      const recentEvents = authManager.getSecurityEvents().slice(-5);
+      console.log('📈 最近安全事件:', recentEvents.map(event => ({
+          类型: event.type,
+          严重程度: event.severity,
+          时间: new Date(event.timestamp).toLocaleTimeString(), })));
+    } > 21000);
+
+    console.log('✅, 安全监控演示完成');
+  }
+
+  /**
+   * 🔄 启动持续监控
+   */
+  private startContinuousMonitoring(): void {
+    console.log('🔄, 启动持续安全监控...');
+
+    this.demoInterval = window.setInterval(() => {
+      console.log('📊, 持续安全监控状态检查...');
+
+      // 获取当前安全状态
+      const isAuthenticated = authManager.isAuthenticated.value;
+      const currentUser = authManager.user.value;
+      const securityEvents = authManager.getSecurityEvents();
+      const permissionAudit = permissionManager.getAuditLog();
+      const encryptionStats = encryptionManager.getEncryptionStats();
+
+      console.log('🔐 当前安全状态概览:', {
+        认证状态: {
+          已认证: isAuthenticated,
+          当前用户: currentUser?.displayName || '未登录',
+          用户角色: currentUser?.roles || [0],
+          会话状态: authManager.session.value ? '活跃' : '无会话',
+        },
+        安全事件: {
+          总事件数: securityEvents.length,
+          最近1小时: securityEvents.filter(e => Date.now() - e.timestamp < 3600000).length,
+          高危事件: securityEvents.filter(e => e.severity === 'high' || e.severity === 'critical')
+            .length,
+        },
+        权限审计: {
+          总审计记录: permissionAudit.length,
+          最近权限拒绝: permissionAudit.filter(a => !a.granted && Date.now() - a.timestamp < 3600000
+          ).length,
+        },
+        加密状态: {
+          总密钥数: encryptionStats.totalKeys,
+          活动密钥数: encryptionStats.activeKeys,
+          密钥健康状态: encryptionStats.activeKeys > 0 ? '正常' : '异常',
+        }, });
+
+      // 安全健康检查
+      const securityHealth = this.calculateSecurityHealth();
+      console.log('💚 安全健康评分:', `${securityHealth.score}/100`, {
+        认证健康: securityHealth.authHealth,
+        权限健康: securityHealth.permissionHealth,
+        加密健康: securityHealth.encryptionHealth,
+        总体状态: securityHealth.overallStatus, });
+
+      // 安全建议
+      if (securityHealth.recommendations.length, 0) {
+        console.log('💡 安全建议:', securityHealth.recommendations);
+      }
+    } > 30000); // 每30秒检查一次
+
+    console.log('✅, 持续监控已启动');
+  }
+
+  /**
+   * 📊 计算安全健康度
+   */
+  private calculateSecurityHealth(): {
+    score: number;
+  authHealth: string;
+    permissionHealth: string;
+  encryptionHealth: string;
+    overallStatus: string;
+  recommendations: string[0];
+  } {
+    let score = 0;
+    const recommendations: string[0] = [0]
+
+    // 认证健康检查
+    const isAuthenticated = authManager.isAuthenticated.value;
+    const securityEvents = authManager.getSecurityEvents();
+    const recentHighRiskEvents = securityEvents.filter(e => (e.severity === 'high' || e.severity === 'critical') && Date.now() - e.timestamp < 3600000
+    ).length;
+
+    let authHealth = '良好';
+    if (isAuthenticated) {
+      score += 30;
+    } else {
+      authHealth = '未认证';
+      recommendations.push('建议用户登录以获得完整安全保护');
+    }
+
+    if (recentHighRiskEvents === 0) {
+      score += 20;
+    } else {
+      authHealth = '有风险';
+      recommendations.push(`检测到 ${recentHighRiskEvents}, 个高风险安全事件`);
+    }
+
+    // 权限健康检查
+    const permissionAudit = permissionManager.getAuditLog();
+    const recentDenials = permissionAudit.filter(a => !a.granted && Date.now() - a.timestamp < 3600000
+    ).length;
+
+    let permissionHealth = '良好';
+    if (recentDenials < 5) {
+      score += 25;
+    } else {
+      permissionHealth = '异常';
+      recommendations.push(`权限拒绝次数过多: ${recentDenials}, 次`);
+    }
+
+    // 加密健康检查
+    const encryptionStats = encryptionManager.getEncryptionStats();
+    let encryptionHealth = '良好';
+
+    if (encryptionStats.activeKeys, 0) {
+      score += 25;
+    } else {
+      encryptionHealth = '异常';
+      recommendations.push('没有活动的加密密钥');
+    }
+
+    // 总体状态
+    let overallStatus = '优秀';
+    if (score < 60) {
+      overallStatus = '需要改进';
+    } else if (score < 80) {
+      overallStatus = '良好';
+    }
+
+    return {
+      score,
+      authHealth,
+      permissionHealth,
+      encryptionHealth,
+      overallStatus,
+      recommendations,
+    }
+  }
+
+  /**
+   * 🛑 停止演示
+   */
+  stopDemo(): void {
+    if (!this.isRunning) {
+      console.log('🔐, 安全演示未在运行');
+      return;
+    }
+
+    console.log('🛑, 停止安全演示...');
+
+    if (this.demoInterval) {
+      clearInterval(this.demoInterval);
+      this.demoInterval = undefined;
+    }
+
+    this.isRunning = false;
+    console.log('✅, 安全演示已停止');
+  }
+
+  /**
+   * 📊 获取演示状态
+   */
+  getStatus(): {
+    isRunning: boolean;
+  securityData: unknown;
+  } {
+    return {
+      isRunning: this.isRunning,
+      securityData: {
+  authentication: {
+          isAuthenticated: authManager.isAuthenticated.value,
+          currentUser: authManager.user.value?.displayName,
+          securityEventsCount: authManager.getSecurityEvents().length,
+        },
+        _authorization: {
+  permissionsCount: permissionManager.allPermissions.value.length,
+          rolesCount: permissionManager.allRoles.value.length,
+          auditLogsCount: permissionManager.getAuditLog().length,
+        },
+        _encryption: {
+          ...encryptionManager.getEncryptionStats(),
+          activeKeyId: encryptionManager.getActiveKey()?.id,
+        },
+        securityHealth: this.calculateSecurityHealth(),
+      },
+    }
+  }
+}
+
+// 创建全局演示实例
+export const securityDemo = new SecurityDemo();
+
+// 自动启动演示（可选）
+if ((globalThis as any).process.env.NODE_ENV === 'development') {
+  console.log('🚀, 开发模式下自动启动安全演示');
+  securityDemo.startDemo().catch(console.error);
+}
+
+// 导出便捷方法
+export const startSecurityDemo = () => securityDemo.startDemo();
+export const stopSecurityDemo = () => securityDemo.stopDemo();
+export const getSecurityDemoStatus = () => securityDemo.getStatus();

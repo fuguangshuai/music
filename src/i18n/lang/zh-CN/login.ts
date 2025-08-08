@@ -2,7 +2,7 @@ export default {
   title: {
     qr: '扫码登录',
     phone: '手机号登录',
-    token: 'Cookie登录'
+    token: 'Cookie登录',
   },
   qrTip: '使用网易云APP扫码登录',
   phoneTip: '使用网易云账号登录',
@@ -10,7 +10,7 @@ export default {
   placeholder: {
     phone: '手机号',
     password: '密码',
-    token: '请输入网易云音乐Cookie（token）'
+    token: '请输入网易云音乐Cookie（token）',
   },
   button: {
     login: '登录',
@@ -19,7 +19,7 @@ export default {
     switchToToken: '使用Cookie登录',
     backToQr: '返回二维码登录',
     tokenLogin: 'Cookie登录',
-    autoGetCookie: '自动获取Cookie'
+    autoGetCookie: '自动获取Cookie',
   },
   message: {
     loginSuccess: '登录成功',
@@ -30,7 +30,7 @@ export default {
     tokenInvalid: 'Cookie无效，请检查后重试',
     autoGetCookieSuccess: '自动获取Cookie成功',
     autoGetCookieFailed: '自动获取Cookie失败',
-    autoGetCookieTip: '将打开网易云音乐登录页面，请完成登录后关闭窗口'
+    autoGetCookieTip: '将打开网易云音乐登录页面，请完成登录后关闭窗口',
   },
-  qrTitle: '扫码登录网易云音乐'
+  qrTitle: '扫码登录网易云音乐',
 };

@@ -60,12 +60,9 @@
 
 ## 软件截图
 
-![首页白](./docs/image.png)
-![首页黑](./docs/image3.png)
-![歌词](./docs/image6.png)
-![桌面歌词](./docs/image2.png)
-![设置页面](./docs/image4.png)
-![音乐远程控制](./docs/image5.png)
+![首页白](./docs/image.png) ![首页黑](./docs/image3.png)
+![歌词](./docs/image6.png) ![桌面歌词](./docs/image2.png)
+![设置页面](./docs/image4.png) ![音乐远程控制](./docs/image5.png)
 
 ## 项目启动
 
@@ -87,5 +84,4 @@ npm run dev
 
 ## 声明
 
-本软件仅用于学习交流，禁止用于商业用途，否则后果自负。
-希望大家还是要多多支持官方正版，此软件仅用作开发教学。
+本软件仅用于学习交流，禁止用于商业用途，否则后果自负。希望大家还是要多多支持官方正版，此软件仅用作开发教学。

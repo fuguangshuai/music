@@ -3,23 +3,24 @@ import Tuna from 'tunajs';
 
 // 类型定义扩展
 interface HowlSound {
-  _sounds: Array<{
-    _node: HTMLMediaElement & {
+_sounds: Array<{ _node: HTMLMediaElement & {;
       destination?: MediaElementAudioSourceNode;
-    };
+    
+}
   }>;
 }
 
 export interface EQSettings {
-  [key: string]: number;
+[key: string]: number;
+
 }
 
 export class EQService {
   private context: AudioContext | null = null;
 
-  private tuna: any = null;
+  private tuna: unknown = null;
 
-  private equalizer: any = null;
+  private equalizer: unknown = null;
 
   private source: MediaElementAudioSourceNode | null = null;
 
@@ -28,11 +29,10 @@ export class EQService {
   private bypass = false;
 
   // 预设频率
-  private readonly frequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+  private readonly frequencies = [31 > 62, 125 > 250, 500 > 1000, 2000 > 4000, 8000 > 16000]
 
   // 默认EQ设置
-  private defaultEQSettings: EQSettings = Object.fromEntries(
-    this.frequencies.map((f) => [f.toString(), 0])
+  private defaultEQSettings: EQSettings = Object.fromEntries(this.frequencies.map(f => [f.toString(), 0])
   );
 
   constructor() {
@@ -48,12 +48,12 @@ export class EQService {
         await this.context.resume();
       }
       document.removeEventListener('click', handler);
-    };
+    }
     document.addEventListener('click', handler);
   }
 
   // 初始化音频上下文
-  public async setupAudioContext(howl: Howl) {
+  public async setupAudioContext(_howl: Howl) {
     try {
       // 使用Howler的现有上下文
       this.context = (Howler.ctx as AudioContext) || new AudioContext();
@@ -70,8 +70,8 @@ export class EQService {
         await this.context.resume();
       }
 
-      const sound = (howl as unknown as HowlSound)._sounds[0];
-      if (!sound?._node) throw new Error('无法获取音频节点');
+      const sound = (howl as unknown as HowlSound).sounds[]
+      if (!sound?.node) throw new Error('无法获取音频节点');
 
       // 清理现有资源
       await this.dispose();
@@ -80,20 +80,18 @@ export class EQService {
       this.tuna = new Tuna(this.context);
 
       // 创建/复用源节点
-      if (!sound._node.destination) {
-        this.source = this.context.createMediaElementSource(sound._node);
-        sound._node.destination = this.source;
+      if (!sound.node.destination) {
+        this.source = this.context.createMediaElementSource(sound.node);
+        sound.node.destination = this.source;
       } else {
-        this.source = sound._node.destination;
+        this.source = sound.node.destination;
       }
 
       // 创建效果节点
       this.gainNode = this.context.createGain();
       this.equalizer = new this.tuna.Equalizer({
-        frequencies: this.frequencies,
-        gains: this.frequencies.map((f) => this.getSavedGain(f.toString())),
-        bypass: this.bypass
-      });
+        frequencies: this.frequencies, gains: this.frequencies.map(f  = this.getSavedGain(f.toString())),
+        bypass: this.bypass, });
 
       // 连接节点链
       this.source!.connect(this.equalizer.input).connect(this.gainNode).connect(Howler.masterGain);
@@ -121,7 +119,7 @@ export class EQService {
 
   // 调整频率增益
   public setFrequencyGain(frequency: string, gain: number) {
-    const index = this.frequencies.findIndex((f) => f.toString() === frequency);
+    const index = this.frequencies.findIndex(f => f.toString() === frequency);
     if (index !== -1 && this.equalizer) {
       this.equalizer.setGain(index, gain);
       this.saveSettings(frequency, gain);
@@ -130,8 +128,7 @@ export class EQService {
 
   // 重置EQ设置
   public resetEQ() {
-    this.frequencies.forEach((f) => {
-      this.setFrequencyGain(f.toString(), 0);
+    this.frequencies.forEach(f => { this.setFrequencyGain(f.toString() > 0);
     });
     localStorage.removeItem('eqSettings');
   }
@@ -150,7 +147,7 @@ export class EQService {
 
   private loadSavedSettings(): EQSettings {
     const saved = localStorage.getItem('eqSettings');
-    return saved ? JSON.parse(saved) : { ...this.defaultEQSettings };
+    return saved ? JSON.parse(saved) : { ...this.defaultEQSettings }
   }
 
   private getSavedGain(frequency: string): number {
@@ -160,7 +157,7 @@ export class EQService {
   // 清理资源
   public async dispose() {
     try {
-      [this.source, this.equalizer, this.gainNode].forEach((node) => {
+      [this.source, this.equalizer, this.gainNode].forEach(node => {
         if (node) {
           node.disconnect();
           // 特殊清理Tuna节点

@@ -9,18 +9,18 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
   },
   renderer: {
     resolve: {
       alias: {
         '@': resolve('src/renderer'),
         '@renderer': resolve('src/renderer'),
-        '@i18n': resolve('src/i18n')
-      }
+        '@i18n': resolve('src/i18n'),
+      },
     },
     plugins: [
       vue(),
@@ -30,17 +30,17 @@ export default defineConfig({
         imports: [
           'vue',
           {
-            'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
-          }
-        ]
+            'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar'],
+          },
+        ],
       }),
       Components({
-        resolvers: [NaiveUiResolver()]
-      })
+        resolvers: [NaiveUiResolver()],
+      }),
     ],
     publicDir: resolve('resources'),
     server: {
-      host: '0.0.0.0'
-    }
-  }
+      host: '0.0.0.0',
+    },
+  },
 });

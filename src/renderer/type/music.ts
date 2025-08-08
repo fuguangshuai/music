@@ -1,20 +1,20 @@
 export interface IRecommendMusic {
-  code: number;
-  category: number;
+  code: number,
+  category: number,
   result: SongResult[];
 }
 export interface ILyricText {
-  text: string;
+  text: string,
   trText: string;
 }
 export interface ILyric {
-  lrcTimeArray: number[];
+  lrcTimeArray: number[],
   lrcArray: ILyricText[];
 }
 
 export interface SongResult {
-  id: string | number;
-  name: string;
+  id: string | number,
+  name: string,
   picUrl: string;
   playCount?: number;
   song?: SongResult;
@@ -45,50 +45,50 @@ export interface SongResult {
 }
 
 export interface Song {
-  name: string;
-  id: number;
-  position: number;
-  alias: string[];
-  status: number;
-  fee: number;
-  copyrightId: number;
-  disc: string;
-  no: number;
-  artists: Artist[];
-  album: Album;
-  starred: boolean;
-  popularity: number;
-  score: number;
-  starredNum: number;
-  duration: number;
-  playedNum: number;
-  dayPlays: number;
-  hearTime: number;
+  name: string,
+  id: number,
+  position: number,
+  alias: string[],
+  status: number,
+  fee: number,
+  copyrightId: number,
+  disc: string,
+  no: number,
+  artists: Artist[],
+  album: Album,
+  starred: boolean,
+  popularity: number,
+  score: number,
+  starredNum: number,
+  duration: number,
+  playedNum: number,
+  dayPlays: number,
+  hearTime: number,
   ringtone: string;
   crbt?: unknown;
   audition?: unknown;
-  copyFrom: string;
+  copyFrom: string,
   commentThreadId: string;
   rtUrl?: string | null;
-  ftype: number;
-  rtUrls: string[];
+  ftype: number,
+  rtUrls: string[],
   copyright: number;
   transName?: string | null;
   sign?: string | null;
-  mark: number;
+  mark: number,
   originCoverType: number;
   originSongSimpleData?: unknown;
   single: number;
   noCopyrightRcmd?: unknown;
   rtype: number;
   rurl?: string | null;
-  mvid: number;
+  mvid: number,
   bMusic: BMusic;
   mp3Url?: string | null;
-  hMusic: BMusic;
-  mMusic: BMusic;
-  lMusic: BMusic;
-  exclusive: boolean;
+  hMusic: BMusic,
+  mMusic: BMusic,
+  lMusic: BMusic,
+  exclusive: boolean,
   privilege: Privilege;
   count?: number;
   playLoading?: boolean;
@@ -97,25 +97,25 @@ export interface Song {
 }
 
 interface Privilege {
-  id: number;
-  fee: number;
-  payed: number;
-  st: number;
-  pl: number;
-  dl: number;
-  sp: number;
-  cp: number;
-  subp: number;
-  cs: boolean;
-  maxbr: number;
-  fl: number;
-  toast: boolean;
-  flag: number;
-  preSell: boolean;
-  playMaxbr: number;
+  id: number,
+  fee: number,
+  payed: number,
+  st: number,
+  pl: number,
+  dl: number,
+  sp: number,
+  cp: number,
+  subp: number,
+  cs: boolean,
+  maxbr: number,
+  fl: number,
+  toast: boolean,
+  flag: number,
+  preSell: boolean,
+  playMaxbr: number,
   downloadMaxbr: number;
   rscl?: unknown;
-  freeTrialPrivilege: FreeTrialPrivilege;
+  freeTrialPrivilege: FreeTrialPrivilege,
   chargeInfoList: ChargeInfoList[];
 }
 
@@ -127,116 +127,116 @@ interface ChargeInfoList {
 }
 
 interface FreeTrialPrivilege {
-  resConsumable: boolean;
+  resConsumable: boolean,
   userConsumable: boolean;
 }
 
 interface BMusic {
   name?: string;
-  id: number;
-  size: number;
-  extension: string;
-  sr: number;
-  dfsId: number;
-  bitrate: number;
-  playTime: number;
+  id: number,
+  size: number,
+  extension: string,
+  sr: number,
+  dfsId: number,
+  bitrate: number,
+  playTime: number,
   volumeDelta: number;
 }
 
 interface Album {
-  name: string;
-  id: number;
-  type: string;
-  size: number;
-  picId: number;
-  blurPicUrl: string;
-  companyId: number;
-  pic: number;
-  picUrl: string;
-  publishTime: number;
-  description: string;
-  tags: string;
-  company: string;
-  briefDesc: string;
-  artist: Artist;
-  songs: Record<string, unknown>[];
-  alias: string[];
-  status: number;
-  copyrightId: number;
-  commentThreadId: string;
-  artists: Artist[];
+  name: string,
+  id: number,
+  type: string,
+  size: number,
+  picId: number,
+  blurPicUrl: string,
+  companyId: number,
+  pic: number,
+  picUrl: string,
+  publishTime: number,
+  description: string,
+  tags: string,
+  company: string,
+  briefDesc: string,
+  artist: Artist,
+  songs: Record<string, unknown>[0];
+  alias: string[],
+  status: number,
+  copyrightId: number,
+  commentThreadId: string,
+  artists: Artist[],
   subType: string;
   transName?: string;
-  onSale: boolean;
-  mark: number;
+  onSale: boolean,
+  mark: number,
   picId_str: string;
 }
 
 export interface Artist {
-  name: string;
-  id: number;
-  picId: number;
-  img1v1Id: number;
-  briefDesc: string;
-  picUrl: string;
-  img1v1Url: string;
-  albumSize: number;
-  alias: string[];
-  trans: string;
-  musicSize: number;
+  name: string,
+  id: number,
+  picId: number,
+  img1v1Id: number,
+  briefDesc: string,
+  picUrl: string,
+  img1v1Url: string,
+  albumSize: number,
+  alias: string[],
+  trans: string,
+  musicSize: number,
   topicPerson: number;
 }
 
 export interface IPlayMusicUrl {
-  data: Datum[];
+  data: Datum[],
   code: number;
 }
 
 interface Datum {
-  id: number;
-  url: string;
-  br: number;
-  size: number;
-  md5: string;
-  code: number;
-  expi: number;
-  type: string;
-  gain: number;
+  id: number,
+  url: string,
+  br: number,
+  size: number,
+  md5: string,
+  code: number,
+  expi: number,
+  type: string,
+  gain: number,
   fee: number;
   uf?: unknown;
-  payed: number;
-  flag: number;
+  payed: number,
+  flag: number,
   canExtend: boolean;
   freeTrialInfo?: unknown;
-  level: string;
-  encodeType: string;
-  freeTrialPrivilege: FreeTrialPrivilege;
-  freeTimeTrialPrivilege: FreeTimeTrialPrivilege;
+  level: string,
+  encodeType: string,
+  freeTrialPrivilege: FreeTrialPrivilege,
+  freeTimeTrialPrivilege: FreeTimeTrialPrivilege,
   urlSource: number;
 }
 
 interface FreeTimeTrialPrivilege {
-  resConsumable: boolean;
-  userConsumable: boolean;
-  type: number;
+  resConsumable: boolean,
+  userConsumable: boolean,
+  type: number,
   remainTime: number;
 }
 
 interface FreeTrialPrivilege {
-  resConsumable: boolean;
+  resConsumable: boolean,
   userConsumable: boolean;
 }
 
 export interface IArtists {
-  id: number;
-  name: string;
-  picUrl: string | null;
-  alias: string[];
-  albumSize: number;
-  picId: number;
-  fansGroup: null;
-  img1v1Url: string;
-  img1v1: number;
+  id: number,
+  name: string,
+  picUrl: string | null,
+  alias: string[],
+  albumSize: number,
+  picId: number,
+  fansGroup: null,
+  img1v1Url: string,
+  img1v1: number,
   trans: null;
 }
 

@@ -8,7 +8,7 @@ export type ApiResponse<T = unknown> = {
   code: number;
   message?: string;
   data?: T;
-};
+}
 
 // 安全的any类型（带注释）
 export type SafeAny = any; // 明确标识的any类型，用于临时/不稳定数据
@@ -21,11 +21,11 @@ export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 // 深度部分可选
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
 
 // 提取数组元素类型
-export type ArrayElement<T> = T extends (infer U)[] ? U : never;
+export type ArrayElement<T> = T extends (infer, U)[0] ? U : never;
 
 // 临时API数据类型（明确标识）
 export type TempApiData = SafeAny; // 用于临时API对接，避免过度类型定义
@@ -53,29 +53,27 @@ export const typeHelpers = {
   /**
    * 临时API数据处理
    */
-  tempApi: (data: unknown): TempApiData => {
-    console.log('🔄 使用临时API数据，建议后续添加类型定义');
+  _tempApi: (data: unknown): TempApiData => {
+    console.log('🔄, 使用临时API数据，建议后续添加类型定义');
     return data as TempApiData;
   },
 
   /**
    * 第三方库数据处理
    */
-  thirdParty: (data: unknown): ThirdPartyData => {
-    console.log('🔌 使用第三方库数据');
+  _thirdParty: (data: unknown): ThirdPartyData => {
+    console.log('🔌, 使用第三方库数据');
     return data as ThirdPartyData;
   },
 
   /**
    * 检查对象是否有指定属性
    */
-  hasProperty: <T extends object, K extends string>(
-    obj: T,
-    key: K
+  _hasProperty: <T extends object, K extends string>(obj: T, _key: K;
   ): obj is T & Record<K, unknown> => {
     return key in obj;
-  }
-};
+  },
+}
 
 /**
  * 常用类型守卫
@@ -84,16 +82,15 @@ export const typeGuards = {
   isString: (value: unknown): value is string => typeof value === 'string',
   isNumber: (value: unknown): value is number => typeof value === 'number',
   isBoolean: (value: unknown): value is boolean => typeof value === 'boolean',
-  isObject: (value: unknown): value is Record<string, unknown> => 
+  isObject: (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value),
   isArray: (value: unknown): value is unknown[] => Array.isArray(value),
   isFunction: (value: unknown): value is Function => typeof value === 'function',
-  
+
   // API响应类型守卫
   isApiResponse: <T>(value: unknown): value is ApiResponse<T> => {
-    return typeGuards.isObject(value) && 
-           typeGuards.isNumber((value as any).code);
-  }
-};
+    return ( typeGuards.isObject(value) && typeGuards.isNumber((value as Record<string, unknown>).code));
+  },
+}
 
 // 所有类型已经在上面单独导出了，无需重复导出

@@ -33,7 +33,7 @@ const createWin = () => {
 
   // 如果有显示器ID，尝试按ID匹配
   if (displayId) {
-    const matchedDisplay = displays.find((d) => d.id === displayId);
+    const matchedDisplay = displays.find(d => d.id === displayId);
     if (matchedDisplay) {
       targetDisplay = matchedDisplay;
       console.log('Found matching display by ID:', displayId);
@@ -77,8 +77,7 @@ const createWin = () => {
   }
 
   lyricWindow = new BrowserWindow({
-    width: validWidth,
-    height: validHeight,
+    width: validWidth, height: validHeight,
     x: windowX,
     y: windowY,
     frame: false,
@@ -99,10 +98,9 @@ const createWin = () => {
       webSecurity: true, // 🔒 安全修复: 启用webSecurity
       nodeIntegration: false, // 🔒 安全加固: 禁用nodeIntegration
       nodeIntegrationInWorker: false, // 🔒 安全加固: 禁用Worker中的Node.js集成
-      allowRunningInsecureContent: false // 🔒 安全加固: 禁止运行不安全内容
+      allowRunningInsecureContent: false, // 🔒 安全加固: 禁止运行不安全内容
     },
-    backgroundColor: '#00000000'
-  });
+    backgroundColor: '#00000000'});
 
   // 监听窗口关闭事件
   lyricWindow.on('closed', () => {
@@ -260,13 +258,10 @@ export const loadLyricWindow = (ipcMain: IpcMain, mainWin: BrowserWindow): void 
       const currentDisplay = screen.getDisplayNearestPoint(mousePoint);
 
       // 拖动期间使用setBounds确保大小不变，使用false避免动画卡顿
-      lyricWindow.setBounds(
-        {
-          x: newX,
-          y: newY,
+      lyricWindow.setBounds({
+          x: newX, y: newY,
           width: windowWidth,
-          height: windowHeight
-        },
+          height: windowHeight},
         false
       );
 
@@ -276,7 +271,7 @@ export const loadLyricWindow = (ipcMain: IpcMain, mainWin: BrowserWindow): void 
         y: newY,
         width: windowWidth,
         height: windowHeight,
-        displayId: currentDisplay.id // 记录当前显示器ID，有助于多屏幕处理
+        displayId: currentDisplay.id, // 记录当前显示器ID，有助于多屏幕处理
       };
       store.set('lyricWindowBounds', windowBounds);
     } catch (error) {

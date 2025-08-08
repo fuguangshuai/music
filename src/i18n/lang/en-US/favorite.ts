@@ -13,5 +13,5 @@ export default {
   downloading: 'Downloading, please wait...',
   selectSongsFirst: 'Please select songs to download first',
   descending: 'Descending',
-  ascending: 'Ascending'
+  ascending: 'Ascending',
 };

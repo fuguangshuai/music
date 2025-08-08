@@ -34,7 +34,7 @@ export default {
     required: '此项是必填的',
     invalidInput: '输入无效',
     selectRequired: '请选择一个选项',
-    numberRange: '请输入 {min} 到 {max} 之间的数字'
+    numberRange: '请输入 {min} 到 {max} 之间的数字',
   },
   viewMore: '查看更多',
   noMore: '没有更多了',
@@ -51,6 +51,6 @@ export default {
     next: '下一首',
     pause: '暂停',
     play: '播放',
-    favorite: '收藏'
-  }
+    favorite: '收藏',
+  },
 };

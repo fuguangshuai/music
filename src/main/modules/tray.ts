@@ -5,7 +5,7 @@ import {
   MenuItem,
   MenuItemConstructorOptions,
   nativeImage,
-  Tray
+  Tray,
 } from 'electron';
 import { join } from 'path';
 
@@ -15,7 +15,7 @@ import { getStore } from './config';
 
 // 歌曲信息接口定义
 interface SongInfo {
-  name: string;
+  name: string,
   song: {
     artists: Array<{ name: string; [key: string]: unknown }>;
     [key: string]: unknown;
@@ -49,7 +49,7 @@ export function updatePlayState(playing: boolean) {
 // 获取艺术家名称字符串
 function getArtistString(song: SongInfo | null): string {
   if (!song || !song.song || !song.song.artists) return '';
-  return song.song.artists.map((item) => item.name).join(' / ');
+  return song.song.artists.map(item => item.name).join(' / ');
 }
 
 // 获取歌曲完整标题（歌曲名 - 艺术家）
@@ -97,7 +97,7 @@ function updateStatusBarTray() {
 
       // 设置标题和提示
       songTitleTray.setTitle(title, {
-        fontType: 'monospacedDigit' // 使用等宽字体以确保更好的可读性
+        fontType: 'monospacedDigit', // 使用等宽字体以确保更好的可读性
       });
 
       // 完整信息放在tooltip中
@@ -106,7 +106,7 @@ function updateStatusBarTray() {
       console.log('更新状态栏歌曲显示:', title, '完整信息:', fullTitle);
     } else {
       songTitleTray.setTitle('未播放', {
-        fontType: 'monospacedDigit'
+        fontType: 'monospacedDigit',
       });
       songTitleTray.setToolTip('未播放');
       console.log('更新状态栏歌曲显示: 未播放');
@@ -125,7 +125,9 @@ function updateStatusBarTray() {
     icon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
     playPauseTray.setImage(icon);
     playPauseTray.setToolTip(
-      isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
+      isPlaying
+        ? String(i18n.global.t('common.tray.pause'))
+        : String(i18n.global.t('common.tray.play'))
     );
   }
 }
@@ -145,7 +147,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         new MenuItem({
           label: getSongTitle(currentSong),
           enabled: false,
-          type: 'normal'
+          type: 'normal',
         })
       );
       menu.append(new MenuItem({ type: 'separator' }));
@@ -159,7 +161,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'prevPlay');
-        }
+        },
       })
     );
 
@@ -169,7 +171,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'togglePlay');
-        }
+        },
       })
     );
 
@@ -181,7 +183,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         click: () => {
           console.log('[Tray] 发送收藏命令 - macOS菜单');
           mainWindow.webContents.send('global-shortcut', 'toggleFavorite');
-        }
+        },
       })
     );
 
@@ -191,7 +193,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'nextPlay');
-        }
+        },
       })
     );
 
@@ -205,21 +207,19 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           mainWindow.show();
-        }
+        },
       })
     );
 
     // 语言切换子菜单
-    const languageSubmenu = Menu.buildFromTemplate(
-      LANGUAGES.map(({ label, value }) => ({
-        label,
-        type: 'radio',
+    const languageSubmenu = Menu.buildFromTemplate(LANGUAGES.map(({ label, value }) => ({
+        label, type: 'radio',
         checked: i18n.global.locale === value,
         click: () => {
           i18n.global.locale = value;
           updateTrayMenu(mainWindow);
           mainWindow.webContents.send('language-changed', value);
-        }
+        },
       }))
     );
 
@@ -227,7 +227,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
       new MenuItem({
         label: String(i18n.global.t('common.language')),
         type: 'submenu',
-        submenu: languageSubmenu
+        submenu: languageSubmenu,
       })
     );
 
@@ -238,7 +238,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           app.quit();
-        }
+        },
       })
     );
 
@@ -252,17 +252,17 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
             {
               label: getSongTitle(currentSong),
               enabled: false,
-              type: 'normal'
+              type: 'normal',
             },
-            { type: 'separator' }
+            { type: 'separator' },
           ]
-        : []) as MenuItemConstructorOptions[]),
+        : [0]) as MenuItemConstructorOptions[]),
       {
         label: String(i18n.global.t('common.tray.show')),
         type: 'normal',
         click: () => {
           mainWindow.show();
-        }
+        },
       },
       {
         label: String(i18n.global.t('common.tray.favorite')),
@@ -270,7 +270,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         click: () => {
           console.log('[Tray] 发送收藏命令 - Windows/Linux菜单');
           mainWindow.webContents.send('global-shortcut', 'toggleFavorite');
-        }
+        },
       },
       { type: 'separator' },
       {
@@ -278,36 +278,35 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'prevPlay');
-        }
+        },
       },
       {
         label: String(i18n.global.t(isPlaying ? 'common.tray.pause' : 'common.tray.play')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'togglePlay');
-        }
+        },
       },
       {
         label: String(i18n.global.t('common.tray.next')),
         type: 'normal',
         click: () => {
           mainWindow.webContents.send('global-shortcut', 'nextPlay');
-        }
+        },
       },
       { type: 'separator' },
       {
         label: String(i18n.global.t('common.language')),
         type: 'submenu',
         submenu: LANGUAGES.map(({ label, value }) => ({
-          label,
-          type: 'radio',
+          label, type: 'radio',
           checked: i18n.global.locale === value,
           click: () => {
             i18n.global.locale = value;
             updateTrayMenu(mainWindow);
             mainWindow.webContents.send('language-changed', value);
-          }
-        }))
+          },
+        })),
       },
       { type: 'separator' },
       {
@@ -315,8 +314,8 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         type: 'normal',
         click: () => {
           app.quit();
-        }
-      }
+        },
+      },
     ];
 
     const contextMenu = Menu.buildFromTemplate(menuTemplate);
@@ -349,7 +348,9 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
   playPauseIcon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
   playPauseTray = new Tray(playPauseIcon);
   playPauseTray.setToolTip(
-    isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
+    isPlaying
+      ? String(i18n.global.t('common.tray.pause'))
+      : String(i18n.global.t('common.tray.play'))
   );
   playPauseTray.on('click', () => {
     mainWindow.webContents.send('global-shortcut', 'togglePlay');
@@ -378,7 +379,7 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
 
   // 在macOS上，特别设置title来显示文本，确保它能正确显示
   songTitleTray.setTitle(initialText, {
-    fontType: 'monospacedDigit' // 使用等宽字体以确保更好的可读性
+    fontType: 'monospacedDigit', // 使用等宽字体以确保更好的可读性
   });
 
   songTitleTray.setToolTip(initialText);

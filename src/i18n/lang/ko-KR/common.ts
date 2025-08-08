@@ -34,7 +34,7 @@ export default {
     required: '이 항목은 필수입니다',
     invalidInput: '잘못된 입력',
     selectRequired: '옵션을 선택해주세요',
-    numberRange: '{min}에서 {max} 사이의 숫자를 입력해주세요'
+    numberRange: '{min}에서 {max} 사이의 숫자를 입력해주세요',
   },
   viewMore: '더 보기',
   noMore: '더 이상 없음',
@@ -51,6 +51,6 @@ export default {
     next: '다음 곡',
     pause: '일시정지',
     play: '재생',
-    favorite: '즐겨찾기'
-  }
+    favorite: '즐겨찾기',
+  },
 };

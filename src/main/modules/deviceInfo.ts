@@ -23,9 +23,9 @@ export function getDeviceId(): string {
       let macAddress = '';
 
       // 尝试获取第一个非内部网络接口的MAC地址
-      Object.values(networkInterfaces).forEach((interfaces) => {
+      Object.values(networkInterfaces).forEach(interfaces => {
         if (interfaces) {
-          interfaces.forEach((iface) => {
+          interfaces.forEach(iface => {
             if (!iface.internal && !macAddress && iface.mac !== '00:00:00:00:00:00') {
               macAddress = iface.mac;
             }
@@ -58,6 +58,6 @@ export function getSystemInfo() {
     osVersion: os.release(),
     osArch: os.arch(),
     platform: process.platform,
-    appVersion: app.getVersion()
+    appVersion: app.getVersion(),
   };
 }

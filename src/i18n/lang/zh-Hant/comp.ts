@@ -16,22 +16,22 @@ export default {
     count: '首歌曲',
     loginFirst: '請先登入',
     getPlaylistFailed: '取得播放清單失敗',
-    inputPlaylistName: '請輸入播放清單名稱'
+    inputPlaylistName: '請輸入播放清單名稱',
   },
   playlistType: {
     title: '播放清單分類',
     showAll: '顯示全部',
-    hide: '隱藏部分'
+    hide: '隱藏部分',
   },
   recommendAlbum: {
-    title: '最新專輯'
+    title: '最新專輯',
   },
   recommendSinger: {
     title: '每日推薦',
-    songlist: '每日推薦清單'
+    songlist: '每日推薦清單',
   },
   recommendSonglist: {
-    title: '本週最熱音樂'
+    title: '本週最熱音樂',
   },
   searchBar: {
     login: '登入',
@@ -46,17 +46,17 @@ export default {
     zoom: '頁面縮放',
     zoom100: '標準縮放100%',
     resetZoom: '點擊重設縮放',
-    zoomDefault: '標準縮放'
+    zoomDefault: '標準縮放',
   },
   titleBar: {
     closeTitle: '請選擇關閉方式',
     minimizeToTray: '最小化到系統匣',
     exitApp: '退出應用程式',
     rememberChoice: '記住我的選擇',
-    closeApp: '關閉應用程式'
+    closeApp: '關閉應用程式',
   },
   userPlayList: {
-    title: '{name}的常聽'
+    title: '{name}的常聽',
   },
   musicList: {
     searchSongs: '搜尋歌曲',
@@ -71,7 +71,7 @@ export default {
     cancelCollect: '取消收藏',
     addToPlaylist: '新增至播放清單',
     addToPlaylistSuccess: '新增至播放清單成功',
-    songsAlreadyInPlaylist: '歌曲已存在於播放清單中'
+    songsAlreadyInPlaylist: '歌曲已存在於播放清單中',
   },
   playlist: {
     import: {
@@ -130,8 +130,8 @@ export default {
       confirm: '確認',
       cancel: '取消',
       clearTasksSuccess: '任務清單已清除',
-      clearTasksFailed: '清除任務清單失敗'
-    }
+      clearTasksFailed: '清除任務清單失敗',
+    },
   },
   settings: '設定',
   user: '使用者',
@@ -140,5 +140,5 @@ export default {
   list: '播放清單',
   mv: 'MV',
   home: '首頁',
-  search: '搜尋'
+  search: '搜尋',
 };

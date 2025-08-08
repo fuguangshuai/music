@@ -12,6 +12,6 @@ export const useArtist = () => {
   };
 
   return {
-    navigateToArtist
+    navigateToArtist,
   };
 };

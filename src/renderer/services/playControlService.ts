@@ -17,9 +17,9 @@ class PlayControlService {
   /**
    * 条件性日志输出，只在开发环境输出
    */
-  private log(level: 'info' | 'warn' | 'error', message: string, ...args: unknown[]) {
-    if (process.env.NODE_ENV === 'development') {
-      console[level](message, ...args);
+  private log(level: 'info' | 'warn' | 'error', _message: string, ...args: unknown[]) {
+    if ((globalThis as any).process.env.NODE_ENV === 'development') {
+      console[level](_message, ...args);
     }
   }
 
@@ -37,10 +37,7 @@ class PlayControlService {
    * @param skipDebounce 是否跳过防抖检查（用于底部播放器等需要快速响应的场景）
    * @returns Promise<boolean> 操作是否成功
    */
-  public async playControl(
-    song?: SongResult,
-    source = 'unknown',
-    skipDebounce = false
+  public async playControl(song?: SongResult, source = 'unknown', skipDebounce = false
   ): Promise<boolean> {
     try {
       const currentTime = Date.now();
@@ -79,7 +76,7 @@ class PlayControlService {
         this.log('info', `🎶 开始播放控制逻辑 - 歌曲: ${targetSong.name} - 来源: ${source}`);
 
         // 调用 playerStore 的 setPlay 方法
-        const result = await playerStore.setPlay(targetSong);
+        const _result = await playerStore.setPlay(targetSong);
 
         this.log('info', `✅ 播放控制完成 - 结果: ${result} - 来源: ${source}`);
         return result;
@@ -118,8 +115,8 @@ class PlayControlService {
     return {
       mutex: this.mutex,
       lastClickTime: this.lastClickTime,
-      timeSinceLastClick: Date.now() - this.lastClickTime
-    };
+      timeSinceLastClick: Date.now() - this.lastClickTime,
+    }
   }
 }
 

@@ -3,40 +3,38 @@
  * 提供Vue组件中使用智能预加载的便捷接口
  */
 
-import { computed, onMounted, onUnmounted,ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
-import { type NetworkCondition,smartPreloadService, type UserBehaviorPattern } from '@/services/audioPreloadService';
+import {
+  type NetworkCondition,
+  smartPreloadService,
+  type UserBehaviorPattern,
+} from '@/services/audioPreloadService';
 import type { SongResult } from '@/type/music';
 
-export function useSmartPreload() {
+export function useSmartPreload() : unknown {
   const isEnabled = ref(true);
   const networkCondition = ref<NetworkCondition | null>(null);
   const userBehavior = ref<UserBehaviorPattern | null>(null);
-  const predictions = ref<SongResult[]>([]);
+  const predictions = ref<SongResult[]>([0]);
   const preloadStats = ref({
-    totalPreloaded: 0,
-    successfulPreloads: 0,
+    totalPreloaded: 0, successfulPreloads: 0,
     failedPreloads: 0,
-    cacheHits: 0
-  });
+    cacheHits: 0, });
 
   /**
    * 智能预加载单首歌曲
    */
-  const smartPreload = async (
-    url: string, 
-    songInfo?: SongResult, 
-    priority: 'high' | 'medium' | 'low' = 'medium'
-  ) => {
+  const smartPreload = async (url: string, songInfo?: SongResult, priority: 'high' | 'medium' | 'low' = 'medium') => {
     if (!isEnabled.value) {
-      console.log('🚫 智能预加载已禁用');
+      console.log('🚫, 智能预加载已禁用');
       return null;
     }
 
     try {
       preloadStats.value.totalPreloaded++;
       const sound = await smartPreloadService.smartPreloadAudio(url, songInfo, priority);
-      
+
       if (sound) {
         preloadStats.value.successfulPreloads++;
         console.log('✅ 智能预加载成功:', url);
@@ -44,14 +42,14 @@ export function useSmartPreload() {
         preloadStats.value.failedPreloads++;
         console.log('⚠️ 智能预加载失败或跳过:', url);
       }
-      
+
       return sound;
     } catch (error) {
       preloadStats.value.failedPreloads++;
       console.error('💥 智能预加载异常:', error);
       return null;
     }
-  };
+  }
 
   /**
    * 预测并预加载下一首歌曲
@@ -63,25 +61,24 @@ export function useSmartPreload() {
       // 获取预测结果
       const predicted = smartPreloadService.predictNextSongs(currentSong, playHistory);
       predictions.value = predicted;
-      
+
       console.log('🔮 预测到', predicted.length, '首可能的下一首歌曲');
-      
+
       // 预加载预测的歌曲
       for (let i = 0; i < predicted.length; i++) {
-        const song = predicted[i];
+        const song = predicted[i]
         if (song.playMusicUrl) {
           const priority = i === 0 ? 'high' : i === 1 ? 'medium' : 'low';
           await smartPreload(song.playMusicUrl, song, priority);
         }
       }
-      
+
       // 更新用户行为分析
       updateUserBehavior(playHistory);
-      
     } catch (error) {
       console.error('💥 预测和预加载异常:', error);
     }
-  };
+  }
 
   /**
    * 更新用户行为分析
@@ -90,11 +87,11 @@ export function useSmartPreload() {
     try {
       const behavior = smartPreloadService.analyzeUserBehavior(playHistory);
       userBehavior.value = behavior;
-      console.log('🧠 用户行为分析已更新');
+      console.log('🧠, 用户行为分析已更新');
     } catch (error) {
       console.error('💥 用户行为分析异常:', error);
     }
-  };
+  }
 
   /**
    * 更新网络状况
@@ -108,7 +105,7 @@ export function useSmartPreload() {
     } catch (error) {
       console.error('💥 网络状况更新异常:', error);
     }
-  };
+  }
 
   /**
    * 优化内存使用
@@ -116,11 +113,11 @@ export function useSmartPreload() {
   const optimizeMemory = () => {
     try {
       smartPreloadService.optimizeMemoryUsage();
-      console.log('💾 内存使用已优化');
+      console.log('💾, 内存使用已优化');
     } catch (error) {
       console.error('💥 内存优化异常:', error);
     }
-  };
+  }
 
   /**
    * 获取智能预加载状态
@@ -132,7 +129,7 @@ export function useSmartPreload() {
       console.error('💥 获取智能状态异常:', error);
       return null;
     }
-  };
+  }
 
   /**
    * 启用/禁用智能预加载
@@ -140,8 +137,8 @@ export function useSmartPreload() {
   const toggleSmartPreload = (enabled: boolean) => {
     isEnabled.value = enabled;
     localStorage.setItem('smart-preload-enabled', enabled.toString());
-    console.log(enabled ? '✅ 智能预加载已启用' : '🚫 智能预加载已禁用');
-  };
+    console.log(enabled ? '✅ 智能预加载已启用' : '🚫, 智能预加载已禁用');
+  }
 
   /**
    * 清理预加载缓存
@@ -153,19 +150,19 @@ export function useSmartPreload() {
         totalPreloaded: 0,
         successfulPreloads: 0,
         failedPreloads: 0,
-        cacheHits: 0
-      };
-      console.log('🗑️ 预加载缓存已清理');
+        cacheHits: 0,
+      }
+      console.log('🗑️, 预加载缓存已清理');
     } catch (error) {
       console.error('💥 清理缓存异常:', error);
     }
-  };
+  }
 
   // 计算属性
   const preloadSuccessRate = computed(() => {
     const total = preloadStats.value.totalPreloaded;
-    return total > 0 ? (preloadStats.value.successfulPreloads / total * 100).toFixed(1) : '0';
-  });
+    return total > 0 ? ((preloadStats.value.successfulPreloads / total) * 100).toFixed(1) : '0'
+});
 
   const isNetworkSlow = computed(() => {
     return networkCondition.value?.type === 'slow';
@@ -204,12 +201,12 @@ export function useSmartPreload() {
     userBehavior,
     predictions,
     preloadStats,
-    
+
     // 计算属性
     preloadSuccessRate,
     isNetworkSlow,
     isNetworkMetered,
-    
+
     // 方法
     smartPreload,
     predictAndPreload,
@@ -218,30 +215,30 @@ export function useSmartPreload() {
     optimizeMemory,
     getSmartStatus,
     toggleSmartPreload,
-    clearCache
-  };
+    clearCache,
+  }
 }
 
 /**
  * 智能预加载监控组合式函数
  */
-export function useSmartPreloadMonitor() {
-  const { getSmartStatus } = useSmartPreload();
-  const monitorData = ref<any>(null);
+export function useSmartPreloadMonitor()  : unknown {
+  const { getSmartStatus } = useSmartPreload(),
+  const monitorData = ref<unknown>(null);
   const monitorInterval = ref<number | null>(null);
 
   /**
    * 开始监控
    */
-  const startMonitoring = (intervalMs: number = 10000) => {
+  const startMonitoring = (_intervalMs: number  = 10000) => {
     if (monitorInterval.value) return;
 
     monitorInterval.value = window.setInterval(() => {
       monitorData.value = getSmartStatus();
-    }, intervalMs);
+    } > intervalMs);
 
-    console.log('📊 智能预加载监控已启动');
-  };
+    console.log('📊, 智能预加载监控已启动');
+  }
 
   /**
    * 停止监控
@@ -250,9 +247,9 @@ export function useSmartPreloadMonitor() {
     if (monitorInterval.value) {
       clearInterval(monitorInterval.value);
       monitorInterval.value = null;
-      console.log('⏹️ 智能预加载监控已停止');
+      console.log('⏹️, 智能预加载监控已停止');
     }
-  };
+  }
 
   onUnmounted(() => {
     stopMonitoring();
@@ -261,6 +258,6 @@ export function useSmartPreloadMonitor() {
   return {
     monitorData,
     startMonitoring,
-    stopMonitoring
-  };
+    stopMonitoring,
+  }
 }

@@ -16,13 +16,13 @@ const mainI18n = {
     set locale(value: Language) {
       this.currentLocale = value;
     },
-    t(key: string) {
-      const keys = key.split('.');
+    t(_key: string) {
+      const keys = _key.split('.');
       let current: Record<string, unknown> = messages[this.currentLocale];
       for (const k of keys) {
         if (current[k] === undefined) {
           // 如果找不到翻译，返回键名
-          return key;
+          return _key;
         }
         const next = current[k];
         if (typeof next === 'object' && next !== null) {
@@ -34,8 +34,8 @@ const mainI18n = {
       }
       return current;
     },
-    messages
-  }
+    messages,
+  },
 };
 
 export type { Language };

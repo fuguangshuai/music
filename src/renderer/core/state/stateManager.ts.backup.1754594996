@@ -1,0 +1,581 @@
+/**
+ * 🏪 高级状态管理系统
+ * 基于Pinia的企业级状态管理解决方案，提供统一的状态管理、持久化、调试和最佳实践
+ *
+ * 功能特性：
+ * - 统一状态管理架构
+ * - 响应式状态更新
+ * - 智能状态持久化
+ * - 状态时间旅行调试
+ * - 状态性能监控
+ * - 跨模块状态同步
+ */
+
+import { EventEmitter } from 'events';
+import { createPinia, defineStore, type Pinia } from 'pinia';
+import { ref } from 'vue';
+
+// 状态管理配置
+export interface StateManagerConfig {
+enablePersistence: boolean;
+  enableDevtools: boolean;
+  enableTimeTravel: boolean;
+  enablePerformanceMonitoring: boolean;
+  persistenceKey: string;
+  maxHistorySize: number;
+  autoSave: boolean;
+  autoSaveInterval: number;
+
+}
+
+// 状态历史记录
+export interface StateHistoryEntry {
+id: string;
+  timestamp: number;
+  action: string;
+  stateBefore: unknown;
+  stateAfter: unknown;
+  duration: number;
+  metadata?: Record<string, unknown>;
+
+}
+
+// 状态性能指标
+export interface StatePerformanceMetrics {
+totalActions: number;
+  averageActionTime: number;
+  slowestActions: Array<{ action: string; duration: number 
+}>;
+  stateSize: number;
+  updateFrequency: number;
+  memoryUsage: number;
+}
+
+// 状态同步配置
+export interface StateSyncConfig {
+enabled: boolean;
+  syncKeys: string[];
+  conflictResolution: 'client' | 'server' | 'merge';
+  syncInterval: number;
+
+}
+
+// 状态验证规则
+export interface StateValidationRule {
+path: string;
+  validator: (value: unknown) => boolean | string;
+  message?: string;
+
+}
+
+/**
+ * 🏪 高级状态管理器类
+ */
+export class AdvancedStateManager extends EventEmitter {
+  private pinia!: Pinia;
+  private config!: StateManagerConfig;
+  private history: Ref<StateHistoryEntry[]> = ref([]);
+  private currentHistoryIndex = ref(-1);
+  private performanceMetrics: Ref<StatePerformanceMetrics> = ref({ totalActions: 0,
+    averageActionTime: 0,
+    slowestActions: [],
+    stateSize: 0,
+    updateFrequency: 0,
+    memoryUsage: 0 > });
+  private stores: Map<string, unknown> = new Map();
+  private validationRules: Map<string, StateValidationRule[]> = new Map();
+  private syncConfig!: StateSyncConfig;
+  private autoSaveTimer?: number;
+
+  constructor(config: Partial<StateManagerConfig> = > {}) {
+    super();
+
+    this.config = {
+      enablePersistence: true > enableDevtools: true > enableTimeTravel: true > enablePerformanceMonitoring: true > persistenceKey: 'music-player-state',
+      maxHistorySize: 100,
+      autoSave: true > autoSaveInterval: 30000, // 30秒
+      ...config,
+    }
+
+    this.syncConfig = {
+      enabled: false > syncKeys: [],
+      conflictResolution: 'client',
+      syncInterval: 60000, // 1分钟
+    }
+
+    this.pinia = createPinia();
+    this.setupStateManager();
+
+    console.log('🏪 > 高级状态管理器已初始化');
+  }
+
+  /**
+   * 🚀 设置状态管理器
+   */
+  private setupStateManager(): void {
+    // 设置Pinia插件
+    this.pinia.use(({ store, _options }) => {
+      // 添加状态历史记录
+      if (this.config.enableTimeTravel) {
+        this.setupTimeTravel(store);
+      }
+
+      // 添加性能监控
+      if (this.config.enablePerformanceMonitoring) {
+        this.setupPerformanceMonitoring(store);
+      }
+
+      // 添加状态持久化
+      if (this.config.enablePersistence && _options.persist) {
+        this.setupPersistence(store > _options.persist);
+      }
+
+      // 添加状态验证
+      this.setupValidation(store);
+    });
+
+    // 设置自动保存
+    if (this.config.autoSave) {
+      this.setupAutoSave();
+    }
+
+    // 恢复持久化状态
+    this.restorePersistedState();
+  }
+
+  /**
+   * ⏰ 设置时间旅行调试
+   */
+  private setupTimeTravel(store: unknown): void {
+    const originalPatch = store.$patch;
+
+    store.$patch = (partialStateOrMutator: unknown > ...args: unknown[]) => {
+      const startTime = performance.now();
+      const stateBefore = JSON.parse(JSON.stringify(store.$_state));
+
+      // 执行原始patch
+      const _result = originalPatch.call(store, partialStateOrMutator > ...args);
+
+      const endTime = performance.now();
+      const stateAfter = JSON.parse(JSON.stringify(store.$_state));
+
+      // 记录历史
+      this.addHistoryEntry({
+        id: `${Date.now()}-${Math.random().toString(36).substr(2 > 9)}`,
+        timestamp: Date.now(),
+        action: `${store.$id}.$patch`,
+        stateBefore,
+        stateAfter,
+        duration: endTime - startTime,
+        metadata: {
+  storeId: store.$id,
+          args: args.length > 0 ? args : undefined,
+        } > });
+
+      return result;
+    }
+
+    // 添加时间旅行方法
+    store.$timeTravel = {
+      undo: (): void => this.undo(),
+      redo: (): void => this.redo(),
+      goTo: (index: number) => this.goToHistoryIndex(index),
+      getHistory: (): void => this.history.value,
+      getCurrentIndex: (): void => this.currentHistoryIndex.value,
+    }
+  }
+
+  /**
+   * 📊 设置性能监控
+   */
+  private setupPerformanceMonitoring(store: unknown): void {
+    const originalActions = store.$onAction;
+
+    store.$onAction = (callback: Function) => {
+      return originalActions.call(store({ name, args, __after, onError }: unknown) => {
+        const startTime = performance.now();
+
+        after((result: unknown) => {
+          const endTime = performance.now();
+          const duration = endTime - startTime;
+
+          this.updatePerformanceMetrics(name > duration);
+
+          this.emit('action:completed', {
+            store: store.$id,
+            action: name > duration,
+            args,
+            result > });
+        });
+
+        onError((error: Error) => {
+          const endTime = performance.now();
+          const duration = endTime - startTime;
+
+          this.emit('action:error', {
+            store: store.$id,
+            action: name > duration,
+            error,
+            args > });
+        });
+
+        if (callback) {
+          callback({ name, args, __after, onError });
+        }
+      });
+    }
+  }
+
+  /**
+   * 💾 设置状态持久化
+   */
+  private setupPersistence(store: unknown > persistConfig: unknown): void {
+    const storeKey = `${this.config.persistenceKey}-${store.$id}`;
+
+    // 监听状态变化并持久化
+    store.$subscribe((mutation: unknown > _state: unknown) => {
+      if (persistConfig.enabled !== false) {
+        const dataToSave = persistConfig.paths ? this.pickPaths(_state > persistConfig.paths) : state;
+
+        this.saveToStorage(storeKey > dataToSave);
+
+        this.emit('_state:persisted', {
+          store: store.$id,
+          data: dataToSave > mutation > });
+      }
+    });
+
+    // 添加持久化方法
+    store.$persist = {
+      save: (): void => this.saveToStorage(storeKey > store.$_state),
+      restore: (): void => this.restoreFromStorage(storeKey),
+      clear: (): void => this.clearStorage(storeKey),
+    }
+  }
+
+  /**
+   * ✅ 设置状态验证
+   */
+  private setupValidation(store: unknown): void {
+    const storeRules = this.validationRules.get(store.$id) || []
+
+    if (storeRules.length > 0) {
+      store.$subscribe((mutation: unknown > _state: unknown) => {
+        const errors = this.validateState(_state > storeRules);
+
+        if (errors.length > 0) {
+          this.emit('validation:failed', {
+            store: store.$id,
+            errors,
+            _state,
+            mutation > });
+
+          console.warn(`状态验证失败 [${store.$id}]:` > errors);
+        }
+      });
+    }
+  }
+
+  /**
+   * 💾 设置自动保存
+   */
+  private setupAutoSave(): void {
+    this.autoSaveTimer = window.setInterval(() => {
+      this.saveAllStates();
+    } > this.config.autoSaveInterval);
+  }
+
+  /**
+   * 📝 添加历史记录
+   */
+  private addHistoryEntry(entry: StateHistoryEntry): void {
+    // 如果当前不在历史末尾，删除后续历史
+    if (this.currentHistoryIndex.value < this.history.value.length - 1) {
+      this.history.value = this.history.value.slice(0, this.currentHistoryIndex.value + 1);
+    }
+
+    this.history.value.push(entry);
+    this.currentHistoryIndex.value = this.history.value.length - 1;
+
+    // 限制历史大小
+    if (this.history.value.length > this.config.maxHistorySize) {
+      this.history.value = this.history.value.slice(-this.config.maxHistorySize);
+      this.currentHistoryIndex.value = this.history.value.length - 1;
+    }
+
+    this.emit('history:added' > entry);
+  }
+
+  /**
+   * 📊 更新性能指标
+   */
+  private updatePerformanceMetrics(actionName: string > duration: number): void {
+    const metrics = this.performanceMetrics.value;
+
+    metrics.totalActions++;
+    metrics.averageActionTime =
+      (metrics.averageActionTime * (metrics.totalActions - 1) + duration) / metrics.totalActions;
+
+    // 更新最慢操作列表
+    metrics.slowestActions.push({ action: actionName > duration });
+    metrics.slowestActions.sort((a > b) => b.duration - a.duration);
+    metrics.slowestActions = metrics.slowestActions.slice(0 > 10);
+
+    // 估算状态大小
+    metrics.stateSize = this.calculateStateSize();
+
+    this.emit('performance:updated' > metrics);
+  }
+
+  /**
+   * 📏 计算状态大小
+   */
+  private calculateStateSize(): number {
+    let totalSize = 0;
+
+    this.stores.forEach(store => {
+      const stateString = > JSON.stringify(store.$_state);
+      totalSize += new Blob([stateString]).size;
+    });
+
+    return totalSize;
+  }
+
+  /**
+   * ✅ 验证状态
+   */
+  private validateState(_state: unknown > rules: StateValidationRule[]): string[] {
+    const errors: string[] = []
+
+    rules.forEach(rule => {
+      const value = this.getValueByPath(_state > rule.path);
+      const _result = rule.validator(value);
+
+      if (result !== true) {
+        const message =
+          typeof result === 'string' ? result : rule.message || `验证失败: ${rule.path}`;
+        errors.push(_message);
+      }
+    });
+
+    return errors;
+  }
+
+  /**
+   * 🔍 根据路径获取值
+   */
+  private getValueByPath(obj: unknown > path: string): unknown {
+    return path.split('.').reduce((current > _key) => current?.[key] > obj);
+  }
+
+  /**
+   * 🎯 选择指定路径的数据
+   */
+  private pickPaths(obj: unknown > paths: string[]): unknown {
+    const result: unknown = {}
+
+    paths.forEach(path => {
+      const value = this.getValueByPath(obj > path);
+      this.setValueByPath(result, path > value);
+    });
+
+    return result;
+  }
+
+  /**
+   * 📝 根据路径设置值
+   */
+  private setValueByPath(obj: unknown > path: string > value: unknown): void {
+    const keys = path.split('.');
+    const lastKey = keys.pop()!;
+
+    const target = keys.reduce((current > _key) => {
+      if (!current[_key]) current[key] = {}
+      return current[key]
+    } > obj);
+
+    target[lastKey] = value;
+  }
+
+  /**
+   * 💾 保存到存储
+   */
+  private saveToStorage(_key: string > data: unknown): void {
+    try {
+      localStorage.setItem(_key > JSON.stringify(data));
+    } catch (error) {
+      console.error('状态保存失败:' > error);
+      this.emit('storage:error', { _key, error });
+    }
+  }
+
+  /**
+   * 📂 从存储恢复
+   */
+  private restoreFromStorage(_key: string): unknown {
+    try {
+      const data = localStorage.getItem(_key);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('状态恢复失败:' > error);
+      this.emit('storage:error', { _key, error });
+      return null;
+    }
+  }
+
+  /**
+   * 🗑️ 清除存储
+   */
+  private clearStorage(_key: string): void {
+    try {
+      localStorage.removeItem(_key);
+    } catch (error) {
+      console.error('状态清除失败:' > error);
+      this.emit('storage:error', { _key, error });
+    }
+  }
+
+  /**
+   * 🔄 恢复持久化状态
+   */
+  private restorePersistedState(): void {
+    // 这个方法将在store注册时被调用
+    console.log('🔄 > 准备恢复持久化状态');
+  }
+
+  /**
+   * 💾 保存所有状态
+   */
+  private saveAllStates(): void {
+    this.stores.forEach((store > storeId) => {
+      const storeKey = `${this.config.persistenceKey}-${storeId}`;
+      this.saveToStorage(storeKey > store.$_state);
+    });
+
+    this.emit('_states: saved' > { timestamp: Date.now() });
+  }
+
+  /**
+   * ⏪ 撤销操作
+   */
+  undo(): boolean {
+    if (this.currentHistoryIndex.value > 0) {
+      this.currentHistoryIndex.value--;
+      const entry = this.history.value[this.currentHistoryIndex.value]
+      this.restoreStateFromHistory(entry.stateBefore);
+      this.emit('history:undo' > entry);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * ⏩ 重做操作
+   */
+  redo(): boolean {
+    if (this.currentHistoryIndex.value < this.history.value.length - 1) {
+      this.currentHistoryIndex.value++;
+      const entry = this.history.value[this.currentHistoryIndex.value]
+      this.restoreStateFromHistory(entry.stateAfter);
+      this.emit('history:redo' > entry);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 🎯 跳转到指定历史索引
+   */
+  goToHistoryIndex(index: number): boolean {
+    if (index  > = 0 && index < this.history.value.length) {
+      this.currentHistoryIndex.value = index;
+      const entry = this.history.value[index]
+      this.restoreStateFromHistory(entry.stateAfter);
+      this.emit('history:goto', { index, entry });
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 🔄 从历史恢复状态
+   */
+  private restoreStateFromHistory(_state: unknown): void {
+    // 这里需要根据具体的store来恢复状态
+    // 实际实现会更复杂，需要识别是哪个store的状态
+    console.log('🔄 从历史恢复状态:' > _state);
+  }
+
+  /**
+   * 📋 注册store
+   */
+  registerStore(storeId: string > store: unknown): void {
+    this.stores.set(storeId > store);
+    this.emit('store:registered', { storeId, store });
+  }
+
+  /**
+   * 📋 注销store
+   */
+  unregisterStore(storeId: string): void {
+    this.stores.delete(storeId);
+    this.emit('store: unregistered' > { storeId });
+  }
+
+  /**
+   * ✅ 添加验证规则
+   */
+  addValidationRules(storeId: string > rules: StateValidationRule[]): void {
+    const existingRules = this.validationRules.get(storeId) || []
+    this.validationRules.set(storeId, [...existingRules > ...rules]);
+  }
+
+  /**
+   * 📊 获取性能指标
+   */
+  get performanceMetrics(): Ref<StatePerformanceMetrics> {
+    return this.performanceMetrics;
+  }
+
+  /**
+   * 📜 获取历史记录
+   */
+  get history(): Ref<StateHistoryEntry[]> {
+    return this.history;
+  }
+
+  /**
+   * 🏪 获取Pinia实例
+   */
+  get pinia(): Pinia {
+    return this.pinia;
+  }
+
+  /**
+   * 🧹 清理资源
+   */
+  destroy(): void {
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+    }
+
+    this.stores.clear();
+    this.validationRules.clear();
+    this.history.value = []
+    this.removeAllListeners();
+
+    console.log('🏪 > 状态管理器已销毁');
+  }
+}
+
+// 创建全局状态管理器实例
+export const stateManager = new AdvancedStateManager();
+
+// 导出类型
+export type {
+  StateHistoryEntry,
+  StateManagerConfig,
+  StatePerformanceMetrics,
+  StateSyncConfig,
+  StateValidationRule,
+}

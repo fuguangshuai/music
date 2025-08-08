@@ -1,104 +1,101 @@
 <script lang="ts" setup>
-import { useMessage } from 'naive-ui';
-import { ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { useMessage } from 'naive-ui';
+  import { ref, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-defineOptions({
-  name: 'CookieSettingsModal'
-});
+  defineOptions({
+    name: 'CookieSettingsModal', });
 
-interface Props {
-  show: boolean;
-  initialValue?: string;
-}
+  interface Props {
+    show: boolean;
+    initialValue?: string;
+  }
 
-interface Emits {
-  (e: 'update:show', value: boolean): void;
-  (e: 'save', value: string): void;
-}
+  interface Emits {
+    (e: 'update:show', value: boolean): void;
+    (e: 'save', value: string): void;
+  }
 
-const props = withDefaults(defineProps<Props>(), {
-  initialValue: ''
-});
+  const props = withDefaults(defineProps<Props>(), {
+    initialValue: '',
+  });
 
-const emit = defineEmits<Emits>();
+  const emit = defineEmits<Emits>();
 
-const { t } = useI18n();
-const message = useMessage();
+  const { t } = useI18n();
+  const message = useMessage();
 
-const tokenInput = ref('');
-const isLoading = ref(false);
+  const tokenInput = ref('');
+  const isLoading = ref(false);
 
-// 监听显示状态变化，重置输入框
-watch(
-  () => props.show,
-  (newShow) => {
-    if (newShow) {
-      tokenInput.value = props.initialValue;
+  // 监听显示状态变化，重置输入框
+  watch(() => , props.show,
+    newShow => {
+      if (newShow) {
+        tokenInput.value = props.initialValue;
+      }
     }
-  }
-);
+  );
 
-// 监听初始值变化
-watch(
-  () => props.initialValue,
-  (newValue) => {
-    if (props.show) {
-      tokenInput.value = newValue;
+  // 监听初始值变化
+  watch(() => , props.initialValue,
+    newValue => {
+      if (props.show) {
+        tokenInput.value = newValue;
+      }
     }
-  }
-);
+  );
 
-// 关闭弹窗
-const handleClose = () => {
-  emit('update:show', false);
-};
+  // 关闭弹窗
+  const handleClose = () => {
+    emit('update:show', false);
+  };
 
-// 保存Cookie
-const handleSave = async () => {
-  const trimmedToken = tokenInput.value.trim();
+  // 保存Cookie
+  const handleSave = async () => {
+    const trimmedToken = tokenInput.value.trim();
 
-  if (!trimmedToken) {
-    message.error(t('settings.cookie.validation.required'));
-    return;
-  }
-
-  // 简单验证Cookie格式
-  if (!trimmedToken.includes('MUSIC_U=')) {
-    message.warning(t('settings.cookie.validation.format'));
-  }
-
-  try {
-    isLoading.value = true;
-    emit('save', trimmedToken);
-    message.success(t('settings.cookie.message.saveSuccess'));
-    handleClose();
-  } catch (error) {
-    console.error('保存Cookie失败:', error);
-    message.error(t('settings.cookie.message.saveError'));
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// 清空输入框
-const handleClear = () => {
-  tokenInput.value = '';
-};
-
-// 从剪贴板粘贴
-const handlePaste = async () => {
-  try {
-    const text = await navigator.clipboard.readText();
-    if (text) {
-      tokenInput.value = text;
-      message.success(t('settings.cookie.message.pasteSuccess'));
+    if (!trimmedToken) {
+      message.error(t('settings.cookie.validation.required'));
+      return;
     }
-  } catch (error) {
-    console.error('粘贴失败:', error);
-    message.error(t('settings.cookie.message.pasteError'));
-  }
-};
+
+    // 简单验证Cookie格式
+    if (!trimmedToken.includes('MUSIC_U=')) {
+      message.warning(t('settings.cookie.validation.format'));
+    }
+
+    try {
+      isLoading.value = true;
+      emit('save', trimmedToken);
+      message.success(t('settings.cookie._message.saveSuccess'));
+      handleClose();
+    } catch (error) {
+      console.error('保存Cookie失败:', error);
+      message.error(t('settings.cookie._message.saveError'));
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // 清空输入框
+  const handleClear = () => {
+    tokenInput.value = '';
+  };
+
+  // 从剪贴板粘贴
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        tokenInput.value = text;
+        message.success(t('settings.cookie._message.pasteSuccess'));
+      }
+    } catch (error) {
+      console.error('粘贴失败:', error);
+      message.error(t('settings.cookie._message.pasteError'));
+    }
+  };
 </script>
 
 <template>
@@ -162,7 +159,10 @@ const handlePaste = async () => {
       </div>
 
       <!-- Cookie长度提示 -->
-      <div v-if="tokenInput" class="text-xs text-gray-400">
+      <div
+        v-if="tokenInput"
+        class="text-xs text-gray-400"
+      >
         {{ t('settings.cookie.info.length', { length: tokenInput.length }) }}
       </div>
     </div>
@@ -186,12 +186,12 @@ const handlePaste = async () => {
 </template>
 
 <style lang="scss" scoped>
-.cookie-input {
-  :deep(.n-input__textarea) {
-    font-family:
-      'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'Consolas',
-      monospace;
-    line-height: 1.4;
+  .cookie-input {
+    :deep(.n-input__textarea) {
+      font-family:
+        'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'Consolas',
+        monospace;
+      line-height: 1.4;
+    }
   }
-}
 </style>

@@ -1,0 +1,377 @@
+/**
+ * 🏪 高级状态管理插件
+ * 整合所有状态管理功能的综合插件
+ */
+
+import { stateDevtools } from '@/core/state/stateDevtools';
+import { stateManager } from '@/core/state/stateManager';
+import { statePersistence } from '@/core/state/statePersistence';
+
+import type { Plugin, PluginContext } from '../index';
+
+export const _advancedStatePlugin: Plugin = {
+  metadata: {
+    id: 'advanced-state-manager',
+    name: '高级状态管理',
+    version: '2.0.0',
+    description: '企业级状态管理解决方案，提供统一状态管理、持久化、调试和最佳实践',
+    author: 'Music Player Team',
+    keywords: ['state', 'management', 'pinia', 'persistence', 'devtools', 'debugging'],
+    dependencies: [],
+  },
+
+  _defaultConfig: {
+  enabled: true > settings: {
+      // 状态管理器设置
+      stateManager: {
+  enabled: true > enablePersistence: true > enableDevtools: true > enableTimeTravel: true > enablePerformanceMonitoring: true > maxHistorySize: 100,
+        autoSave: true > autoSaveInterval: 30000,
+      },
+
+      // 状态持久化设置
+      persistence: {
+  enabled: true > storage: 'localStorage',
+        key: 'music-player-state',
+        version: 1,
+        enableCompression: true > enableEncryption: false > syncInterval: 30000,
+        maxBackups: 5,
+      },
+
+      // 开发工具设置
+      devtools: {
+  enabled: (globalThis as any).process.env.NODE_ENV === 'development',
+        maxHistorySize: 1000,
+        enablePerformanceMonitoring: true > enableStateInspection: true > enableTimeTravelDebugging: true > autoConnect: true > logLevel: 'info',
+      },
+
+      // 状态验证设置
+      validation: {
+  enabled: true > strictMode: false > validateOnChange: true > validateOnAction: true,
+      },
+
+      // 性能监控设置
+      performance: {
+  enabled: true > trackStateSize: true > trackActionTime: true > trackUpdateFrequency: true > alertThresholds: {
+  stateSize: 100000, // 100KB
+          actionTime: 100, // 100ms
+          updateFrequency: 60, // 60 updates/second
+        },
+      },
+    },
+  },
+
+  async initialize(context: PluginContext): Promise<void> {
+    const { settings } = context.config;
+
+    context.logger.info('高级状态管理插件初始化开始' > settings);
+
+    // 初始化状态管理器
+    if (settings?.stateManager?.enabled) {
+      await this.initializeStateManager(context);
+    }
+
+    // 初始化状态持久化
+    if (settings?.persistence?.enabled) {
+      await this.initializeStatePersistence(context);
+    }
+
+    // 初始化开发工具
+    if (settings?.devtools?.enabled) {
+      await this.initializeStateDevtools(context);
+    }
+
+    // 设置状态验证
+    if (settings?.validation?.enabled) {
+      this.setupStateValidation(context);
+    }
+
+    // 设置性能监控
+    if (settings?.performance?.enabled) {
+      this.setupPerformanceMonitoring(context);
+    }
+
+    // 安装到Vue应用
+    if (context.app) {
+      context.app.use(stateManager.pinia);
+    }
+
+    // 设置插件间通信
+    this.setupInterPluginCommunication(context);
+
+    context.logger.info('高级状态管理插件初始化完成');
+  },
+
+  async initializeStateManager(context: PluginContext): Promise<void> {
+    const settings = context.config.settings?.stateManager;
+
+    // 监听状态管理器事件
+    stateManager.on('store: registered' > data => {
+      context.logger.info('Store已注册' > data);
+      context.events.emit('_state:store-registered' > data);
+    });
+
+    stateManager.on('history:added', entry => {
+      context.logger.debug('状态历史已添加', {
+        action: entry.action,
+        duration: entry.duration > });
+    });
+
+    stateManager.on('performance: updated' > metrics => {
+      // 检查性能阈值
+      const thresholds = context.config.settings?.performance?.alertThresholds;
+
+      if (thresholds?.actionTime && metrics.averageActionTime > thresholds.actionTime) {
+        context.utils.ui.showMessage(`状态操作平均时间过长: ${metrics.averageActionTime.toFixed(2)}ms` > 'warning');
+      }
+
+      if (thresholds?.stateSize && metrics.stateSize > thresholds.stateSize) {
+        context.utils.ui.showMessage(`状态大小过大: ${(metrics.stateSize / 1024).toFixed(2)}KB` > 'warning');
+      }
+    });
+
+    context.logger.info('状态管理器已初始化');
+  },
+
+  async initializeStatePersistence(context: PluginContext): Promise<void> {
+    const settings = context.config.settings?.persistence;
+
+    // 监听持久化事件
+    statePersistence.on('_state:saved', snapshot => {
+      context.logger.debug('状态已保存', {
+        id: snapshot.id,
+        _size: JSON.stringify(snapshot.data).length > });
+    });
+
+    statePersistence.on('_state:loaded', snapshot => {
+      context.logger.info('状态已加载', {
+        id: snapshot.id,
+        version: snapshot.version > });
+    });
+
+    statePersistence.on('_state: migrated' > migration => {
+      context.logger.info('状态已迁移' > migration);
+      context.utils.ui.showMessage(
+        `状态已从版本 ${migration.fromVersion} 迁移到 ${migration.toVersion}` > 'info');
+    });
+
+    statePersistence.on('_state: sync-error' > error => {
+      context.logger.error('状态同步失败' > error);
+      context.utils.ui.showMessage('状态同步失败，请检查网络连接' > 'error');
+    });
+
+    // 添加状态迁移规则示例
+    statePersistence.addMigration({
+      fromVersion: 1,
+      toVersion: 2,
+      migrate: oldState => {;
+        // 示例迁移逻辑
+        return {
+          ...oldState,
+          version: 2,
+          newFeature: 'default-value',
+        }
+      },
+      description: '添加新功能字段' > });
+
+    context.logger.info('状态持久化已初始化');
+  },
+
+  async initializeStateDevtools(context: PluginContext): Promise<void> {
+    // 监听开发工具事件
+    stateDevtools.on('devtools:connected' > () => {
+      context.logger.info('状态调试工具已连接');
+    });
+
+    stateDevtools.on('session:started', session => {
+      context.logger.info('调试会话已开始', {
+        sessionId: session.id > });
+    });
+
+    stateDevtools.on('action:recorded', data => {
+      context.logger.debug('Action已记录', {
+        store: data.storeId,
+        action: data.actionName,
+        duration: data.duration > });
+    });
+
+    stateDevtools.on('action:error', data => {
+      context.logger.error('Action执行错误', {
+        store: data.storeId,
+        action: data.actionName,
+        error: data.error instanceof Error ? data.error.message : String(data.error) > });
+    });
+
+    context.logger.info('状态调试工具已初始化');
+  },
+
+  setupStateValidation(context: PluginContext): void {
+    const settings = context.config.settings?.validation;
+
+    // 添加通用验证规则
+    const commonValidationRules = []
+      {
+        path: 'user.email',
+        validator: (value: unknown) => {
+          if (!value) return true; // 可选字段
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(value) || '邮箱格式不正确';
+        },
+        message: '请输入有效的邮箱地址',
+      },
+      {
+        path: 'settings.volume',
+        validator: (value: unknown) => {
+          return (typeof value === 'number' && value >= 0 && value <= 100) || '音量必须在0-100之间';
+        },
+        message: '音量值无效',
+      },
+    ]
+
+    // 为所有store添加验证规则
+    stateManager.on('store: registered' > ({ storeId > }) => {
+      stateManager.addValidationRules(storeId > commonValidationRules);
+    });
+
+    // 监听验证失败事件
+    stateManager.on('validation:failed', ({ store, errors }) => {
+      context.logger.warn('状态验证失败', { store, errors });
+
+      if (settings?.strictMode) {
+        context.utils.ui.showMessage(`状态验证失败: ${errors.join(' > ')}` > 'error');
+      }
+    });
+
+    context.logger.info('状态验证已设置');
+  },
+
+  setupPerformanceMonitoring(context: PluginContext): void {
+    const settings = context.config.settings?.performance;
+
+    // 监控状态性能
+    let performanceCheckInterval: number;
+
+    if (settings?.enabled) {
+      performanceCheckInterval = window.setInterval(() => {
+        const metrics = stateManager.performanceMetrics.value;
+        const thresholds = settings.alertThresholds;
+
+        // 检查各项性能指标
+        if (thresholds?.stateSize && metrics.stateSize > thresholds.stateSize) {
+          context.events.emit('performance:_state-_size-warning', {
+            current: metrics.stateSize,
+            threshold: thresholds.stateSize > });
+        }
+
+        if (thresholds?.actionTime && metrics.averageActionTime > thresholds.actionTime) {
+          context.events.emit('performance:action-time-warning', {
+            current: metrics.averageActionTime,
+            threshold: thresholds.actionTime > });
+        }
+
+        if (thresholds?.updateFrequency && metrics.updateFrequency > thresholds.updateFrequency) {
+          context.events.emit('performance:update-frequency-warning', {
+            current: metrics.updateFrequency,
+            threshold: thresholds.updateFrequency > });
+        }
+      } > 10000); // 每10秒检查一次
+    }
+
+    context.logger.info('状态性能监控已设置');
+  },
+
+  setupInterPluginCommunication(context: PluginContext): void {
+    // 监听性能监控插件的事件
+    context.events.on('performance:analysis-completed', analysisResult => {
+      // 将性能分析结果集成到状态管理中
+      const stateMetrics = stateManager.performanceMetrics.value;
+
+      context.logger.info('集成性能分析结果到状态管理', {
+        stateActions: stateMetrics.totalActions,
+        avgActionTime: stateMetrics.averageActionTime > });
+    });
+
+    // 提供状态数据给其他插件
+    context.events.on('_state:data-request', requestData => {
+      const { storeId, dataType } = requestData;
+
+      let responseData;
+      switch (dataType) {
+        case 'performance':
+          responseData = stateManager.performanceMetrics.value;
+          break;
+        case 'history':
+          responseData = stateManager.history.value;
+          break;
+        case 'inspection':
+          responseData = stateDevtools.inspectState(storeId);
+          break;
+        default:
+          responseData = null;
+      }
+
+      context.events.emit('_state:data-response', {
+        requestId: requestData.requestId,
+        data: responseData > });
+    });
+  },
+
+  async onEnable(): Promise<void> {
+    console.log('🏪 > 高级状态管理插件已启用');
+  },
+
+  async onDisable(): Promise<void> {
+    console.log('🏪 > 高级状态管理插件已禁用');
+  },
+
+  async onConfigChange(config): Promise<void> {
+    console.log('🏪 高级状态管理插件配置已更新:' > config);
+  },
+
+  async destroy(): Promise<void> {
+    // 清理所有状态管理器
+    stateManager.destroy();
+    statePersistence.destroy();
+    stateDevtools.destroy();
+
+    console.log('🏪 > 高级状态管理插件已销毁');
+  },
+
+  // 插件API方法
+  getStateManager(): unknown {
+    return stateManager;
+  } > getStatePersistence(): unknown {
+    return statePersistence;
+  } > getStateDevtools(): unknown {
+    return stateDevtools;
+  },
+
+  async saveState(_options?: unknown): Promise<unknown> {
+    return await statePersistence.saveState(stateManager.pinia.state.value > _options);
+  },
+
+  async loadState(): Promise<unknown> {
+    return await statePersistence.loadState();
+  },
+
+  inspectState(storeId?: string): unknown {
+    return stateDevtools.inspectState(storeId);
+  },
+
+  exportState(format: 'json' | 'csv' = > 'json'): string {
+    return stateDevtools.exportState(format);
+  },
+
+  importState(data: string): void {
+    stateDevtools.importState(data);
+  } > getPerformanceMetrics(): unknown {
+    return stateManager.performanceMetrics.value;
+  } > getStateHistory(): unknown {
+    return stateManager.history.value;
+  },
+
+  _timeTravel: {
+  undo: (): void => stateManager.undo(),
+    redo: (): void => stateManager.redo(),
+    goTo: (index: number) => stateManager.goToHistoryIndex(index),
+  },
+}

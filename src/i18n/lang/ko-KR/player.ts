@@ -17,19 +17,19 @@ export default {
   playMode: {
     sequence: '순차 재생',
     loop: '한 곡 반복',
-    random: '랜덤 재생'
+    random: '랜덤 재생',
   },
   fullscreen: {
     enter: '전체화면',
-    exit: '전체화면 종료'
+    exit: '전체화면 종료',
   },
   close: '닫기',
   modeHint: {
     single: '한 곡 반복',
-    list: '자동으로 다음 곡 재생'
+    list: '자동으로 다음 곡 재생',
   },
   lrc: {
-    noLrc: '가사가 없습니다. 음악을 감상해주세요'
+    noLrc: '가사가 없습니다. 음악을 감상해주세요',
   },
   reparse: {
     title: '음원 선택',
@@ -39,7 +39,7 @@ export default {
     warning: '음원을 선택해주세요',
     bilibiliNotSupported: 'B站 비디오는 재분석을 지원하지 않습니다',
     processing: '분석 중...',
-    clear: '사용자 정의 음원 지우기'
+    clear: '사용자 정의 음원 지우기',
   },
   playBar: {
     expand: '가사 펼치기',
@@ -53,7 +53,7 @@ export default {
     playMode: {
       sequence: '순차 재생',
       loop: '반복 재생',
-      random: '랜덤 재생'
+      random: '랜덤 재생',
     },
     play: '재생 시작',
     pause: '재생 일시정지',
@@ -64,7 +64,7 @@ export default {
     unFavorite: '{name} 즐겨찾기 해제됨',
     miniPlayBar: '미니 재생바',
     playbackSpeed: '재생 속도',
-    advancedControls: '고급 설정'
+    advancedControls: '고급 설정',
   },
   eq: {
     title: '이퀄라이저',
@@ -87,8 +87,8 @@ export default {
       vocal: '보컬',
       dance: '댄스',
       acoustic: '어쿠스틱',
-      custom: '사용자 정의'
-    }
+      custom: '사용자 정의',
+    },
   },
   sleepTimer: {
     title: '타이머 종료',
@@ -109,7 +109,7 @@ export default {
     timerEnded: '타이머 종료 실행됨',
     playbackStopped: '음악 재생이 중지됨',
     minutesRemaining: '남은 시간 {minutes}분',
-    songsRemaining: '남은 곡 수 {count}곡'
+    songsRemaining: '남은 곡 수 {count}곡',
   },
   playList: {
     clearAll: '재생 목록 비우기',
@@ -117,6 +117,6 @@ export default {
     cleared: '재생 목록이 비워졌습니다',
     empty: '재생 목록이 비어있습니다',
     clearConfirmTitle: '재생 목록 비우기',
-    clearConfirmContent: '재생 목록의 모든 곡을 삭제하고 현재 재생을 중지합니다. 계속하시겠습니까?'
-  }
+    clearConfirmContent: '재생 목록의 모든 곡을 삭제하고 현재 재생을 중지합니다. 계속하시겠습니까?',
+  },
 };

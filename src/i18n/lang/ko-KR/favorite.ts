@@ -9,5 +9,5 @@ export default {
   downloading: '다운로드 중입니다. 잠시만 기다려주세요...',
   selectSongsFirst: '먼저 다운로드할 곡을 선택해주세요',
   descending: '내림차순',
-  ascending: '오름차순'
+  ascending: '오름차순',
 };

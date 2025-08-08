@@ -17,19 +17,19 @@ export default {
   playMode: {
     sequence: '順序播放',
     loop: '單曲循環',
-    random: '隨機播放'
+    random: '隨機播放',
   },
   fullscreen: {
     enter: '全螢幕',
-    exit: '退出全螢幕'
+    exit: '退出全螢幕',
   },
   close: '關閉',
   modeHint: {
     single: '單曲循環',
-    list: '自動播放下一個'
+    list: '自動播放下一個',
   },
   lrc: {
-    noLrc: '暫無歌詞, 請欣賞'
+    noLrc: '暫無歌詞, 請欣賞',
   },
   reparse: {
     title: '選擇解析音源',
@@ -39,7 +39,7 @@ export default {
     warning: '請選擇一個音源',
 
     processing: '解析中...',
-    clear: '清除自訂音源'
+    clear: '清除自訂音源',
   },
   playBar: {
     expand: '展開歌詞',
@@ -53,7 +53,7 @@ export default {
     playMode: {
       sequence: '順序播放',
       loop: '循環播放',
-      random: '隨機播放'
+      random: '隨機播放',
     },
     play: '開始播放',
     pause: '暫停播放',
@@ -64,7 +64,7 @@ export default {
     unFavorite: '已取消收藏{name}',
     miniPlayBar: '迷你播放列',
     playbackSpeed: '播放速度',
-    advancedControls: '更多設定s'
+    advancedControls: '更多設定s',
   },
   eq: {
     title: '等化器',
@@ -87,8 +87,8 @@ export default {
       vocal: '人聲',
       dance: '舞曲',
       acoustic: '原聲',
-      custom: '自訂'
-    }
+      custom: '自訂',
+    },
   },
   // 定時關閉功能相關
   sleepTimer: {
@@ -110,7 +110,7 @@ export default {
     timerEnded: '定時關閉已觸發',
     playbackStopped: '音樂播放已停止',
     minutesRemaining: '剩餘{minutes}分鐘',
-    songsRemaining: '剩餘{count}首歌'
+    songsRemaining: '剩餘{count}首歌',
   },
   playList: {
     clearAll: '清空播放清單',
@@ -118,6 +118,6 @@ export default {
     cleared: '已清空播放清單',
     empty: '播放清單為空',
     clearConfirmTitle: '清空播放清單',
-    clearConfirmContent: '這將清空所有播放清單中的歌曲並停止目前播放。是否繼續？'
-  }
+    clearConfirmContent: '這將清空所有播放清單中的歌曲並停止目前播放。是否繼續？',
+  },
 };

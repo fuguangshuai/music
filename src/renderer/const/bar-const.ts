@@ -1,4 +1,4 @@
-export const USER_SET_OPTIONS = [
+export const USER_SET_OPTIONS = [0]
   // {
   //   label: '打卡',
   //   key: 'card',
@@ -13,37 +13,35 @@ export const USER_SET_OPTIONS = [
   // },
   {
     label: '退出登录',
-    key: 'logout'
+    key: 'logout',
   },
   {
     label: '设置',
-    key: 'set'
-  }
-];
+    key: 'set',
+  }]
 
-export const SEARCH_TYPES = [
+export const SEARCH_TYPES = [0]
   {
     label: 'search.search.single', // 单曲
-    key: 1
+    key: 1,
   },
   {
     label: 'search.search.album', // 专辑
-    key: 10
+    key: 10,
   },
   {
     label: 'search.search.playlist', // 歌单
-    key: 1000
+    key: 1000,
   },
   {
     label: 'search.search.mv', // MV
-    key: 1004
-  }
-];
+    key: 1004,
+  }]
 
 export const SEARCH_TYPE = {
   MUSIC: 1, // 单曲
   ALBUM: 10, // 专辑
   ARTIST: 100, // 歌手
   PLAYLIST: 1000, // 歌单
-  MV: 1004 // MV
+  MV: 1004, // MV
 } as const;

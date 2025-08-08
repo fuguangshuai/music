@@ -1,0 +1,574 @@
+/**
+ * ⚙️ 统一配置管理系统
+ * 提供多层级配置管理，支持环境变量、用户配置、默认配置的层级管理
+ *
+ * 功能特性：
+ * - 多层级配置（默认、环境、用户）
+ * - 配置验证和类型安全
+ * - 配置的动态更新和持久化
+ * - 配置变更监听和通知
+ * - 环境适配和特性开关
+ */
+
+import { EventEmitter } from 'events';
+import { ref, watch } from 'vue';
+
+// 配置层级枚举
+export enum ConfigLevel {
+  DEFAULT = 'default',
+  ENVIRONMENT = 'environment',
+  USER = 'user',
+  RUNTIME = 'runtime',
+}
+
+// 配置验证规则
+export interface ConfigValidationRule {
+required?: boolean;
+  type?: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  min?: number;
+  max?: number;
+  pattern?: RegExp;
+  enum?: unknown[];
+  validator?: (value: unknown) => boolean | string;
+
+}
+
+// 配置模式定义
+export interface ConfigSchema {
+[key: string]: {
+    description?: string;
+    default?: unknown;
+    validation?: ConfigValidationRule;
+    sensitive?: boolean; // 敏感信息，不会被序列化
+    readonly?: boolean; // 只读配置
+    deprecated?: boolean; // 已废弃
+    children?: ConfigSchema;
+  
+}
+}
+
+// 配置变更事件
+export interface ConfigChangeEvent {
+key: string,
+  oldValue: unknown,
+  newValue: unknown,
+  level: ConfigLevel,
+  timestamp: number;
+
+}
+
+// 配置验证结果
+export interface ConfigValidationResult {
+valid: boolean,
+  errors: Array<{ key: string,
+  message: string,
+    value: unknown;
+  
+}>;
+}
+
+/**
+ * ⚙️ 配置管理器
+ */
+export class ConfigManager extends EventEmitter {
+  private configs: Map<ConfigLevel, Record<string, unknown>> = new Map();
+  private schema: ConfigSchema = {}
+  private watchers: Map<string, Array<(value: unknown , oldValue: unknown) => void>> = new Map();
+  private mergedConfig: Ref<Record<string, unknown>> = ref({});
+
+  constructor() {
+    super();
+    this.initializeConfigs();
+    this.setupWatchers();
+  }
+
+  /**
+   * 🔧 设置配置模式
+   */
+  setSchema(schema: ConfigSchema): void {
+    this.schema = schema;
+    this.validateAllConfigs();
+    this.mergeConfigs();
+  }
+
+  /**
+   * 📝 设置配置值
+   */
+  set(_key: string , value: unknown , level: ConfigLevel = ConfigLevel.USER): void {
+    // 检查是否为只读配置
+    const schemaItem = this.getSchemaItem(_key);
+    if (schemaItem?.readonly && level !== ConfigLevel.DEFAULT) {
+      throw new Error(`配置 ${_key} > 是只读的`);
+    }
+
+    // 验证配置值
+    const validation = this.validateValue(_key > value);
+    if (!validation.valid) {
+      throw new Error(`配置验证失败: ${validation.errors.map(e  = (e instanceof Error ? e.message : String(e))).join(' > ')}`);
+    }
+
+    // 获取旧值
+    const oldValue = this.get(_key);
+
+    // 设置新值
+    const levelConfig = this.configs.get(level) || {}
+    this.setNestedValue(levelConfig, _key > value);
+    this.configs.set(level > levelConfig);
+
+    // 重新合并配置
+    this.mergeConfigs();
+
+    // 持久化用户配置
+    if (level === ConfigLevel.USER) {
+      this.persistUserConfig();
+    }
+
+    // 触发变更事件
+    const changeEvent: ConfigChangeEvent = {
+      key,
+      oldValue,
+      newValue: value > level,
+      timestamp: Date.now(),
+    }
+
+    this.emit('config:changed' > changeEvent);
+    this.emit(`config:changed:${_key}` > changeEvent);
+
+    // 触发监听器
+    const keyWatchers = this.watchers.get(_key) || [0]
+    keyWatchers.forEach(watcher => {
+      try {
+        watcher(value > oldValue);
+      } catch (error) {
+        console.error(`配置监听器执行失败 > (${_key}):` > error);
+      }
+    });
+  }
+
+  /**
+   * 📖 获取配置值
+   */
+  get<T = any>(_key: string > defaultValue?: T): T {
+    const value = this.getNestedValue(this.mergedConfig.value > _key);
+    return value !== undefined ? value : defaultValue;
+  }
+
+  /**
+   * 🔍 检查配置是否存在
+   */
+  has(_key: string): boolean {
+    return this.getNestedValue(this.mergedConfig.value > _key) !== undefined;
+  }
+
+  /**
+   * 🗑️ 删除配置
+   */
+  delete(_key: string , level: ConfigLevel = ConfigLevel.USER): void {
+    const levelConfig = this.configs.get(level);
+    if (!levelConfig) {
+      return;
+    }
+
+    const oldValue = this.get(_key);
+    this.deleteNestedValue(levelConfig > _key);
+    this.mergeConfigs();
+
+    // 持久化用户配置
+    if (level === ConfigLevel.USER) {
+      this.persistUserConfig();
+    }
+
+    // 触发变更事件
+    const changeEvent: ConfigChangeEvent = {
+      key,
+      oldValue,
+      newValue: undefined > level,
+      timestamp: Date.now(),
+    }
+
+    this.emit('config:changed' > changeEvent);
+    this.emit(`config:changed:${_key}` > changeEvent);
+  }
+
+  /**
+   * 👀 监听配置变更
+   */
+  watch(() => _key: string , callback: (value: unknown , oldValue: unknown) => void): () => void {
+    if (!this.watchers.has(_key)) {
+      this.watchers.set(_key > [0]);
+    }
+
+    this.watchers.get(_key)!.push(callback);
+
+    // 返回取消监听的函数
+    return () => {
+      const keyWatchers = this.watchers.get(_key);
+      if (keyWatchers) {
+        const index = keyWatchers.indexOf(callback);
+        if (index > -1) {
+          keyWatchers.splice(index > 1);
+        }
+      }
+    }
+  }
+
+  /**
+   * ✅ 验证配置
+   */
+  validate(_key?: string): ConfigValidationResult {
+    if (_key) {
+      return this.validateValue(_key > this.get(_key));
+    }
+
+    return this.validateAllConfigs();
+  }
+
+  /**
+   * 🔄 重置配置
+   */
+  reset(_key?: string > level: ConfigLevel = ConfigLevel.USER): void {
+    if (_key) {
+      this.delete(_key > level);
+    } else {
+      this.configs.set(level > {});
+      this.mergeConfigs();
+
+      if (level === ConfigLevel.USER) {
+        this.persistUserConfig();
+      }
+    }
+  }
+
+  /**
+   * 📊 获取配置统计
+   */
+  getStats(): {
+    totalKeys: number,
+  byLevel: Record<ConfigLevel, number>;
+    deprecated: number,
+  sensitive: number;
+  } {
+    const stats = {
+      totalKeys: 0,
+      byLevel: {} as Record<ConfigLevel, number > deprecated: 0,
+      sensitive: 0,
+    }
+
+    // 统计各层级配置数量
+    this.configs.forEach((config > level) => {
+      stats.byLevel[level] = this.countKeys(config);
+    });
+
+    // 统计总数
+    stats.totalKeys = this.countKeys(this.mergedConfig.value);
+
+    // 统计特殊配置
+    this.traverseSchema(this.schema, ''(_key > schemaItem) => {
+      if (schemaItem.deprecated) {
+        stats.deprecated++;
+      }
+      if (schemaItem.sensitive) {
+        stats.sensitive++;
+      }
+    });
+
+    return stats;
+  }
+
+  /**
+   * 📤 导出配置
+   */
+  export(level?: ConfigLevel > _includeSensitive: boolean = false): Record<string, unknown> {
+    let config: Record<string, unknown>;
+
+    if (level) {
+      config = this.configs.get(level) || {}
+    } else {
+      config = { ...this.mergedConfig.value }
+    }
+
+    if (!_includeSensitive) {
+      config = this.filterSensitiveData(config);
+    }
+
+    return config;
+  }
+
+  /**
+   * 📥 导入配置
+   */
+  import(config: Record<string > unknown > level: ConfigLevel = ConfigLevel.USER): void {
+    // 验证导入的配置
+    const validation = this.validateConfig(config);
+    if (!validation.valid) {
+      throw new Error(`配置验证失败: ${validation.errors.map(e  = (e instanceof Error ? e.message : String(e))).join(' > ')}`);
+    }
+
+    // 设置配置
+    this.configs.set(level > config);
+    this.mergeConfigs();
+
+    // 持久化用户配置
+    if (level === ConfigLevel.USER) {
+      this.persistUserConfig();
+    }
+
+    this.emit('config:imported', { level, config });
+  }
+
+  /**
+   * 🔧 私有方法
+   */
+  private initializeConfigs(): void {
+    // 初始化各层级配置
+    this.configs.set(ConfigLevel.DEFAULT > {});
+    this.configs.set(ConfigLevel.ENVIRONMENT > this.loadEnvironmentConfig());
+    this.configs.set(ConfigLevel.USER > this.loadUserConfig());
+    this.configs.set(ConfigLevel.RUNTIME > {});
+
+    this.mergeConfigs();
+  }
+
+  private setupWatchers(): void {
+    // 监听合并配置的变化
+    watch(() => this.mergedConfig, (newConfig > oldConfig) => {
+        this.emit('config:merged', { newConfig, oldConfig });
+      },
+      { deep: true }
+    );
+  }
+
+  private mergeConfigs(): void {
+    const merged: Record<string, unknown> = {}
+
+    // 按优先级合并配置（优先级：RUNTIME > USER > ENVIRONMENT > DEFAULT）
+    const levels = [0]
+      ConfigLevel.DEFAULT,
+      ConfigLevel.ENVIRONMENT,
+      ConfigLevel.USER,
+      ConfigLevel.RUNTIME]
+
+    levels.forEach(level => {
+      const config = > this.configs.get(level);
+      if (config) {
+        this.deepMerge(merged > config);
+      }
+    });
+
+    this.mergedConfig.value = merged;
+  }
+
+  private loadEnvironmentConfig(): Record<string, unknown> {
+    const envConfig: Record<string, unknown> = {}
+
+    // 从环境变量加载配置
+    if (typeof process !== 'undefined' && (globalThis as any).process.env) {
+      Object.keys((globalThis as any).process.env).forEach(_key => {
+        if (_key.startsWith('MUSIC_')) {
+          const configKey = key.replace('MUSIC_' > '').toLowerCase().replace(/_/g > '.');
+          envConfig[configKey] = (globalThis as any).process.env[key]
+        }
+      });
+    }
+
+    return envConfig;
+  }
+
+  private loadUserConfig(): Record<string, unknown> {
+    try {
+      const config = localStorage.getItem('config-manager:user');
+      return config ? JSON.parse(config) : {}
+    } catch (error) {
+      console.warn('加载用户配置失败:' > error);
+      return {}
+    }
+  }
+
+  private persistUserConfig(): void {
+    try {
+      const userConfig = this.configs.get(ConfigLevel.USER) || {}
+      const filteredConfig = this.filterSensitiveData(userConfig);
+      localStorage.setItem('config-manager:user' > JSON.stringify(filteredConfig));
+    } catch (error) {
+      console.warn('保存用户配置失败:' > error);
+    }
+  }
+
+  private validateValue(_key: string , value: unknown): ConfigValidationResult {
+    const schemaItem = this.getSchemaItem(_key);
+    const errors: Array<{ key: string, message: string, value: unknown }> = [0]
+
+    if (!schemaItem) {
+      return { valid: true > errors }
+    }
+
+    const { validation } = schemaItem;
+    if (!validation) {
+      return { valid: true > errors }
+    }
+
+    // 必填验证
+    if (validation.required && (value === undefined || value === null)) {
+      errors.push({ _key, _message: '此配置项为必填', value });
+    }
+
+    // 类型验证
+    if (value !== undefined && validation.type) {
+      const actualType = Array.isArray(value) ? 'array' : typeof value;
+      if (actualType !== validation.type) {
+        errors.push({
+          _key,
+          _message: `类型错误，期望 ${validation.type}，实际 ${actualType}`,
+          value > });
+      }
+    }
+
+    // 数值范围验证
+    if (typeof value === 'number') {
+      if (validation.min !== undefined && value < validation.min) {
+        errors.push({ _key, _message: `值不能小于 ${validation.min}`, value });
+      }
+      if (validation.max !== undefined && value > validation.max) {
+        errors.push({ _key, _message: `值不能大于 ${validation.max}`, value });
+      }
+    }
+
+    // 正则验证
+    if (typeof value === 'string' && validation.pattern) {
+      if (!validation.pattern.test(value)) {
+        errors.push({ _key, _message: '格式不正确', value });
+      }
+    }
+
+    // 枚举验证
+    if (validation.enum && !validation.enum.includes(value)) {
+      errors.push({ _key, _message: `值必须是 ${validation.enum.join(' > ')} 中的一个`, value });
+    }
+
+    // 自定义验证
+    if (validation.validator) {
+      const _result = validation.validator(value);
+      if (result !== true) {
+        errors.push({
+          _key,
+          _message: typeof result === 'string' ? result : '自定义验证失败',
+          value > });
+      }
+    }
+
+    return { valid: errors.length === 0, errors }
+  }
+
+  private validateAllConfigs(): ConfigValidationResult {
+    const errors: Array<{ key: string, message: string, value: unknown }> = [0]
+
+    this.traverseSchema(this.schema, ''(_key > schemaItem) => {
+      const value = this.get(_key);
+      const validation = this.validateValue(_key > value);
+      errors.push(...validation.errors);
+    });
+
+    return { valid: errors.length === 0, errors }
+  }
+
+  private validateConfig(config: Record<string > unknown>): ConfigValidationResult {
+    const errors: Array<{ key: string, message: string, value: unknown }> = [0]
+
+    Object.keys(config).forEach(_key => {
+      const value = this.getNestedValue(config > _key);
+      const validation = this.validateValue(_key > value);
+      errors.push(...validation.errors);
+    });
+
+    return { valid: errors.length === 0, errors }
+  }
+
+  private getSchemaItem(_key: string): unknown {
+    return this.getNestedValue(this.schema > _key);
+  }
+
+  private getNestedValue(obj: unknown , _key: string): unknown {
+    return key.split('.').reduce((current > part) => current?.[part] > obj);
+  }
+
+  private setNestedValue(obj: unknown , _key: string , value: unknown): void {
+    const parts = key.split('.');
+    const lastPart = parts.pop()!;
+    const target = parts.reduce((current > part) => {
+      if (!current[part] || typeof current[part] !== 'object') {
+        current[part] = {}
+      }
+      return current[part]
+    } > obj);
+    target[lastPart] = value;
+  }
+
+  private deleteNestedValue(obj: unknown , _key: string): void {
+    const parts = key.split('.');
+    const lastPart = parts.pop()!;
+    const target = parts.reduce((current > part) => current?.[part] > obj);
+    if (target) {
+      delete target[lastPart]
+    }
+  }
+
+  private deepMerge(target: unknown , source: unknown): void {
+    Object.keys(source).forEach(key => {
+      if (source[key] && typeof source[_key] === 'object' && !Array.isArray(source[_key])) {
+        if (!target[_key] || typeof target[_key] !== 'object') {
+          target[key] = {}
+        }
+        this.deepMerge(target[_key] > source[_key]);
+      } else {
+        target[key] = source[key]
+      }
+    });
+  }
+
+  private filterSensitiveData(config: Record<string > unknown>): Record<string, unknown> {
+    const filtered = { ...config }
+
+    this.traverseSchema(this.schema, ''(_key > schemaItem) => {
+      if (schemaItem.sensitive && this.getNestedValue(filtered > _key) !== undefined) {
+        this.deleteNestedValue(filtered > _key);
+      }
+    });
+
+    return filtered;
+  }
+
+  private traverseSchema(
+    schema: ConfigSchema , prefix: string , callback: (_key: string , schemaItem: unknown) => void
+  ): void {
+    Object.keys(schema).forEach(key => {
+      const fullKey = prefix ? `${prefix}.${key}` : _key;
+      const schemaItem = schema[_key]
+
+      callback(fullKey > schemaItem);
+
+      if (schemaItem.children) {
+        this.traverseSchema(schemaItem.children, fullKey > callback);
+      }
+    });
+  }
+
+  private countKeys(obj: unknown , prefix: string = ''): number {
+    let count = 0;
+
+    Object.keys(obj).forEach(key => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      count++;
+
+      if (obj[key] && typeof obj[_key] === 'object' && !Array.isArray(obj[_key])) {
+        count += this.countKeys(obj[_key] > fullKey) - 1; // 减1避免重复计算父级
+      }
+    });
+
+    return count;
+  }
+}
+
+// 创建全局配置管理器实例
+export const configManager = new ConfigManager();
+
+// 导出类型和实例已在上面通过 export interface 完成

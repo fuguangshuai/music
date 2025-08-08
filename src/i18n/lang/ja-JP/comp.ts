@@ -16,22 +16,22 @@ export default {
     count: '曲',
     loginFirst: 'まずログインしてください',
     getPlaylistFailed: 'プレイリストの取得に失敗しました',
-    inputPlaylistName: 'プレイリスト名を入力してください'
+    inputPlaylistName: 'プレイリスト名を入力してください',
   },
   playlistType: {
     title: 'プレイリストカテゴリ',
     showAll: 'すべて表示',
-    hide: '一部を非表示'
+    hide: '一部を非表示',
   },
   recommendAlbum: {
-    title: '最新アルバム'
+    title: '最新アルバム',
   },
   recommendSinger: {
     title: '毎日のおすすめ',
-    songlist: '毎日のおすすめリスト'
+    songlist: '毎日のおすすめリスト',
   },
   recommendSonglist: {
-    title: '今週の人気音楽'
+    title: '今週の人気音楽',
   },
   searchBar: {
     login: 'ログイン',
@@ -46,17 +46,17 @@ export default {
     zoom: 'ページズーム',
     zoom100: '標準ズーム100%',
     resetZoom: 'クリックしてズームをリセット',
-    zoomDefault: '標準ズーム'
+    zoomDefault: '標準ズーム',
   },
   titleBar: {
     closeTitle: '閉じる方法を選択してください',
     minimizeToTray: 'トレイに最小化',
     exitApp: 'アプリを終了',
     rememberChoice: '選択を記憶する',
-    closeApp: 'アプリを閉じる'
+    closeApp: 'アプリを閉じる',
   },
   userPlayList: {
-    title: '{name}のよく聞く音楽'
+    title: '{name}のよく聞く音楽',
   },
   musicList: {
     searchSongs: '楽曲を検索',
@@ -71,7 +71,7 @@ export default {
     cancelCollect: 'お気に入りから削除',
     addToPlaylist: 'プレイリストに追加',
     addToPlaylistSuccess: 'プレイリストに追加しました',
-    songsAlreadyInPlaylist: '楽曲は既にプレイリストに存在します'
+    songsAlreadyInPlaylist: '楽曲は既にプレイリストに存在します',
   },
   playlist: {
     import: {
@@ -131,8 +131,8 @@ export default {
       confirm: '確認',
       cancel: 'キャンセル',
       clearTasksSuccess: 'タスクリストをクリアしました',
-      clearTasksFailed: 'タスクリストのクリアに失敗しました'
-    }
+      clearTasksFailed: 'タスクリストのクリアに失敗しました',
+    },
   },
   settings: '設定',
   user: 'ユーザー',
@@ -141,5 +141,5 @@ export default {
   list: 'プレイリスト',
   mv: 'MV',
   home: 'ホーム',
-  search: '検索'
+  search: '検索',
 };

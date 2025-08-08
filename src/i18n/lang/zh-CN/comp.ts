@@ -16,22 +16,22 @@ export default {
     count: '首歌曲',
     loginFirst: '请先登录',
     getPlaylistFailed: '获取歌单失败',
-    inputPlaylistName: '请输入歌单名称'
+    inputPlaylistName: '请输入歌单名称',
   },
   playlistType: {
     title: '歌单分类',
     showAll: '显示全部',
-    hide: '隐藏一些'
+    hide: '隐藏一些',
   },
   recommendAlbum: {
-    title: '最新专辑'
+    title: '最新专辑',
   },
   recommendSinger: {
     title: '每日推荐',
-    songlist: '每日推荐列表'
+    songlist: '每日推荐列表',
   },
   recommendSonglist: {
-    title: '本周最热音乐'
+    title: '本周最热音乐',
   },
   searchBar: {
     login: '登录',
@@ -46,17 +46,17 @@ export default {
     zoom: '页面缩放',
     zoom100: '标准缩放100%',
     resetZoom: '点击重置缩放',
-    zoomDefault: '标准缩放'
+    zoomDefault: '标准缩放',
   },
   titleBar: {
     closeTitle: '请选择关闭方式',
     minimizeToTray: '最小化到托盘',
     exitApp: '退出应用',
     rememberChoice: '记住我的选择',
-    closeApp: '关闭应用'
+    closeApp: '关闭应用',
   },
   userPlayList: {
-    title: '{name}的常听'
+    title: '{name}的常听',
   },
   musicList: {
     searchSongs: '搜索歌曲',
@@ -71,7 +71,7 @@ export default {
     cancelCollect: '取消收藏',
     addToPlaylist: '添加到播放列表',
     addToPlaylistSuccess: '添加到播放列表成功',
-    songsAlreadyInPlaylist: '歌曲已存在于播放列表中'
+    songsAlreadyInPlaylist: '歌曲已存在于播放列表中',
   },
   playlist: {
     import: {
@@ -130,8 +130,8 @@ export default {
       confirm: '确认',
       cancel: '取消',
       clearTasksSuccess: '任务列表已清除',
-      clearTasksFailed: '清除任务列表失败'
-    }
+      clearTasksFailed: '清除任务列表失败',
+    },
   },
   settings: '设置',
   user: '用户',
@@ -140,5 +140,5 @@ export default {
   list: '歌单',
   mv: 'MV',
   home: '首页',
-  search: '搜索'
+  search: '搜索',
 };

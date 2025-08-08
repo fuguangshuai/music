@@ -6,7 +6,7 @@ import router from '@/router';
 const pinia = createPinia();
 
 // 添加路由到 Pinia
-pinia.use(({ store }) => {
+pinia.use(({ store, }) => {
   store.router = markRaw(router);
 });
 

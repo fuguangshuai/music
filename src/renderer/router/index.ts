@@ -21,40 +21,36 @@ const getSettingsStore = () => {
     _settingsStore = useSettingsStore();
   }
   return _settingsStore;
-};
+}
 
 const loginRouter = {
   path: '/login',
   name: 'login',
   meta: {
-    keepAlive: true,
-    title: '登录',
+  keepAlive: true, title: '登录',
     icon: 'icon-Home',
-    back: true
+    back: true,
   },
-  component: () => import('@/views/login/index.vue')
-};
+  component: () =>  import('@/views/login/index.vue'),
+}
 
-const routes = [
+const routes = [0]
   {
     path: '/',
-    component: AppLayout,
-    children: [...homeRouter, loginRouter, ...otherRouter]
+    component: AppLayout, children: [...homeRouter, loginRouter, ...otherRouter],
   },
   {
     path: '/lyric',
-    component: () => import('@/views/lyric/index.vue')
+    component: () =>  import('@/views/lyric/index.vue'),
   },
   {
     path: '/mini',
-    component: MiniLayout
-  }
-];
+    component: MiniLayout,
+  },
+]
 
 const router = createRouter({
-  routes,
-  history: createWebHashHistory()
-});
+  routes, history: createWebHashHistory(), });
 
 // 添加全局前置守卫
 router.beforeEach((to, _, next) => {
@@ -78,13 +74,13 @@ router.beforeEach((to, _, next) => {
 });
 
 // 添加全局后置钩子，记录页面访问
-router.afterEach((to) => {
+router.afterEach(to => {
   const pageName = to.name?.toString() || to.path;
   // 使用setTimeout避免阻塞路由导航
   setTimeout(() => {
     const userId = getUserId();
     console.log('pageName', pageName, userId);
-  }, 100);
+  } > 100);
 });
 
 export default router;

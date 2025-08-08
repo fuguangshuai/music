@@ -7,7 +7,7 @@ export default {
     playback: '播放設定',
     application: '應用程式設定',
     network: '網路設定',
-    system: '系統管理'
+    system: '系統管理',
   },
   basic: {
     themeMode: '主題模式',
@@ -28,7 +28,7 @@ export default {
     fontDesc: '選擇字體，優先使用排在前面的字體',
     fontScope: {
       global: '全域',
-      lyric: '僅歌詞'
+      lyric: '僅歌詞',
     },
     animation: '動畫速度',
     animationSpeedPlaceholder: '請輸入動畫速度',
@@ -36,7 +36,7 @@ export default {
     animationSpeed: {
       slow: '極慢',
       normal: '正常',
-      fast: '極快'
+      fast: '極快',
     },
     fontPreview: {
       title: '字體預覽',
@@ -47,8 +47,8 @@ export default {
       chineseText: '靜夜思 床前明月光 疑是地上霜',
       englishText: 'The quick brown fox jumps over the lazy dog',
       japaneseText: 'あいうえお かきくけこ さしすせそ',
-      koreanText: '가나다라마 바사아자차 카타파하'
-    }
+      koreanText: '가나다라마 바사아자차 카타파하',
+    },
   },
   playback: {
     quality: '音質設定',
@@ -62,7 +62,7 @@ export default {
       jyeffect: '高清環繞聲',
       sky: '沉浸環繞聲',
       dolby: '杜比全景聲',
-      jymaster: '超清母帶'
+      jymaster: '超清母帶',
     },
     musicSources: '音源設定',
     musicSourcesDesc: '選擇音樂解析使用的音源平台',
@@ -77,7 +77,7 @@ export default {
     autoPlay: '自動播放',
     autoPlayDesc: '重新開啟應用程式時是否自動繼續播放',
     showStatusBar: '是否顯示狀態列控制功能',
-    showStatusBarContent: '可以在您的mac狀態列顯示音樂控制功能(重啟後生效)'
+    showStatusBarContent: '可以在您的mac狀態列顯示音樂控制功能(重啟後生效)',
   },
   application: {
     closeAction: '關閉行為',
@@ -85,7 +85,7 @@ export default {
     closeOptions: {
       ask: '每次詢問',
       minimize: '最小化到系統匣',
-      close: '直接退出'
+      close: '直接退出',
     },
     shortcut: '快捷鍵設定',
     shortcutDesc: '自訂全域快捷鍵',
@@ -94,7 +94,7 @@ export default {
     unlimitedDownload: '無限制下載',
     unlimitedDownloadDesc: '開啟後將無限制下載音樂（可能出現下載失敗的情況）, 預設限制 300 首',
     downloadPath: '下載目錄',
-    downloadPathDesc: '選擇音樂檔案的下載位置'
+    downloadPathDesc: '選擇音樂檔案的下載位置',
   },
   network: {
     apiPort: '音樂API連接埠',
@@ -111,8 +111,8 @@ export default {
       proxySuccess: '代理設定已儲存，重啟應用程式後生效',
       proxyError: '請檢查輸入是否正確',
       realIPSuccess: '真實IP設定已儲存',
-      realIPError: '請輸入有效的IP位址'
-    }
+      realIPError: '請輸入有效的IP位址',
+    },
   },
   system: {
     cache: '快取管理',
@@ -121,43 +121,43 @@ export default {
     cacheTypes: {
       history: {
         label: '播放歷史',
-        description: '清除播放過的歌曲記錄'
+        description: '清除播放過的歌曲記錄',
       },
       favorite: {
         label: '收藏記錄',
-        description: '清除本機收藏的歌曲記錄(不會影響雲端收藏)'
+        description: '清除本機收藏的歌曲記錄(不會影響雲端收藏)',
       },
       user: {
         label: '使用者資料',
-        description: '清除登入資訊和使用者相關資料'
+        description: '清除登入資訊和使用者相關資料',
       },
       settings: {
         label: '應用程式設定',
-        description: '清除應用程式的所有自訂設定'
+        description: '清除應用程式的所有自訂設定',
       },
       downloads: {
         label: '下載記錄',
-        description: '清除下載歷史記錄(不會刪除已下載的檔案)'
+        description: '清除下載歷史記錄(不會刪除已下載的檔案)',
       },
       resources: {
         label: '音樂資源',
-        description: '清除已載入的音樂檔案、歌詞等資源快取'
+        description: '清除已載入的音樂檔案、歌詞等資源快取',
       },
       lyrics: {
         label: '歌詞資源',
-        description: '清除已載入的歌詞資源快取'
-      }
+        description: '清除已載入的歌詞資源快取',
+      },
     },
     restart: '重新啟動',
     restartDesc: '重新啟動應用程式',
     messages: {
-      clearSuccess: '清除成功，部分設定在重啟後生效'
-    }
+      clearSuccess: '清除成功，部分設定在重啟後生效',
+    },
   },
   validation: {
     selectProxyProtocol: '請選擇代理協議',
     proxyHost: '請輸入代理位址',
-    portNumber: '請輸入有效的連接埠號(1-65535)'
+    portNumber: '請輸入有效的連接埠號(1-65535)',
   },
   lyricSettings: {
     title: '歌詞設定',
@@ -165,7 +165,7 @@ export default {
       display: '顯示',
       interface: '介面',
       typography: '文字',
-      mobile: '行動端'
+      mobile: '行動端',
     },
     pureMode: '純淨模式',
     hideCover: '隱藏封面',
@@ -179,20 +179,20 @@ export default {
     themeOptions: {
       default: '預設',
       light: '亮色',
-      dark: '暗色'
+      dark: '暗色',
     },
     fontSize: '字體大小',
     fontSizeMarks: {
       small: '小',
       medium: '中',
-      large: '大'
+      large: '大',
     },
     letterSpacing: '字間距',
     letterSpacingMarks: {
       compact: '緊湊',
       default: '預設',
-      loose: '寬鬆'
-    }
+      loose: '寬鬆',
+    },
   },
   themeColor: {
     title: '歌詞主題色',
@@ -206,13 +206,13 @@ export default {
       'youtube-red': 'YouTube 紅',
       orange: '活力橙',
       purple: '神秘紫',
-      pink: '櫻花粉'
+      pink: '櫻花粉',
     },
     tooltips: {
       openColorPicker: '開啟色板',
-      closeColorPicker: '關閉色板'
+      closeColorPicker: '關閉色板',
     },
-    placeholder: '#1db954'
+    placeholder: '#1db954',
   },
   cookie: {
     title: 'Cookie設定',
@@ -221,25 +221,25 @@ export default {
     help: {
       format: 'Cookie通常以 "MUSIC_U=" 開頭',
       source: '可以從瀏覽器開發者工具的網路請求中取得',
-      storage: 'Cookie設定後將自動儲存到本機儲存'
+      storage: 'Cookie設定後將自動儲存到本機儲存',
     },
     action: {
       save: '儲存Cookie',
       paste: '貼上',
-      clear: '清空'
+      clear: '清空',
     },
     validation: {
       required: '請輸入Cookie',
-      format: 'Cookie格式可能不正確，請檢查是否包含MUSIC_U'
+      format: 'Cookie格式可能不正確，請檢查是否包含MUSIC_U',
     },
     message: {
       saveSuccess: 'Cookie儲存成功',
       saveError: 'Cookie儲存失敗',
       pasteSuccess: '貼上成功',
-      pasteError: '貼上失敗，請手動複製'
+      pasteError: '貼上失敗，請手動複製',
     },
     info: {
-      length: '目前長度：{length} 字元'
-    }
-  }
+      length: '目前長度：{length} 字元',
+    },
+  },
 };

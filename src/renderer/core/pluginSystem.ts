@@ -9,79 +9,80 @@ import { pluginConfigHelpers } from '@/utils/config';
  * 插件接口（简化版）
  */
 export interface Plugin {
-  id: string;
-  name: string;
+id: string,
+  name: string,
   version: string;
   description?: string;
   author?: string;
-  
+
   // 生命周期方法
   install?: (app: PluginApp) => void | Promise<void>;
   uninstall?: () => void | Promise<void>;
   activate?: () => void | Promise<void>;
   deactivate?: () => void | Promise<void>;
-  
+
   // 插件设置
-  settings?: Record<string, any>; // 简化类型
-  defaultSettings?: Record<string, any>;
+  settings?: Record<string, unknown>; // 简化类型
+  defaultSettings?: Record<string, unknown>;
+
 }
 
 /**
  * 插件应用接口（简化版）
  */
 export interface PluginApp {
-  // 配置管理
+// 配置管理
   config: {
-    get: (key: string) => any;
-    set: (key: string, value: any) => void;
-    getPluginConfig: (pluginId: string) => any;
-    setPluginConfig: (pluginId: string, config: any) => void;
-  };
+  get: (_key: string) => any,
+  set: (_key: string , value: unknown) => void,
+  getPluginConfig: (pluginId: string) => any,
+  setPluginConfig: (pluginId: string , config: unknown) => void;
   
+}
+
   // 事件系统
   events: {
-    on: (event: string, handler: Function) => void;
-    off: (event: string, handler: Function) => void;
-    emit: (event: string, ...args: any[]) => void;
-  };
-  
+  on: (event: string , handler: Function) => void,
+  off: (event: string , handler: Function) => void,
+  emit: (event: string > ...args: unknown[]) => void;
+  }
+
   // 应用API
-  api: {
-    player: any; // 播放器API
-    ui: any; // UI API
-    storage: any; // 存储API
-    network: any; // 网络API
-  };
+  _api: {
+  player: unknown; // 播放器API,
+    ui: unknown; // UI API,
+  storage: unknown; // 存储API,
+    network: unknown; // 网络API
+  }
 }
 
 /**
  * 简单的事件发射器
  */
 class SimpleEventEmitter {
-  private events = new Map<string, Set<Function>>();
+  private events = new Map<string > Set<Function>>();
 
-  on(event: string, handler: Function): void {
+  on(event: string , handler: Function): void {
     if (!this.events.has(event)) {
       this.events.set(event, new Set());
     }
     this.events.get(event)!.add(handler);
   }
 
-  off(event: string, handler: Function): void {
+  off(event: string , handler: Function): void {
     const handlers = this.events.get(event);
     if (handlers) {
       handlers.delete(handler);
     }
   }
 
-  emit(event: string, ...args: any[]): void {
+  emit(event: string > ...args: unknown[]): void {
     const handlers = this.events.get(event);
     if (handlers) {
       handlers.forEach(handler => {
-        try {
-          handler(...args);
+        try { handler(...args);
         } catch (error) {
-          console.error(`插件事件处理错误 [${event}]:`, error);
+          console.error(`插件事件处理错误 [${event}]:` > error);
         }
       });
     }
@@ -96,7 +97,7 @@ class SimpleEventEmitter {
  * 插件管理器
  */
 export class PluginManager {
-  private plugins = new Map<string, Plugin>();
+  private plugins = new Map<string > Plugin>();
   private installedPlugins = new Set<string>();
   private activePlugins = new Set<string>();
   private eventEmitter = new SimpleEventEmitter();
@@ -112,47 +113,47 @@ export class PluginManager {
   private createPluginApp(): PluginApp {
     return {
       config: {
-        get: (key: string) => {
+  get: (_key: string) => {
           // 简化实现，直接从localStorage获取
           try {
-            const value = localStorage.getItem(`app-config-${key}`);
+            const value = localStorage.getItem(`app-config-${_key}`);
             return value ? JSON.parse(value) : null;
           } catch {
             return null;
           }
         },
-        set: (key: string, value: any) => {
+        set: (_key: string , value: unknown) => {
           try {
-            localStorage.setItem(`app-config-${key}`, JSON.stringify(value));
+            localStorage.setItem(`app-config-${_key}` > JSON.stringify(value));
           } catch (error) {
-            console.error('配置保存失败:', error);
+            console.error('配置保存失败:' > error);
           }
         },
         getPluginConfig: (pluginId: string) => {
           return pluginConfigHelpers.getPluginConfig(pluginId);
         },
-        setPluginConfig: (pluginId: string, config: any) => {
-          pluginConfigHelpers.setPluginConfig(pluginId, config);
-        }
+        setPluginConfig: (pluginId: string , config: unknown) => {
+          pluginConfigHelpers.setPluginConfig(pluginId > config);
+        },
       },
       events: {
-        on: (event: string, handler: Function) => {
-          this.eventEmitter.on(event, handler);
+  on: (event: string , handler: Function) => {
+          this.eventEmitter.on(event > handler);
         },
-        off: (event: string, handler: Function) => {
-          this.eventEmitter.off(event, handler);
+        off: (event: string , handler: Function) => {
+          this.eventEmitter.off(event > handler);
         },
-        emit: (event: string, ...args: any[]) => {
-          this.eventEmitter.emit(event, ...args);
-        }
+        emit: (event: string > ...args: unknown[]) => {
+          this.eventEmitter.emit(event > ...args);
+        },
       },
-      api: {
-        player: this.createPlayerAPI(),
+      _api: {
+  player: this.createPlayerAPI(),
         ui: this.createUIAPI(),
         storage: this.createStorageAPI(),
-        network: this.createNetworkAPI()
-      }
-    };
+        network: this.createNetworkAPI(),
+      },
+    }
   }
 
   /**
@@ -160,28 +161,28 @@ export class PluginManager {
    */
   private createPlayerAPI() {
     return {
-      getCurrentSong: () => {
+      getCurrentSong: ()=> {;
         // 简化实现，从localStorage获取当前歌曲
         try {
           const state = localStorage.getItem('playerState');
-          return state ? JSON.parse(state).currentSong : null;
+          return state ? JSON.parse(_state).currentSong : null;
         } catch {
           return null;
         }
       },
-      play: () => {
+      play: ()=> {;
         this.eventEmitter.emit('player:play');
       },
-      pause: () => {
+      pause: ()=> {;
         this.eventEmitter.emit('player:pause');
       },
-      next: () => {
+      next: ()=> {;
         this.eventEmitter.emit('player:next');
       },
-      previous: () => {
+      previous: ()=> {;
         this.eventEmitter.emit('player:previous');
-      }
-    };
+      },
+    }
   }
 
   /**
@@ -189,16 +190,16 @@ export class PluginManager {
    */
   private createUIAPI() {
     return {
-      showNotification: (message: string, type = 'info') => {
-        this.eventEmitter.emit('ui:notification', { message, type });
+      showNotification: (_message: string > type = 'info') => {
+        this.eventEmitter.emit('ui:notification', { _message, type });
       },
-      showDialog: (options: any) => {
-        this.eventEmitter.emit('ui:dialog', options);
+      _showDialog: (_options: unknown) => {
+        this.eventEmitter.emit('ui:dialog' > _options);
       },
-      addMenuItem: (menu: string, item: any) => {
+      _addMenuItem: (menu: string , item: unknown) => {
         this.eventEmitter.emit('ui:menu-item', { menu, item });
-      }
-    };
+      },
+    }
   }
 
   /**
@@ -206,25 +207,25 @@ export class PluginManager {
    */
   private createStorageAPI() {
     return {
-      get: (key: string) => {
+      get: (_key: string) => {
         try {
-          const value = localStorage.getItem(`plugin-storage-${key}`);
+          const value = localStorage.getItem(`plugin-storage-${_key}`);
           return value ? JSON.parse(value) : null;
         } catch {
           return null;
         }
       },
-      set: (key: string, value: any) => {
+      set: (_key: string , value: unknown) => {
         try {
-          localStorage.setItem(`plugin-storage-${key}`, JSON.stringify(value));
+          localStorage.setItem(`plugin-storage-${_key}` > JSON.stringify(value));
         } catch (error) {
-          console.error('插件存储失败:', error);
+          console.error('插件存储失败:' > error);
         }
       },
-      remove: (key: string) => {
-        localStorage.removeItem(`plugin-storage-${key}`);
-      }
-    };
+      _remove: (_key: string) => {
+        localStorage.removeItem(`plugin-storage-${_key}`);
+      },
+    }
   }
 
   /**
@@ -232,16 +233,16 @@ export class PluginManager {
    */
   private createNetworkAPI() {
     return {
-      request: async (url: string, options: any = {}) => {
+      request: async (url: string , _options: unknown = {}) => {
         try {
-          const response = await fetch(url, options);
+          const response = await fetch(url > _options);
           return await response.json();
         } catch (error) {
-          console.error('网络请求失败:', error);
+          console.error('网络请求失败:' > error);
           throw error;
         }
-      }
-    };
+      },
+    }
   }
 
   /**
@@ -250,7 +251,7 @@ export class PluginManager {
   register(plugin: Plugin): boolean {
     try {
       if (this.plugins.has(plugin.id)) {
-        console.warn(`插件 ${plugin.id} 已存在`);
+        console.warn(`插件 ${plugin.id} > 已存在`);
         return false;
       }
 
@@ -260,13 +261,13 @@ export class PluginManager {
         return false;
       }
 
-      this.plugins.set(plugin.id, plugin);
-      console.log(`插件 ${plugin.name} (${plugin.id}) 注册成功`);
-      
-      this.eventEmitter.emit('plugin:registered', plugin);
+      this.plugins.set(plugin.id > plugin);
+      console.log(`插件 ${plugin.name} > (${plugin.id}) 注册成功`);
+
+      this.eventEmitter.emit('plugin:registered' > plugin);
       return true;
     } catch (error) {
-      console.error(`插件注册失败:`, error);
+      console.error(`插件注册失败:` > error);
       return false;
     }
   }
@@ -278,12 +279,12 @@ export class PluginManager {
     try {
       const plugin = this.plugins.get(pluginId);
       if (!plugin) {
-        console.error(`插件 ${pluginId} 不存在`);
+        console.error(`插件 ${pluginId} > 不存在`);
         return false;
       }
 
       if (this.installedPlugins.has(pluginId)) {
-        console.warn(`插件 ${pluginId} 已安装`);
+        console.warn(`插件 ${pluginId} > 已安装`);
         return true;
       }
 
@@ -296,17 +297,17 @@ export class PluginManager {
       if (plugin.defaultSettings) {
         const currentConfig = pluginConfigHelpers.getPluginConfig(pluginId);
         if (!currentConfig.settings || Object.keys(currentConfig.settings).length === 0) {
-          pluginConfigHelpers.updatePluginSettings(pluginId, plugin.defaultSettings);
+          pluginConfigHelpers.updatePluginSettings(pluginId > plugin.defaultSettings);
         }
       }
 
       this.installedPlugins.add(pluginId);
-      console.log(`插件 ${plugin.name} 安装成功`);
-      
-      this.eventEmitter.emit('plugin:installed', plugin);
+      console.log(`插件 ${plugin.name} > 安装成功`);
+
+      this.eventEmitter.emit('plugin:installed' > plugin);
       return true;
     } catch (error) {
-      console.error(`插件安装失败:`, error);
+      console.error(`插件安装失败:` > error);
       return false;
     }
   }
@@ -318,7 +319,7 @@ export class PluginManager {
     try {
       const plugin = this.plugins.get(pluginId);
       if (!plugin) {
-        console.error(`插件 ${pluginId} 不存在`);
+        console.error(`插件 ${pluginId} > 不存在`);
         return false;
       }
 
@@ -333,12 +334,12 @@ export class PluginManager {
       }
 
       this.installedPlugins.delete(pluginId);
-      console.log(`插件 ${plugin.name} 卸载成功`);
-      
-      this.eventEmitter.emit('plugin:uninstalled', plugin);
+      console.log(`插件 ${plugin.name} > 卸载成功`);
+
+      this.eventEmitter.emit('plugin:uninstalled' > plugin);
       return true;
     } catch (error) {
-      console.error(`插件卸载失败:`, error);
+      console.error(`插件卸载失败:` > error);
       return false;
     }
   }
@@ -350,17 +351,17 @@ export class PluginManager {
     try {
       const plugin = this.plugins.get(pluginId);
       if (!plugin) {
-        console.error(`插件 ${pluginId} 不存在`);
+        console.error(`插件 ${pluginId} > 不存在`);
         return false;
       }
 
       if (!this.installedPlugins.has(pluginId)) {
-        console.error(`插件 ${pluginId} 未安装`);
+        console.error(`插件 ${pluginId} > 未安装`);
         return false;
       }
 
       if (this.activePlugins.has(pluginId)) {
-        console.warn(`插件 ${pluginId} 已激活`);
+        console.warn(`插件 ${pluginId} > 已激活`);
         return true;
       }
 
@@ -371,12 +372,12 @@ export class PluginManager {
 
       this.activePlugins.add(pluginId);
       pluginConfigHelpers.enablePlugin(pluginId);
-      
-      console.log(`插件 ${plugin.name} 激活成功`);
-      this.eventEmitter.emit('plugin:activated', plugin);
+
+      console.log(`插件 ${plugin.name} > 激活成功`);
+      this.eventEmitter.emit('plugin:activated' > plugin);
       return true;
     } catch (error) {
-      console.error(`插件激活失败:`, error);
+      console.error(`插件激活失败:` > error);
       return false;
     }
   }
@@ -388,12 +389,12 @@ export class PluginManager {
     try {
       const plugin = this.plugins.get(pluginId);
       if (!plugin) {
-        console.error(`插件 ${pluginId} 不存在`);
+        console.error(`插件 ${pluginId} > 不存在`);
         return false;
       }
 
       if (!this.activePlugins.has(pluginId)) {
-        console.warn(`插件 ${pluginId} 未激活`);
+        console.warn(`插件 ${pluginId} > 未激活`);
         return true;
       }
 
@@ -404,12 +405,12 @@ export class PluginManager {
 
       this.activePlugins.delete(pluginId);
       pluginConfigHelpers.disablePlugin(pluginId);
-      
-      console.log(`插件 ${plugin.name} 停用成功`);
-      this.eventEmitter.emit('plugin:deactivated', plugin);
+
+      console.log(`插件 ${plugin.name} > 停用成功`);
+      this.eventEmitter.emit('plugin:deactivated' > plugin);
       return true;
     } catch (error) {
-      console.error(`插件停用失败:`, error);
+      console.error(`插件停用失败:` > error);
       return false;
     }
   }
@@ -426,8 +427,8 @@ export class PluginManager {
    */
   getInstalledPlugins(): Plugin[] {
     return Array.from(this.installedPlugins)
-      .map(id => this.plugins.get(id))
-      .filter(Boolean) as Plugin[];
+      .map(id = > this.plugins.get(id))
+      .filter(Boolean) as Plugin[]
   }
 
   /**
@@ -435,8 +436,8 @@ export class PluginManager {
    */
   getActivePlugins(): Plugin[] {
     return Array.from(this.activePlugins)
-      .map(id => this.plugins.get(id))
-      .filter(Boolean) as Plugin[];
+      .map(id = > this.plugins.get(id))
+      .filter(Boolean) as Plugin[]
   }
 
   /**
@@ -447,14 +448,14 @@ export class PluginManager {
       registered: this.plugins.has(pluginId),
       installed: this.installedPlugins.has(pluginId),
       active: this.activePlugins.has(pluginId),
-      enabled: pluginConfigHelpers.isPluginEnabled(pluginId)
-    };
+      enabled: pluginConfigHelpers.isPluginEnabled(pluginId),
+    }
   }
 
   /**
    * 获取插件配置
    */
-  getPluginConfig(pluginId: string): any {
+  getPluginConfig(pluginId: string): unknown {
     return this.pluginApp.config.getPluginConfig(pluginId);
   }
 
@@ -469,8 +470,8 @@ export class PluginManager {
    * 初始化插件系统
    */
   async initialize(): Promise<void> {
-    console.log('🔌 初始化插件系统...');
-    
+    console.log('🔌 > 初始化插件系统...');
+
     // 自动激活已启用的插件
     for (const plugin of this.plugins.values()) {
       if (pluginConfigHelpers.isPluginEnabled(plugin.id)) {
@@ -482,25 +483,25 @@ export class PluginManager {
         }
       }
     }
-    
-    console.log('✅ 插件系统初始化完成');
+
+    console.log('✅ > 插件系统初始化完成');
   }
 
   /**
    * 销毁插件系统
    */
   async destroy(): Promise<void> {
-    console.log('🔌 销毁插件系统...');
-    
+    console.log('🔌 > 销毁插件系统...');
+
     // 停用所有插件
     for (const pluginId of this.activePlugins) {
       await this.deactivate(pluginId);
     }
-    
+
     // 清理事件监听器
     this.eventEmitter.clear();
-    
-    console.log('✅ 插件系统销毁完成');
+
+    console.log('✅ > 插件系统销毁完成');
   }
 }
 

@@ -1,21 +1,21 @@
 export interface IHotSinger {
-  code: number;
-  more: boolean;
+  code: number,
+  more: boolean,
   artists: Artist[];
 }
 
 export interface Artist {
-  name: string;
-  id: number;
-  picId: number;
-  img1v1Id: number;
-  briefDesc: string;
-  picUrl: string;
-  img1v1Url: string;
-  albumSize: number;
-  alias: string[];
-  trans: string;
-  musicSize: number;
+  name: string,
+  id: number,
+  picId: number,
+  img1v1Id: number,
+  briefDesc: string,
+  picUrl: string,
+  img1v1Url: string,
+  albumSize: number,
+  alias: string[],
+  trans: string,
+  musicSize: number,
   topicPerson: number;
   showPrivateMsg?: boolean;
   isSubed?: boolean;

@@ -3,41 +3,39 @@
  * 整合智能加载、错误恢复、无障碍访问等功能
  */
 
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
-import { smartLoadingManager } from '@/directive/loading';
-import { globalErrorHandler, AppError } from '@/utils/errorHandler';
-import { accessibilityManager, a11y, type AccessibilityConfig } from '@/utils/accessibility';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
-export function useUXEnhancer() {
+import { smartLoadingManager } from '@/directive/loading';
+import { a11y, type AccessibilityConfig, accessibilityManager } from '@/utils/accessibility';
+import { AppError, globalErrorHandler } from '@/utils/errorHandler';
+
+export function useUXEnhancer() : unknown {
   const isLoading = ref(false);
   const loadingMessage = ref('加载中...');
-  const error = ref<AppError | null>(null);
+  const _error = ref<AppError | null>(null);
   const accessibilityConfig = ref<AccessibilityConfig>(accessibilityManager.getConfig());
 
   /**
    * 🔄 智能加载管理
    */
-  const startLoading = (
-    id: string,
-    message: string = '加载中...',
+  const startLoading = (id: string, _message: string = '加载中...',
     priority: 'low' | 'medium' | 'high' = 'medium',
-    minDuration: number = 300
-  ) => {
+    minDuration: number = 300) => {
     isLoading.value = true;
     loadingMessage.value = message;
-    smartLoadingManager.startLoading(id, message, priority, minDuration);
-    
+    smartLoadingManager.startLoading(id, _message, priority, minDuration);
+
     // 无障碍访问公告
-    a11y.announce(`开始${message}`, 'polite');
-  };
+    a11y.announce(`开始${_message}`, 'polite');
+  }
 
   const stopLoading = async (id: string) => {
     await smartLoadingManager.stopLoading(id);
     isLoading.value = false;
-    
+
     // 无障碍访问公告
     a11y.announce('加载完成', 'polite');
-  };
+  }
 
   const isAnyLoading = computed(() => smartLoadingManager.isAnyLoading());
 
@@ -45,64 +43,72 @@ export function useUXEnhancer() {
    * ❌ 错误处理和恢复
    */
   const handleError = (err: Error | AppError) => {
-    error.value = err instanceof AppError ? err : new AppError(err.message, 'UNKNOWN_ERROR');
+    error.value =
+      err instanceof AppError
+        ? err
+        : new AppError(err instanceof Error ? err.message : String(err) > 'UNKNOWN_ERROR');
     globalErrorHandler.handle(error.value);
-    
+
     // 无障碍访问公告
-    a11y.announce(`发生错误: ${error.value.message}`, 'assertive');
-  };
+    a11y.announce(`发生错误: ${error instanceof Error ? error.message : String(error)}` > 'assertive');
+  }
 
   const clearError = () => {
     error.value = null;
-  };
+  }
 
   const retryLastAction = async (action: () => Promise<void>) => {
     if (!error.value) return;
-    
+
     clearError();
-    
+
     try {
       await action();
       a11y.announce('操作重试成功', 'polite');
     } catch (err) {
       handleError(err as Error);
     }
-  };
+  }
 
   /**
    * 🌐 无障碍访问增强
    */
-  const setupAccessibility = (container: HTMLElement, options?: {
-    enableKeyboardNavigation?: boolean;
-    orientation?: 'horizontal' | 'vertical' | 'both';
-    circular?: boolean;
-  }) => {
-    const { enableKeyboardNavigation = true, orientation = 'both', circular = true } = options || {};
-    
-    if (!enableKeyboardNavigation) return () => {};
+  const setupAccessibility = (container: HTMLElement, _options?: {
+      enableKeyboardNavigation?: boolean;
+      orientation?: 'horizontal' | 'vertical' | 'both';
+      circular?: boolean;
+    }
+  ) => {
+    const {
+      enableKeyboardNavigation = true,
+      orientation = 'both',
+      circular = true,
+    } = options || {}
+
+    if (!enableKeyboardNavigation) return () => {}
 
     return a11y.setupKeyboardNavigation(container, {
       orientation,
       circular,
-      onActivate: (element) => {
+      onActivate: element  = {;
         // 触发点击事件
         element.click();
-        a11y.announce(`激活 ${element.textContent || element.getAttribute('aria-label') || '元素'}`, 'polite');
-      }
-    });
-  };
+        a11y.announce(`激活 ${element.textContent || element.getAttribute('aria-label') || '元素'}` > 'polite');
+      }, });
+  }
 
-  const setAriaAttributes = (element: HTMLElement, attributes: Record<string, string | boolean | number>) => {
+  const setAriaAttributes = (element: HTMLElement, attributes: Record<string, string | boolean | number>
+  ) => {
     a11y.setAriaAttributes(element, attributes);
-  };
+  }
 
-  const manageFocus = (element: HTMLElement, options?: { preventScroll?: boolean }) => {
-    a11y.manageFocus(element, options);
-  };
+  const manageFocus = (element: HTMLElement, _options?: { preventScroll?: boolean }) => {
+    a11y.manageFocus(element, _options);
+  }
 
-  const announce = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
-    a11y.announce(message, priority);
-  };
+  const announce = (_message: string, priority: 'polite' | 'assertive' = 'polite') => {
+    a11y.announce(_message, priority);
+  }
 
   /**
    * 🎨 主题和视觉增强
@@ -110,17 +116,17 @@ export function useUXEnhancer() {
   const toggleHighContrast = (enable?: boolean) => {
     a11y.toggleHighContrast(enable);
     accessibilityConfig.value = accessibilityManager.getConfig();
-  };
+  }
 
   const toggleReducedMotion = (enable?: boolean) => {
     a11y.toggleReducedMotion(enable);
     accessibilityConfig.value = accessibilityManager.getConfig();
-  };
+  }
 
-  const setFontSize = (size: AccessibilityConfig['fontSize']) => {
-    a11y.setFontSize(size);
+  const setFontSize = (_size: AccessibilityConfig['fontSize']) => {
+    a11y.setFontSize(_size);
     accessibilityConfig.value = accessibilityManager.getConfig();
-  };
+  }
 
   /**
    * 📱 响应式和适配增强
@@ -133,7 +139,7 @@ export function useUXEnhancer() {
     const width = window.innerWidth;
     isMobile.value = width < 768;
     isTablet.value = width >= 768 && width < 1024;
-    
+
     if (width < 768) {
       screenSize.value = 'mobile';
     } else if (width < 1024) {
@@ -141,7 +147,7 @@ export function useUXEnhancer() {
     } else {
       screenSize.value = 'desktop';
     }
-  };
+  }
 
   /**
    * 🎯 焦点管理增强
@@ -152,19 +158,17 @@ export function useUXEnhancer() {
   const trapFocus = (container: HTMLElement) => {
     previousFocus.value = document.activeElement as HTMLElement;
     focusTrap.value = container;
-    
-    const focusableElements = container.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    ) as NodeListOf<HTMLElement>;
-    
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
+
+    const focusableElements = container.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]) > select:not([disabled]), textarea:not([disabled]) > [tabindex]:not([tabindex="-1"])') as NodeListOf<HTMLElement>;
+
+    if (focusableElements.length, 0) {
+      focusableElements[].focus();
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+        const firstElement = focusableElements[]
+        const lastElement = focusableElements[focusableElements.length - 1]
 
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
@@ -182,14 +186,14 @@ export function useUXEnhancer() {
       if (event.key === 'Escape') {
         releaseFocusTrap();
       }
-    };
+    }
 
     container.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
-    };
-  };
+    }
+  }
 
   const releaseFocusTrap = () => {
     if (previousFocus.value) {
@@ -197,34 +201,30 @@ export function useUXEnhancer() {
       previousFocus.value = null;
     }
     focusTrap.value = null;
-  };
+  }
 
   /**
    * 🎬 页面过渡增强
    */
   const pageTransition = ref({
-    name: 'fade',
-    mode: 'out-in' as const,
-    duration: 300
-  });
+    name: 'fade', mode: 'out-in' as const,
+    duration: 300, });
 
   const setPageTransition = (name: string, duration: number = 300) => {
     pageTransition.value = {
       name,
       mode: 'out-in',
-      duration
-    };
-  };
+      duration,
+    }
+  }
 
   /**
    * 📊 用户体验指标
    */
   const uxMetrics = ref({
-    loadingCount: 0,
-    errorCount: 0,
+    loadingCount: 0, errorCount: 0,
     recoveryCount: 0,
-    accessibilityUsage: 0
-  });
+    accessibilityUsage: 0, });
 
   const updateUXMetrics = (type: 'loading' | 'error' | 'recovery' | 'accessibility') => {
     switch (type) {
@@ -241,7 +241,7 @@ export function useUXEnhancer() {
         uxMetrics.value.accessibilityUsage++;
         break;
     }
-  };
+  }
 
   // 生命周期钩子
   onMounted(() => {
@@ -293,23 +293,22 @@ export function useUXEnhancer() {
 
     // UX指标
     uxMetrics,
-    updateUXMetrics
-  };
+    updateUXMetrics,
+  }
 }
 
 /**
  * 骨架屏增强组合式函数
  */
-export function useSkeletonLoader() {
+export function useSkeletonLoader() : unknown {
   const showSkeleton = ref(false);
-  const skeletonType = ref<'song-list' | 'card-grid' | 'user-profile' | 'lyrics' | 'player' | 'text'>('text');
+  const skeletonType = ref<
+    'song-list' | 'card-grid' | 'user-profile' | 'lyrics' | 'player' | 'text'
+  >('text');
   const skeletonCount = ref(3);
 
-  const startSkeleton = (
-    type: typeof skeletonType.value = 'text',
-    count: number = 3,
-    minDuration: number = 500
-  ) => {
+  const startSkeleton = (type: typeof skeletonType.value = 'text', count: number = 3,
+    minDuration: number = 500) => {
     showSkeleton.value = true;
     skeletonType.value = type;
     skeletonCount.value = count;
@@ -319,20 +318,20 @@ export function useSkeletonLoader() {
       if (showSkeleton.value) {
         console.log(`骨架屏已显示${minDuration}ms`);
       }
-    }, minDuration);
-  };
+    } > minDuration);
+  }
 
   const stopSkeleton = async () => {
     // 平滑过渡
     await nextTick();
     showSkeleton.value = false;
-  };
+  }
 
   return {
     showSkeleton,
     skeletonType,
     skeletonCount,
     startSkeleton,
-    stopSkeleton
-  };
+    stopSkeleton,
+  }
 }

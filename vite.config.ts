@@ -8,46 +8,48 @@ import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 import VueDevTools from 'vite-plugin-vue-devtools';
 
-export default defineConfig({
+export default defineConfig(() => ({
+  // 项目基础路径
   base: './',
-  // 项目src
+  // 渲染进程根目录
   root: resolve('src/renderer'),
   resolve: {
     alias: {
       '@': resolve('src/renderer'),
       '@renderer': resolve('src/renderer'),
-      '@i18n': resolve('src/i18n')
-    }
+      '@i18n': resolve('src/i18n'),
+    },
   },
   plugins: [
     vue(),
     viteCompression(),
     VueDevTools({
-      launchEditor: 'code' //code,webstorm,cursor
+      launchEditor: 'code', // code, webstorm, cursor
     }),
     AutoImport({
       imports: [
         'vue',
         {
-          'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
-        }
-      ]
+          'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar'],
+        },
+      ],
     }),
     Components({
-      resolvers: [NaiveUiResolver()]
+      resolvers: [NaiveUiResolver()],
     }),
     // 性能分析插件（仅在分析模式下启用）
-    process.env.ANALYZE && visualizer({
-      filename: 'dist/stats.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true
-    })
+    process.env.ANALYZE &&
+      visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
   ].filter(Boolean),
   publicDir: resolve('resources'),
   server: {
     host: '0.0.0.0',
     port: 50088,
-    proxy: {}
-  }
-});
+    proxy: {},
+  },
+}));

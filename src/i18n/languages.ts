@@ -6,7 +6,7 @@ export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
   'zh-Hant': '繁體中文',
   'en-US': 'English',
   'ja-JP': '日本語',
-  'ko-KR': '한국어'
+  'ko-KR': '한국어',
 };
 
 // 默认语言
@@ -21,5 +21,5 @@ export const LANGUAGE_PRIORITY: Record<string, number> = {
   'zh-Hant': 2,
   'en-US': 3,
   'ja-JP': 4,
-  'ko-KR': 5
+  'ko-KR': 5,
 };

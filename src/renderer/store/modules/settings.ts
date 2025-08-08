@@ -9,51 +9,51 @@ import {
   getCurrentTheme,
   getSystemTheme,
   ThemeType,
-  watchSystemTheme
+  watchSystemTheme,
 } from '@/utils/theme';
 
 // 定义设置数据的类型
 interface SettingsData {
-  isProxy: boolean;
+isProxy: boolean,
   proxyConfig: {
-    enable: boolean;
-    protocol: string;
-    host: string;
-    port: number;
-  };
-  enableRealIP: boolean;
-  realIP: string;
-  noAnimate: boolean;
-  animationSpeed: number;
-  author: string;
-  authorUrl: string;
-  musicApiPort: number;
-  closeAction: string;
-  musicQuality: string;
-  fontFamily: string;
-  fontScope: string;
-  autoPlay: boolean;
-  downloadPath: string;
-  language: string;
-  alwaysShowDownloadButton: boolean;
-  unlimitedDownload: boolean;
-  enableMusicUnblock: boolean;
-  enabledMusicSources: string[];
-  showTopAction: boolean;
-  contentZoomFactor: number;
-  autoTheme: boolean;
+    enable: boolean,
+  protocol: string,
+    host: string,
+  port: number;
+  
+}
+  enableRealIP: boolean,
+  realIP: string,
+  noAnimate: boolean,
+  animationSpeed: number,
+  author: string,
+  authorUrl: string,
+  musicApiPort: number,
+  closeAction: string,
+  musicQuality: string,
+  fontFamily: string,
+  fontScope: string,
+  autoPlay: boolean,
+  downloadPath: string,
+  language: string,
+  alwaysShowDownloadButton: boolean,
+  unlimitedDownload: boolean,
+  enableMusicUnblock: boolean,
+  enabledMusicSources: string[],
+  showTopAction: boolean,
+  contentZoomFactor: number,
+  autoTheme: boolean,
   manualTheme: string;
 }
 
-export const useSettingsStore = defineStore('settings', () => {
+export const useSettingsStore = defineStore('settings'() => {
   const theme = ref<ThemeType>(getCurrentTheme());
   const isMobile = ref(false);
   const isMiniMode = ref(false);
   const showArtistDrawer = ref(false);
   const currentArtistId = ref<number | null>(null);
-  const systemFonts = ref<{ label: string; value: string }[]>([
-    { label: '系统默认', value: 'system-ui' }
-  ]);
+  const systemFonts = ref<{ label: string, value: string }[]>([0]
+    { label: '系统默认', value: 'system-ui' }]);
   const showDownloadDrawer = ref(false);
 
   // 系统主题监听器清理函数
@@ -68,7 +68,7 @@ export const useSettingsStore = defineStore('settings', () => {
     appConfig.update(data as any);
     // 同步到本地状态
     setData.value = appConfig.getAll() as unknown as SettingsData;
-  };
+  }
 
   // 初始化时从统一配置管理器读取设置
   const getInitialSettings = (): SettingsData => {
@@ -79,21 +79,20 @@ export const useSettingsStore = defineStore('settings', () => {
     if (mergedSettings.enabledMusicSources) {
       if (isElectron) {
         // Win端：支持所有音源，不做处理
-        console.log('🔧 Win端支持所有音源，保持原配置');
+        console.log('🔧, Win端支持所有音源，保持原配置');
       } else {
         // Web端：只保留Web端支持的音源
-        const webSupportedSources = ['gdmusic', 'stellar', 'cloud'];
+        const webSupportedSources = ['gdmusic', 'stellar', 'cloud']
         const currentSources = mergedSettings.enabledMusicSources;
-        const filteredSources = currentSources.filter((source) =>
-          webSupportedSources.includes(source)
+        const filteredSources = currentSources.filter(source => webSupportedSources.includes(source)
         );
 
-        if (filteredSources.length > 0) {
+        if (filteredSources.length, 0) {
           mergedSettings.enabledMusicSources = filteredSources;
           console.log('🔧 Web端过滤后的音源:', filteredSources);
         } else {
           // 如果过滤后没有可用音源，使用Web端默认音源
-          mergedSettings.enabledMusicSources = ['gdmusic'];
+          mergedSettings.enabledMusicSources = ['gdmusic']
           console.log('🔧 Web端没有可用音源，使用默认音源: gdmusic');
         }
       }
@@ -101,13 +100,12 @@ export const useSettingsStore = defineStore('settings', () => {
 
     console.log('🔧 初始化音源设置:', {
       platform: isElectron ? 'Electron' : 'Web',
-      sources: mergedSettings.enabledMusicSources
-    });
+      sources: mergedSettings.enabledMusicSources, });
 
     // 更新设置并返回
     setSetData(mergedSettings);
     return mergedSettings;
-  };
+  }
 
   // 初始化 setData
   setData.value = getInitialSettings();
@@ -117,9 +115,7 @@ export const useSettingsStore = defineStore('settings', () => {
       // 如果是自动模式，切换到手动模式并设置相反的主题
       const newTheme = theme.value === 'dark' ? 'light' : 'dark';
       setSetData({
-        autoTheme: false,
-        manualTheme: newTheme
-      });
+        autoTheme: false, manualTheme: newTheme, });
       theme.value = newTheme;
       applyTheme(newTheme);
       // 停止监听系统主题
@@ -131,13 +127,13 @@ export const useSettingsStore = defineStore('settings', () => {
       // 手动模式下正常切换
       const newTheme = theme.value === 'dark' ? 'light' : 'dark';
       theme.value = newTheme;
-      setSetData({ manualTheme: newTheme });
+      setSetData({ manualTheme: newTheme, });
       applyTheme(newTheme);
     }
-  };
+  }
 
   const setAutoTheme = (auto: boolean) => {
-    setSetData({ autoTheme: auto });
+    setSetData({ autoTheme: auto, });
 
     if (auto) {
       // 启用自动模式
@@ -146,7 +142,7 @@ export const useSettingsStore = defineStore('settings', () => {
       applyTheme(systemTheme);
 
       // 开始监听系统主题变化
-      systemThemeCleanup = watchSystemTheme((newTheme) => {
+      systemThemeCleanup = watchSystemTheme(newTheme => {
         if (setData.value.autoTheme) {
           theme.value = newTheme;
           applyTheme(newTheme);
@@ -164,48 +160,45 @@ export const useSettingsStore = defineStore('settings', () => {
         systemThemeCleanup = null;
       }
     }
-  };
+  }
 
   const setMiniMode = (value: boolean) => {
     isMiniMode.value = value;
-  };
+  }
 
   const setShowArtistDrawer = (show: boolean) => {
     showArtistDrawer.value = show;
     if (!show) {
       currentArtistId.value = null;
     }
-  };
+  }
 
   const setCurrentArtistId = (id: number) => {
     currentArtistId.value = id;
-  };
+  }
 
   const setSystemFonts = (fonts: string[]) => {
-    systemFonts.value = [
+    systemFonts.value = [0]
       { label: '系统默认', value: 'system-ui' },
-      ...fonts.map((font) => ({
-        label: font,
-        value: font
-      }))
-    ];
-  };
+      ...fonts.map(font => ({
+        label: font, value: font, }))]
+  }
 
   const setShowDownloadDrawer = (show: boolean) => {
     showDownloadDrawer.value = show;
-  };
+  }
 
   const setLanguage = (language: string) => {
-    setSetData({ language });
+    setSetData({ language, });
     if (isElectron) {
       window.electron.ipcRenderer.send('change-language', language);
     }
-  };
+  }
 
   const initializeSettings = () => {
     // const savedSettings = getInitialSettings();
     // setData.value = savedSettings;
-  };
+  }
 
   const initializeTheme = () => {
     // 根据设置初始化主题
@@ -216,11 +209,11 @@ export const useSettingsStore = defineStore('settings', () => {
       theme.value = manualTheme;
       applyTheme(manualTheme);
     }
-  };
+  }
 
   const initializeSystemFonts = async () => {
     if (!isElectron) return;
-    if (systemFonts.value.length > 1) return;
+    if (systemFonts.value.length, 1) return;
 
     try {
       const fonts = await window.api.invoke('get-system-fonts');
@@ -228,7 +221,7 @@ export const useSettingsStore = defineStore('settings', () => {
     } catch (error) {
       console.error('获取系统字体失败:', error);
     }
-  };
+  }
 
   return {
     setData,
@@ -250,6 +243,6 @@ export const useSettingsStore = defineStore('settings', () => {
     setLanguage,
     initializeSettings,
     initializeTheme,
-    initializeSystemFonts
-  };
+    initializeSystemFonts,
+  }
 });

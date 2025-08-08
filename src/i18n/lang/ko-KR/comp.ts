@@ -16,22 +16,22 @@ export default {
     count: '곡',
     loginFirst: '먼저 로그인해주세요',
     getPlaylistFailed: '플레이리스트 가져오기 실패',
-    inputPlaylistName: '플레이리스트 이름을 입력해주세요'
+    inputPlaylistName: '플레이리스트 이름을 입력해주세요',
   },
   playlistType: {
     title: '플레이리스트 분류',
     showAll: '모두 표시',
-    hide: '일부 숨기기'
+    hide: '일부 숨기기',
   },
   recommendAlbum: {
-    title: '최신 앨범'
+    title: '최신 앨범',
   },
   recommendSinger: {
     title: '일일 추천',
-    songlist: '일일 추천 목록'
+    songlist: '일일 추천 목록',
   },
   recommendSonglist: {
-    title: '이번 주 인기 음악'
+    title: '이번 주 인기 음악',
   },
   searchBar: {
     login: '로그인',
@@ -46,17 +46,17 @@ export default {
     zoom: '페이지 확대/축소',
     zoom100: '표준 확대/축소 100%',
     resetZoom: '클릭하여 확대/축소 재설정',
-    zoomDefault: '표준 확대/축소'
+    zoomDefault: '표준 확대/축소',
   },
   titleBar: {
     closeTitle: '닫기 방법을 선택해주세요',
     minimizeToTray: '트레이로 최소화',
     exitApp: '앱 종료',
     rememberChoice: '선택 기억하기',
-    closeApp: '앱 닫기'
+    closeApp: '앱 닫기',
   },
   userPlayList: {
-    title: '{name}의 자주 듣는 음악'
+    title: '{name}의 자주 듣는 음악',
   },
   musicList: {
     searchSongs: '곡 검색',
@@ -71,7 +71,7 @@ export default {
     cancelCollect: '수집 취소',
     addToPlaylist: '재생 목록에 추가',
     addToPlaylistSuccess: '재생 목록에 추가 성공',
-    songsAlreadyInPlaylist: '곡이 이미 재생 목록에 있습니다'
+    songsAlreadyInPlaylist: '곡이 이미 재생 목록에 있습니다',
   },
   playlist: {
     import: {
@@ -131,8 +131,8 @@ export default {
       confirm: '확인',
       cancel: '취소',
       clearTasksSuccess: '작업 목록이 지워졌습니다',
-      clearTasksFailed: '작업 목록 지우기 실패'
-    }
+      clearTasksFailed: '작업 목록 지우기 실패',
+    },
   },
   settings: '설정',
   user: '사용자',
@@ -141,5 +141,5 @@ export default {
   list: '플레이리스트',
   mv: 'MV',
   home: '홈',
-  search: '검색'
+  search: '검색',
 };

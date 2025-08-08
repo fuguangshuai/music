@@ -6,11 +6,11 @@
 </template>
 
 <script setup lang="ts">
-import MiniPlayBar from '@/components/player/MiniPlayBar.vue';
+  import MiniPlayBar from '@/components/player/MiniPlayBar.vue';
 </script>
 
 <style lang="scss" scoped>
-.mini-layout {
-  @apply w-full h-full bg-transparent;
-}
+  .mini-layout {
+    @apply w-full h-full bg-transparent;
+  }
 </style>

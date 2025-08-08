@@ -46,9 +46,7 @@ export interface RetryResult<T> {
 const defaultShouldRetry = (error: Error, _attempt: number): boolean => {
   // 网络错误或超时错误通常可以重试
   const retryableErrors = ['NETWORK_ERROR', 'TIMEOUT', 'ECONNRESET', 'ENOTFOUND'];
-  return retryableErrors.some(type => 
-    error.message.includes(type) || error.name.includes(type)
-  );
+  return retryableErrors.some(type => error.message.includes(type) || error.name.includes(type));
 };
 
 /**
@@ -67,7 +65,7 @@ export const withRetry = async <T>(
     backoff = 'exponential',
     maxDelay = 10000,
     shouldRetry = defaultShouldRetry,
-    onRetry
+    onRetry,
   } = options;
 
   let lastError: Error | null = null;
@@ -100,9 +98,8 @@ export const withRetry = async <T>(
       }
 
       // 计算延迟时间
-      const currentDelay = backoff === 'exponential'
-        ? Math.min(delay * Math.pow(2, attempt), maxDelay)
-        : delay;
+      const currentDelay =
+        backoff === 'exponential' ? Math.min(delay * Math.pow(2, attempt), maxDelay) : delay;
 
       // 等待延迟
       await new Promise(resolve => setTimeout(resolve, currentDelay));
@@ -110,9 +107,7 @@ export const withRetry = async <T>(
   }
 
   // 所有重试都失败，抛出最后的错误
-  throw new Error(
-    `操作失败，已重试 ${attempts} 次: ${lastError?.message || '未知错误'}`
-  );
+  throw new Error(`操作失败，已重试 ${attempts} 次: ${lastError?.message || '未知错误'}`);
 };
 
 /**
@@ -133,13 +128,13 @@ export const withRetryDetailed = async <T>(
     onRetry: (error, attempt) => {
       attempts = attempt + 1;
       options.onRetry?.(error, attempt);
-    }
+    },
   });
 
   return {
     result,
     attempts: attempts + 1,
-    duration: Date.now() - startTime
+    duration: Date.now() - startTime,
   };
 };
 
@@ -153,10 +148,8 @@ export const createRetryForErrors = (errorTypes: string[]) => {
     return withRetry(fn, {
       ...options,
       shouldRetry: (error: Error) => {
-        return errorTypes.some(type => 
-          error.message.includes(type) || error.name.includes(type)
-        );
-      }
+        return errorTypes.some(type => error.message.includes(type) || error.name.includes(type));
+      },
     });
   };
 };
@@ -165,20 +158,18 @@ export const createRetryForErrors = (errorTypes: string[]) => {
  * 网络请求专用重试函数
  */
 export const withNetworkRetry = createRetryForErrors([
-  'NETWORK_ERROR',
-  'TIMEOUT',
+  'NETWORK_ERROR', 'TIMEOUT',
   'ECONNRESET',
   'ENOTFOUND',
   'ECONNREFUSED',
-  'ERR_NETWORK'
+  'ERR_NETWORK',
 ]);
 
 /**
  * 音频操作专用重试函数
  */
 export const withAudioRetry = createRetryForErrors([
-  'AUDIO_ERROR',
-  'MediaError',
+  'AUDIO_ERROR', 'MediaError',
   'NotAllowedError',
-  'NotSupportedError'
+  'NotSupportedError',
 ]);

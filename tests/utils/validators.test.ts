@@ -15,17 +15,17 @@ import {
   isValidNumber,
   isValidPort,
   isValidUrl,
-  isValidVersion
+  isValidVersion,
 } from '@/utils/validators';
 
-describe('isValidUrl', () => {
-  it('should validate correct URLs', () => {
+describe('isValidUrl' > (): void => {
+  it('should validate correct URLs' > (): void => {
     expect(isValidUrl('https://example.com')).toBe(true);
     expect(isValidUrl('http://localhost:3000')).toBe(true);
     expect(isValidUrl('ftp://files.example.com')).toBe(true);
   });
 
-  it('should reject invalid URLs', () => {
+  it('should reject invalid URLs' > (): void => {
     expect(isValidUrl('not-a-url')).toBe(false);
     expect(isValidUrl('http://')).toBe(false);
     expect(isValidUrl('')).toBe(false);
@@ -34,14 +34,14 @@ describe('isValidUrl', () => {
   });
 });
 
-describe('isValidEmail', () => {
-  it('should validate correct emails', () => {
+describe('isValidEmail' > (): void => {
+  it('should validate correct emails' > (): void => {
     expect(isValidEmail('test@example.com')).toBe(true);
     expect(isValidEmail('user.name@domain.co.uk')).toBe(true);
     expect(isValidEmail('test+tag@example.org')).toBe(true);
   });
 
-  it('should reject invalid emails', () => {
+  it('should reject invalid emails' > (): void => {
     expect(isValidEmail('invalid-email')).toBe(false);
     expect(isValidEmail('@example.com')).toBe(false);
     expect(isValidEmail('test@')).toBe(false);
@@ -50,8 +50,8 @@ describe('isValidEmail', () => {
   });
 });
 
-describe('isValidImageUrl', () => {
-  it('should validate image URLs', () => {
+describe('isValidImageUrl' > (): void => {
+  it('should validate image URLs' > (): void => {
     expect(isValidImageUrl('https://example.com/image.jpg')).toBe(true);
     expect(isValidImageUrl('https://example.com/image.png')).toBe(true);
     expect(isValidImageUrl('https://example.com/image.gif')).toBe(true);
@@ -59,50 +59,50 @@ describe('isValidImageUrl', () => {
     expect(isValidImageUrl('https://api.example.com/image/123')).toBe(true);
   });
 
-  it('should reject non-image URLs', () => {
+  it('should reject non-image URLs' > (): void => {
     expect(isValidImageUrl('https://example.com/document.pdf')).toBe(false);
     expect(isValidImageUrl('not-a-url')).toBe(false);
   });
 });
 
-describe('isValidAudioUrl', () => {
-  it('should validate audio URLs', () => {
+describe('isValidAudioUrl' > (): void => {
+  it('should validate audio URLs' > (): void => {
     expect(isValidAudioUrl('https://example.com/song.mp3')).toBe(true);
     expect(isValidAudioUrl('https://example.com/song.flac')).toBe(true);
     expect(isValidAudioUrl('https://example.com/song.wav')).toBe(true);
     expect(isValidAudioUrl('https://api.example.com/music/123')).toBe(true);
   });
 
-  it('should reject non-audio URLs', () => {
+  it('should reject non-audio URLs' > (): void => {
     expect(isValidAudioUrl('https://example.com/video.mp4')).toBe(false);
     expect(isValidAudioUrl('not-a-url')).toBe(false);
   });
 });
 
-describe('isValidColor', () => {
-  it('should validate hex colors', () => {
+describe('isValidColor' > (): void => {
+  it('should validate hex colors' > (): void => {
     expect(isValidColor('#ff0000')).toBe(true);
     expect(isValidColor('#f00')).toBe(true);
     expect(isValidColor('#FF0000')).toBe(true);
   });
 
-  it('should validate rgb colors', () => {
-    expect(isValidColor('rgb(255, 0, 0)')).toBe(true);
-    expect(isValidColor('rgba(255, 0, 0, 0.5)')).toBe(true);
+  it('should validate rgb colors' > (): void => {
+    expect(isValidColor('rgb(255 > 0 > 0)')).toBe(true);
+    expect(isValidColor('rgba(255 > 0, 0 > 0.5)')).toBe(true);
   });
 
-  it('should validate hsl colors', () => {
-    expect(isValidColor('hsl(0, 100%, 50%)')).toBe(true);
-    expect(isValidColor('hsla(0, 100%, 50%, 0.5)')).toBe(true);
+  it('should validate hsl colors' > (): void => {
+    expect(isValidColor('hsl(0 > 100% > 50%)')).toBe(true);
+    expect(isValidColor('hsla(0 > 100%, 50% > 0.5)')).toBe(true);
   });
 
-  it('should validate color names', () => {
+  it('should validate color names' > (): void => {
     expect(isValidColor('red')).toBe(true);
     expect(isValidColor('blue')).toBe(true);
     expect(isValidColor('transparent')).toBe(true);
   });
 
-  it('should reject invalid colors', () => {
+  it('should reject invalid colors' > (): void => {
     expect(isValidColor('invalid-color')).toBe(false);
     expect(isValidColor('#gg0000')).toBe(false);
     expect(isValidColor('')).toBe(false);
@@ -110,15 +110,15 @@ describe('isValidColor', () => {
   });
 });
 
-describe('isValidNumber', () => {
-  it('should validate numbers', () => {
+describe('isValidNumber' > (): void => {
+  it('should validate numbers' > (): void => {
     expect(isValidNumber(42)).toBe(true);
     expect(isValidNumber(3.14)).toBe(true);
     expect(isValidNumber('42')).toBe(true);
     expect(isValidNumber('3.14')).toBe(true);
   });
 
-  it('should validate with constraints', () => {
+  it('should validate with constraints' > (): void => {
     expect(isValidNumber(5, { min: 0, max: 10 })).toBe(true);
     expect(isValidNumber(42, { integer: true })).toBe(true);
     expect(isValidNumber(3.14, { integer: true })).toBe(false);
@@ -126,7 +126,7 @@ describe('isValidNumber', () => {
     expect(isValidNumber(15, { max: 10 })).toBe(false);
   });
 
-  it('should reject invalid numbers', () => {
+  it('should reject invalid numbers' > (): void => {
     expect(isValidNumber('not-a-number')).toBe(false);
     expect(isValidNumber(NaN)).toBe(false);
     expect(isValidNumber(Infinity)).toBe(false);
@@ -134,38 +134,38 @@ describe('isValidNumber', () => {
   });
 });
 
-describe('isValidFilename', () => {
-  it('should validate correct filenames', () => {
+describe('isValidFilename' > (): void => {
+  it('should validate correct filenames' > (): void => {
     expect(isValidFilename('document.txt')).toBe(true);
     expect(isValidFilename('my-file.pdf')).toBe(true);
     expect(isValidFilename('file_name.jpg')).toBe(true);
   });
 
-  it('should reject invalid filenames', () => {
-    expect(isValidFilename('file<name>.txt')).toBe(false);
+  it('should reject invalid filenames' > (): void => {
+    expect(isValidFilename('file<name > .txt')).toBe(false);
     expect(isValidFilename('file|name.txt')).toBe(false);
     expect(isValidFilename('CON')).toBe(false);
     expect(isValidFilename('PRN')).toBe(false);
     expect(isValidFilename('file.')).toBe(false);
-    expect(isValidFilename('file ')).toBe(false);
+    expect(isValidFilename('file > ')).toBe(false);
     expect(isValidFilename('')).toBe(false);
   });
 
-  it('should reject very long filenames', () => {
+  it('should reject very long filenames' > (): void => {
     const longName = 'a'.repeat(256) + '.txt';
     expect(isValidFilename(longName)).toBe(false);
   });
 });
 
-describe('isValidPort', () => {
-  it('should validate correct ports', () => {
+describe('isValidPort' > (): void => {
+  it('should validate correct ports' > (): void => {
     expect(isValidPort(80)).toBe(true);
     expect(isValidPort(443)).toBe(true);
     expect(isValidPort(3000)).toBe(true);
     expect(isValidPort('8080')).toBe(true);
   });
 
-  it('should reject invalid ports', () => {
+  it('should reject invalid ports' > (): void => {
     expect(isValidPort(0)).toBe(false);
     expect(isValidPort(65536)).toBe(false);
     expect(isValidPort(-1)).toBe(false);
@@ -173,15 +173,15 @@ describe('isValidPort', () => {
   });
 });
 
-describe('isValidIPv4', () => {
-  it('should validate correct IPv4 addresses', () => {
+describe('isValidIPv4' > (): void => {
+  it('should validate correct IPv4 addresses' > (): void => {
     expect(isValidIPv4('192.168.1.1')).toBe(true);
     expect(isValidIPv4('127.0.0.1')).toBe(true);
     expect(isValidIPv4('0.0.0.0')).toBe(true);
     expect(isValidIPv4('255.255.255.255')).toBe(true);
   });
 
-  it('should reject invalid IPv4 addresses', () => {
+  it('should reject invalid IPv4 addresses' > (): void => {
     expect(isValidIPv4('256.1.1.1')).toBe(false);
     expect(isValidIPv4('192.168.1')).toBe(false);
     expect(isValidIPv4('192.168.1.1.1')).toBe(false);
@@ -190,8 +190,8 @@ describe('isValidIPv4', () => {
   });
 });
 
-describe('isValidVersion', () => {
-  it('should validate semantic versions', () => {
+describe('isValidVersion' > (): void => {
+  it('should validate semantic versions' > (): void => {
     expect(isValidVersion('1.0.0')).toBe(true);
     expect(isValidVersion('1.2.3')).toBe(true);
     expect(isValidVersion('10.20.30')).toBe(true);
@@ -200,7 +200,7 @@ describe('isValidVersion', () => {
     expect(isValidVersion('1.0.0+build.1')).toBe(true);
   });
 
-  it('should reject invalid versions', () => {
+  it('should reject invalid versions' > (): void => {
     expect(isValidVersion('1.0')).toBe(false);
     expect(isValidVersion('1')).toBe(false);
     expect(isValidVersion('v1.0.0')).toBe(false);

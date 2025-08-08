@@ -7,7 +7,7 @@ export default {
     playback: '播放设置',
     application: '应用设置',
     network: '网络设置',
-    system: '系统管理'
+    system: '系统管理',
   },
   basic: {
     themeMode: '主题模式',
@@ -28,7 +28,7 @@ export default {
     fontDesc: '选择字体，优先使用排在前面的字体',
     fontScope: {
       global: '全局',
-      lyric: '仅歌词'
+      lyric: '仅歌词',
     },
     animation: '动画速度',
     animationSpeedPlaceholder: '请输入动画速度',
@@ -36,7 +36,7 @@ export default {
     animationSpeed: {
       slow: '极慢',
       normal: '正常',
-      fast: '极快'
+      fast: '极快',
     },
     fontPreview: {
       title: '字体预览',
@@ -47,8 +47,8 @@ export default {
       chineseText: '静夜思 床前明月光 疑是地上霜',
       englishText: 'The quick brown fox jumps over the lazy dog',
       japaneseText: 'あいうえお かきくけこ さしすせそ',
-      koreanText: '가나다라마 바사아자차 카타파하'
-    }
+      koreanText: '가나다라마 바사아자차 카타파하',
+    },
   },
   playback: {
     quality: '音质设置',
@@ -62,7 +62,7 @@ export default {
       jyeffect: '高清环绕声',
       sky: '沉浸环绕声',
       dolby: '杜比全景声',
-      jymaster: '超清母带'
+      jymaster: '超清母带',
     },
     musicSources: '音源设置',
     musicSourcesDesc: '选择音乐解析使用的音源平台',
@@ -77,7 +77,7 @@ export default {
     autoPlay: '自动播放',
     autoPlayDesc: '重新打开应用时是否自动继续播放',
     showStatusBar: '是否显示状态栏控制功能',
-    showStatusBarContent: '可以在您的mac状态栏显示音乐控制功能(重启后生效)'
+    showStatusBarContent: '可以在您的mac状态栏显示音乐控制功能(重启后生效)',
   },
   application: {
     closeAction: '关闭行为',
@@ -85,7 +85,7 @@ export default {
     closeOptions: {
       ask: '每次询问',
       minimize: '最小化到托盘',
-      close: '直接退出'
+      close: '直接退出',
     },
     shortcut: '快捷键设置',
     shortcutDesc: '自定义全局快捷键',
@@ -94,7 +94,7 @@ export default {
     unlimitedDownload: '无限制下载',
     unlimitedDownloadDesc: '开启后将无限制下载音乐（可能出现下载失败的情况）, 默认限制 300 首',
     downloadPath: '下载目录',
-    downloadPathDesc: '选择音乐文件的下载位置'
+    downloadPathDesc: '选择音乐文件的下载位置',
   },
   network: {
     apiPort: '音乐API端口',
@@ -111,8 +111,8 @@ export default {
       proxySuccess: '代理设置已保存，重启应用后生效',
       proxyError: '请检查输入是否正确',
       realIPSuccess: '真实IP设置已保存',
-      realIPError: '请输入有效的IP地址'
-    }
+      realIPError: '请输入有效的IP地址',
+    },
   },
   system: {
     cache: '缓存管理',
@@ -121,43 +121,43 @@ export default {
     cacheTypes: {
       history: {
         label: '播放历史',
-        description: '清除播放过的歌曲记录'
+        description: '清除播放过的歌曲记录',
       },
       favorite: {
         label: '收藏记录',
-        description: '清除本地收藏的歌曲记录(不会影响云端收藏)'
+        description: '清除本地收藏的歌曲记录(不会影响云端收藏)',
       },
       user: {
         label: '用户数据',
-        description: '清除登录信息和用户相关数据'
+        description: '清除登录信息和用户相关数据',
       },
       settings: {
         label: '应用设置',
-        description: '清除应用的所有自定义设置'
+        description: '清除应用的所有自定义设置',
       },
       downloads: {
         label: '下载记录',
-        description: '清除下载历史记录(不会删除已下载的文件)'
+        description: '清除下载历史记录(不会删除已下载的文件)',
       },
       resources: {
         label: '音乐资源',
-        description: '清除已加载的音乐文件、歌词等资源缓存'
+        description: '清除已加载的音乐文件、歌词等资源缓存',
       },
       lyrics: {
         label: '歌词资源',
-        description: '清除已加载的歌词资源缓存'
-      }
+        description: '清除已加载的歌词资源缓存',
+      },
     },
     restart: '重启',
     restartDesc: '重启应用',
     messages: {
-      clearSuccess: '清除成功，部分设置在重启后生效'
-    }
+      clearSuccess: '清除成功，部分设置在重启后生效',
+    },
   },
   validation: {
     selectProxyProtocol: '请选择代理协议',
     proxyHost: '请输入代理地址',
-    portNumber: '请输入有效的端口号(1-65535)'
+    portNumber: '请输入有效的端口号(1-65535)',
   },
   lyricSettings: {
     title: '歌词设置',
@@ -165,7 +165,7 @@ export default {
       display: '显示',
       interface: '界面',
       typography: '文字',
-      mobile: '移动端'
+      mobile: '移动端',
     },
     pureMode: '纯净模式',
     hideCover: '隐藏封面',
@@ -179,40 +179,40 @@ export default {
     themeOptions: {
       default: '默认',
       light: '亮色',
-      dark: '暗色'
+      dark: '暗色',
     },
     fontSize: '字体大小',
     fontSizeMarks: {
       small: '小',
       medium: '中',
-      large: '大'
+      large: '大',
     },
     letterSpacing: '字间距',
     letterSpacingMarks: {
       compact: '紧凑',
       default: '默认',
-      loose: '宽松'
+      loose: '宽松',
     },
     lineHeight: '行高',
     lineHeightMarks: {
       compact: '紧凑',
       default: '默认',
-      loose: '宽松'
+      loose: '宽松',
     },
     mobileLayout: '移动端布局',
     layoutOptions: {
       default: '默认',
       ios: 'iOS风格',
-      android: '安卓风格'
+      android: '安卓风格',
     },
     mobileCoverStyle: '封面样式',
     coverOptions: {
       record: '唱片',
       square: '方形',
-      full: '全屏'
+      full: '全屏',
     },
     lyricLines: '歌词行数',
-    mobileUnavailable: '此设置仅在移动端可用'
+    mobileUnavailable: '此设置仅在移动端可用',
   },
   themeColor: {
     title: '歌词主题色',
@@ -226,13 +226,13 @@ export default {
       'youtube-red': 'YouTube 红',
       orange: '活力橙',
       purple: '神秘紫',
-      pink: '樱花粉'
+      pink: '樱花粉',
     },
     tooltips: {
       openColorPicker: '打开色板',
-      closeColorPicker: '关闭色板'
+      closeColorPicker: '关闭色板',
     },
-    placeholder: '#1db954'
+    placeholder: '#1db954',
   },
   shortcutSettings: {
     title: '快捷键设置',
@@ -261,8 +261,8 @@ export default {
       saveError: '保存快捷键失败，请重试',
       cancelEdit: '已取消修改',
       disableAll: '已禁用所有快捷键，请记得保存',
-      enableAll: '已启用所有快捷键，请记得保存'
-    }
+      enableAll: '已启用所有快捷键，请记得保存',
+    },
   },
   cookie: {
     title: 'Cookie设置',
@@ -271,25 +271,25 @@ export default {
     help: {
       format: 'Cookie通常以 "MUSIC_U=" 开头',
       source: '可以从浏览器开发者工具的网络请求中获取',
-      storage: 'Cookie设置后将自动保存到本地存储'
+      storage: 'Cookie设置后将自动保存到本地存储',
     },
     action: {
       save: '保存Cookie',
       paste: '粘贴',
-      clear: '清空'
+      clear: '清空',
     },
     validation: {
       required: '请输入Cookie',
-      format: 'Cookie格式可能不正确，请检查是否包含MUSIC_U'
+      format: 'Cookie格式可能不正确，请检查是否包含MUSIC_U',
     },
     message: {
       saveSuccess: 'Cookie保存成功',
       saveError: 'Cookie保存失败',
       pasteSuccess: '粘贴成功',
-      pasteError: '粘贴失败，请手动复制'
+      pasteError: '粘贴失败，请手动复制',
     },
     info: {
-      length: '当前长度：{length} 字符'
-    }
-  }
+      length: '当前长度：{length} 字符',
+    },
+  },
 };

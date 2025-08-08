@@ -6,16 +6,15 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  name: 'History'
-});
+  defineOptions({
+    name: 'History', });
 
-import Favorite from '@/views/favorite/index.vue';
-import HistoryList from '@/views/history/index.vue';
+  import Favorite from '@/views/favorite/index.vue';
+  import HistoryList from '@/views/history/index.vue';
 </script>
 
 <style scoped>
-.flex-item {
-  @apply flex-1 bg-light-100 dark:bg-dark-100 rounded-2xl overflow-hidden;
-}
+  .flex-item {
+    @apply flex-1 bg-light-100 dark:bg-dark-100 rounded-2xl overflow-hidden;
+  }
 </style>

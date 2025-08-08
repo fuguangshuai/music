@@ -7,13 +7,12 @@ import { buildLanguageMessages } from './utils';
 const messages = buildLanguageMessages();
 
 const i18n = createI18n({
-  legacy: false,
-  locale: DEFAULT_LANGUAGE,
+  legacy: false, locale: DEFAULT_LANGUAGE,
   fallbackLocale: FALLBACK_LANGUAGE,
   messages: messages as any, // 临时类型断言，避免Vue i18n类型检查问题
   globalInjection: true,
   silentTranslationWarn: true,
-  silentFallbackWarn: true
+  silentFallbackWarn: true,
 });
 
 export default i18n;

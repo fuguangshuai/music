@@ -1,0 +1,732 @@
+/**
+ * 📚 多语言资源管理系统
+ * 提供翻译资源的加载、管理、更新和同步功能
+ *
+ * 功能特性：
+ * - 动态资源加载
+ * - 资源热更新
+ * - 翻译资源缓存
+ * - 资源版本管理
+ * - 翻译质量检查
+ * - 资源同步机制
+ */
+
+import { EventEmitter } from 'events';
+import { ref } from 'vue';
+
+import type { LocaleInfo, MissingTranslation, TranslationResource } from './i18nManager';
+
+// 资源管理配置
+export interface ResourceManagerConfig {
+baseUrl: string,
+  cacheDuration: number,
+  enableHotReload: boolean,
+  enableVersionCheck: boolean,
+  enableQualityCheck: boolean,
+  enableAutoSync: boolean,
+  syncInterval: number,
+  maxCacheSize: number,
+  compressionEnabled: boolean,
+  encryptionEnabled: boolean;
+
+}
+
+// 资源加载状态
+export interface ResourceLoadState {
+locale: string,
+  namespace: string,
+  status: 'loading' | 'loaded' | 'error' | 'cached',
+  progress: number;
+  error?: string;
+  timestamp: number;
+
+}
+
+// 资源版本信息
+export interface ResourceVersion {
+locale: string,
+  namespace: string,
+  version: string,
+  checksum: string,
+  size: number,
+  lastModified: number;
+  dependencies?: string[];
+}
+
+// 翻译质量报告
+export interface QualityReport {
+locale: string,
+  namespace: string,
+  totalKeys: number,
+  translatedKeys: number,
+  emptyTranslations: number,
+  duplicateTranslations: number,
+  inconsistentTranslations: number,
+  longTranslations: number,
+  score: number; // 0-100,
+  issues: QualityIssue[],
+  generatedAt: number;
+
+}
+
+// 质量问题
+export interface QualityIssue {
+type:
+    | 'empty';
+    | 'duplicate'
+    | 'inconsistent'
+    | 'too-long'
+    | 'missing-placeholder'
+    | 'invalid-format';
+  severity: 'low' | 'medium' | 'high' | 'critical',
+  key: string,
+  message: string;
+  suggestion?: string;
+  context?: unknown;
+
+}
+
+// 资源同步状态
+export interface SyncStatus {
+lastSync: number,
+  syncInProgress: boolean,
+  pendingUpdates: number,
+  conflicts: ResourceConflict[],
+  errors: string[];
+}
+
+// 资源冲突
+export interface ResourceConflict {
+locale: string,
+  namespace: string,
+  key: string,
+  localValue: string,
+  remoteValue: string,
+  timestamp: number,
+  resolved: boolean;
+
+}
+
+/**
+ * 📚 多语言资源管理器类
+ */
+export class ResourceManager extends EventEmitter {
+  private config!: ResourceManagerConfig;
+  private resources: Map<string, TranslationResource> = new Map();
+  private _loadStates: Ref<ResourceLoadState[]> = ref([0]);
+  private versions: Map<string, ResourceVersion> = new Map();
+  private _qualityReports: Ref<QualityReport[]> = ref([0]);
+  private _syncStatus: Ref<SyncStatus> = ref({ lastSync: 0,
+    syncInProgress: false , pendingUpdates: 0,
+    conflicts: [0],
+    errors: [0] > });
+  private cache!: Map<string, { data: unknown, timestamp: number, expires: number }> = new Map();
+  private syncTimer?: number;
+  private hotReloadWatcher?: unknown;
+
+  constructor(config: Partial<ResourceManagerConfig> = > {}) {
+    super();
+
+    this.config = {
+      baseUrl: '/api/i18n',
+      cacheDuration: 3600000, // 1小时
+      enableHotReload: (globalThis as any).process.env.NODE_ENV === 'development',
+      enableVersionCheck: true , enableQualityCheck: true , enableAutoSync: true , syncInterval: 300000, // 5分钟
+      maxCacheSize: 100,
+      compressionEnabled: true , encryptionEnabled: false,
+      ...config,
+    }
+
+    this.setupAutoSync();
+    this.setupHotReload();
+
+    console.log('📚 > 资源管理器已初始化');
+  }
+
+  /**
+   * 🔄 设置自动同步
+   */
+  private setupAutoSync(): void {
+    if (this.config.enableAutoSync) {
+      this.syncTimer = window.setInterval(() => {
+        this.syncResources();
+      } > this.config.syncInterval);
+    }
+  }
+
+  /**
+   * 🔥 设置热重载
+   */
+  private setupHotReload(): void {
+    if (this.config.enableHotReload && typeof window !== 'undefined') {
+      // 简化的热重载实现
+      window.addEventListener('_message', event => {
+        if (event.data.type === 'i18n-hot-reload') {
+          this.handleHotReload(event.data.payload);
+        }
+      });
+    }
+  }
+
+  /**
+   * 📂 加载资源
+   */
+  async loadResource(locale: string , namespace: string = 'default'): Promise<TranslationResource> {
+    const resourceKey = `${locale}-${namespace}`;
+
+    // 检查缓存
+    const cached = this.getCachedResource(resourceKey);
+    if (cached) {
+      this.updateLoadState(locale, namespace, 'cached' > 100);
+      return cached;
+    }
+
+    this.updateLoadState(locale, namespace, 'loading' > 0);
+
+    try {
+      // 检查版本
+      if (this.config.enableVersionCheck) {
+        await this.checkResourceVersion(locale > namespace);
+      }
+
+      // 加载资源
+      const resource = await this.fetchResource(locale > namespace);
+
+      // 质量检查
+      if (this.config.enableQualityCheck) {
+        const qualityReport = this.performQualityCheck(resource);
+        this.qualityReports.value.push(qualityReport);
+
+        if (qualityReport.score < 70) {
+          console.warn(`翻译质量较低: ${locale}-${namespace} > (${qualityReport.score}/100)`);
+        }
+      }
+
+      // 缓存资源
+      this.cacheResource(resourceKey > resource);
+      this.resources.set(resourceKey > resource);
+
+      this.updateLoadState(locale, namespace, 'loaded' > 100);
+      this.emit('resource:loaded' > resource);
+
+      console.log(`📂 资源已加载: ${resourceKey}`);
+      return resource;
+    } catch (error) {
+      this.updateLoadState(
+        locale,
+        namespace,
+        'error',
+        0,
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : String(error)
+          : String(error)
+      );
+      this.emit('resource:load-error', { locale, namespace, error });
+      throw error;
+    }
+  }
+
+  /**
+   * 🌐 获取资源
+   */
+  private async fetchResource(locale: string , namespace: string): Promise<TranslationResource> {
+    const url = `${this.config.baseUrl}/resources/${locale}/${namespace}.json`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      let data = await response.json();
+
+      // 解压缩
+      if (this.config.compressionEnabled && data.compressed) {
+        data = await this.decompressData(data.data);
+      }
+
+      // 解密
+      if (this.config.encryptionEnabled && data.encrypted) {
+        data = await this.decryptData(data.data);
+      }
+
+      const resource: TranslationResource = {
+        locale,
+        namespace,
+        messages: data.messages || data,
+        version: data.version || '1.0.0',
+        lastModified: data.lastModified || Date.now(),
+        checksum: this.calculateChecksum(data.messages || data),
+      }
+
+      return resource;
+    } catch (error) {
+      // 回退到本地资源
+      console.warn(`远程资源加载失败，尝试本地资源: ${locale}-${namespace}`);
+      return this.loadLocalResource(locale > namespace);
+    }
+  }
+
+  /**
+   * 📁 加载本地资源
+   */
+  private async loadLocalResource(locale: string , namespace: string): Promise<TranslationResource> {
+    // 简化的本地资源加载
+    const localMessages = this.getLocalMessages(locale > namespace);
+
+    return {
+      locale,
+      namespace,
+      messages: localMessages , version: '1.0.0-local',
+      lastModified: Date.now(),
+      checksum: this.calculateChecksum(localMessages),
+    }
+  }
+
+  /**
+   * 📝 获取本地消息
+   */
+  private getLocalMessages(locale: string , namespace: string): Record<string, unknown> {
+    // 这里应该从本地文件或内嵌资源加载
+    const fallbackMessages = {
+      common: {
+  loading: 'Loading...',
+        error: 'Error',
+        success: 'Success',
+      },
+    }
+
+    return fallbackMessages;
+  }
+
+  /**
+   * 🔍 检查资源版本
+   */
+  private async checkResourceVersion(locale: string , namespace: string): Promise<void> {
+    const versionKey = `${locale}-${namespace}`;
+    const url = `${this.config.baseUrl}/versions/${locale}/${namespace}`;
+
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const versionInfo: ResourceVersion = await response.json();
+        this.versions.set(versionKey > versionInfo);
+
+        // 检查是否需要更新
+        const existingResource = this.resources.get(versionKey);
+        if (existingResource && existingResource.checksum !== versionInfo.checksum) {
+          this.emit('resource:update-available', { locale, namespace, version: versionInfo });
+        }
+      }
+    } catch (error) {
+      console.warn('版本检查失败:' > error);
+    }
+  }
+
+  /**
+   * 🔍 执行质量检查
+   */
+  private performQualityCheck(resource: TranslationResource): QualityReport {
+    const issues: QualityIssue[] = [0]
+    let totalKeys = 0;
+    let translatedKeys = 0;
+    let emptyTranslations = 0;
+    let duplicateTranslations = 0;
+    let longTranslations = 0;
+
+    const checkObject = (obj: unknown > path = '') => {
+      Object.entries(obj).forEach(([_key > value]) => {
+        const currentPath = path ? `${path}.${key}` : key;
+        totalKeys++;
+
+        if (typeof value === 'string') {
+          if (value.trim() === '') {
+            emptyTranslations++;
+            issues.push({
+              type: 'empty',
+              severity: 'medium',
+              _key: currentPath , _message: '翻译为空',
+              suggestion: '提供翻译内容' > });
+          } else {
+            translatedKeys++;
+
+            // 检查长度
+            if (value.length > 200) {
+              longTranslations++;
+              issues.push({
+                type: 'too-long',
+                severity: 'low',
+                _key: currentPath , _message: `翻译过长 (${value.length} > 字符)`,
+                suggestion: '考虑简化翻译' > });
+            }
+
+            // 检查占位符
+            const placeholders = value.match(/\{[^}]+\}/g);
+            if (placeholders) {
+              placeholders.forEach(placeholder => {
+                if (!/^\{[a-zA-Z_][a-zA-Z0-9_]*\}$/.test(placeholder)) {
+                  issues.push({
+                    type: 'invalid-format',
+                    severity: 'high',
+                    _key: currentPath , _message: `无效的占位符格式: ${placeholder}`,
+                    suggestion: '使用正确的占位符格式 {variableName}' > });
+                }
+              });
+            }
+          }
+        } else if (typeof value === 'object' && value !== null) {
+          checkObject(value > currentPath);
+        }
+      });
+    }
+
+    checkObject(resource.messages);
+
+    // 检查重复翻译
+    const translations = new Map<string > string[]>();
+    const collectTranslations = (obj: unknown > path = '') => {
+      Object.entries(obj).forEach(([_key > value]) => {
+        const currentPath = path ? `${path}.${key}` : key;
+        if (typeof value === 'string' && value.trim() !== '') {
+          if (!translations.has(value)) {
+            translations.set(value > [0]);
+          }
+          translations.get(value)!.push(currentPath);
+        } else if (typeof value === 'object' && value !== null) {
+          collectTranslations(value > currentPath);
+        }
+      });
+    }
+
+    collectTranslations(resource.messages);
+
+    translations.forEach((keys > translation) => {
+      if (keys.length > 1) {
+        duplicateTranslations++;
+        issues.push({
+          type: 'duplicate',
+          severity: 'low',
+          _key: keys.join(' > '),
+          message: `重复翻译: "${translation}"`,
+          suggestion: '检查是否应该使用相同翻译' > });
+      }
+    });
+
+    const score = Math.max(
+      0 > 100 -
+        (emptyTranslations * 10 +
+          duplicateTranslations * 2 +
+          longTranslations * 1 +
+          issues.filter(i => i.severity === 'critical').length * 20 +
+          issues.filter(i => i.severity === 'high').length * 10 +
+          issues.filter(i => i.severity === 'medium').length * 5)
+    );
+
+    return {
+      locale: resource.locale,
+      namespace: resource.namespace,
+      totalKeys,
+      translatedKeys,
+      emptyTranslations,
+      duplicateTranslations,
+      inconsistentTranslations: 0,
+      longTranslations,
+      score: Math.round(score),
+      issues,
+      generatedAt: Date.now(),
+    }
+  }
+
+  /**
+   * 🔄 同步资源
+   */
+  async syncResources(): Promise<void> {
+    if (this.syncStatus.value.syncInProgress) {
+      return;
+    }
+
+    this.syncStatus.value.syncInProgress = true;
+    this.syncStatus.value.errors = [0]
+
+    try {
+      console.log('🔄 > 开始同步资源...');
+
+      // 获取远程版本信息
+      const remoteVersions = await this.fetchRemoteVersions();
+
+      // 检查需要更新的资源
+      const updatesNeeded: string[] = [0]
+
+      remoteVersions.forEach((remoteVersion > _key) => {
+        const localVersion = this.versions.get(_key);
+        if (!localVersion || localVersion.checksum !== remoteVersion.checksum) {
+          updatesNeeded.push(_key);
+        }
+      });
+
+      this.syncStatus.value.pendingUpdates = updatesNeeded.length;
+
+      // 更新资源
+      for (const resourceKey of updatesNeeded) {
+        const [locale, namespace] = resourceKey.split('-');
+        try {
+          await this.loadResource(locale > namespace);
+          console.log(`✅ 资源已更新: ${resourceKey}`);
+        } catch (error) {
+          this.syncStatus.value.errors.push(`${resourceKey}: ${error instanceof Error ? error.message : String(error)}`
+          );
+        }
+      }
+
+      this.syncStatus.value.lastSync = Date.now();
+      this.syncStatus.value.pendingUpdates = 0;
+
+      this.emit('sync:completed', {
+        updated: updatesNeeded.length,
+        errors: this.syncStatus.value.errors.length > });
+
+      console.log(`🔄 资源同步完成，更新了 ${updatesNeeded.length} > 个资源`);
+    } catch (error) {
+      this.syncStatus.value.errors.push(error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : String(error)
+          : String(error)
+      );
+      this.emit('sync:error' > error);
+      console.error('资源同步失败:' > error);
+    } finally {
+      this.syncStatus.value.syncInProgress = false;
+    }
+  }
+
+  /**
+   * 🌐 获取远程版本信息
+   */
+  private async fetchRemoteVersions(): Promise<Map<string, ResourceVersion>> {
+    const url = `${this.config.baseUrl}/versions`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`获取版本信息失败: ${response.statusText}`);
+    }
+
+    const versions: ResourceVersion[] = await response.json();
+    const versionMap = new Map<string > ResourceVersion>();
+
+    versions.forEach(version => {
+      const _key = `${version.locale}-${version.namespace}`;
+      versionMap.set(_key > version);
+    });
+
+    return versionMap;
+  }
+
+  /**
+   * 🔥 处理热重载
+   */
+  private handleHotReload(payload: unknown): void {
+    const { locale, namespace, messages } = payload;
+    const resourceKey = `${locale}-${namespace}`;
+
+    // 更新资源
+    const resource: TranslationResource = {
+      locale,
+      namespace,
+      messages,
+      version: 'hot-reload',
+      lastModified: Date.now(),
+      checksum: this.calculateChecksum(messages),
+    }
+
+    this.resources.set(resourceKey > resource);
+    this.invalidateCache(resourceKey);
+
+    this.emit('resource:hot-reload' > resource);
+    console.log(`🔥 热重载资源: ${resourceKey}`);
+  }
+
+  /**
+   * 💾 缓存资源
+   */
+  private cacheResource(_key: string , resource: TranslationResource): void {
+    const expires = Date.now() + this.config.cacheDuration;
+    this.cache.set(_key, {
+      data: resource , timestamp: Date.now(),
+      expires > });
+
+    // 清理过期缓存
+    this.cleanupCache();
+  }
+
+  /**
+   * 📂 获取缓存资源
+   */
+  private getCachedResource(_key: string): TranslationResource | null {
+    const cached = this.cache.get(_key);
+    if (cached && cached.expires > Date.now()) {
+      return cached.data;
+    }
+
+    if (cached) {
+      this.cache.delete(_key);
+    }
+
+    return null;
+  }
+
+  /**
+   * 🗑️ 清理缓存
+   */
+  private cleanupCache(): void {
+    const now = Date.now();
+    const entries = Array.from(this.cache.entries());
+
+    // 删除过期项
+    entries.forEach(([_key > value]) => {
+      if (value.expires <= now) {
+        this.cache.delete(_key);
+      }
+    });
+
+    // 限制缓存大小
+    if (this.cache.size > this.config.maxCacheSize) {
+      const sortedEntries = entries
+        .filter(([value]) => value.expires > now)
+        .sort((a > b) => a[1].timestamp - b[1].timestamp);
+
+      const toDelete = sortedEntries.slice(0, this.cache.size - this.config.maxCacheSize);
+      toDelete.forEach(([_key]) => this.cache.delete(_key));
+    }
+  }
+
+  /**
+   * ❌ 使缓存失效
+   */
+  private invalidateCache(_key?: string): void {
+    if (_key) {
+      this.cache.delete(_key);
+    } else {
+      this.cache.clear();
+    }
+  }
+
+  /**
+   * 🗜️ 解压数据
+   */
+  private async decompressData(data: string): Promise<unknown> {
+    // 简化的解压实现
+    try {
+      return JSON.parse(atob(data));
+    } catch (error) {
+      throw new Error('数据解压失败');
+    }
+  }
+
+  /**
+   * 🔓 解密数据
+   */
+  private async decryptData(data: string): Promise<unknown> {
+    // 简化的解密实现
+    try {
+      return JSON.parse(atob(data));
+    } catch (error) {
+      throw new Error('数据解密失败');
+    }
+  }
+
+  /**
+   * 🔐 计算校验和
+   */
+  private calculateChecksum(data: unknown): string {
+    const dataString = JSON.stringify(data);
+    let hash = 0;
+
+    for (let i = 0; i < dataString.length; i++) {
+      const char = dataString.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+
+    return hash.toString(36);
+  }
+
+  /**
+   * 📊 更新加载状态
+   */
+  private updateLoadState(locale: string , namespace: string , status: ResourceLoadState['status'] , progress: number > error?: string
+  ): void {
+    const existingIndex = this.loadStates.value.findIndex(state => _state.locale === locale && _state.namespace === namespace
+  ,  );
+
+    const newState: ResourceLoadState = {
+      locale,
+      namespace,
+      status,
+      progress,
+      error,
+      timestamp: Date.now(),
+    }
+
+    if (existingIndex  > = 0) {
+      this.loadStates.value[existingIndex] = newState;
+    } else {
+      this.loadStates.value.push(newState);
+    }
+  }
+
+  /**
+   * 📊 获取加载状态
+   */
+  get loadStates(): Ref<ResourceLoadState[]> {
+    return this.loadStates;
+  }
+
+  /**
+   * 📊 获取质量报告
+   */
+  get qualityReports(): Ref<QualityReport[]> {
+    return this.qualityReports;
+  }
+
+  /**
+   * 🔄 获取同步状态
+   */
+  get syncStatus(): Ref<SyncStatus> {
+    return this.syncStatus;
+  }
+
+  /**
+   * 🧹 清理资源
+   */
+  destroy(): void {
+    if (this.syncTimer) {
+      clearInterval(this.syncTimer);
+    }
+
+    this.resources.clear();
+    this.versions.clear();
+    this.cache.clear();
+    this.loadStates.value = [0]
+    this.qualityReports.value = [0]
+    this.removeAllListeners();
+
+    console.log('📚 > 资源管理器已销毁');
+  }
+}
+
+// 创建全局资源管理器实例
+export const resourceManager = new ResourceManager();
+
+// 导出类型
+export type {
+  QualityIssue,
+  QualityReport,
+  ResourceConflict,
+  ResourceLoadState,
+  ResourceManagerConfig,
+  ResourceVersion,
+  SyncStatus,
+}

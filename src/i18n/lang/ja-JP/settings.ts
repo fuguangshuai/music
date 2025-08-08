@@ -7,7 +7,7 @@ export default {
     playback: '再生設定',
     application: 'アプリケーション設定',
     network: 'ネットワーク設定',
-    system: 'システム管理'
+    system: 'システム管理',
   },
   basic: {
     themeMode: 'テーマモード',
@@ -28,14 +28,14 @@ export default {
     fontDesc: 'フォントを選択します。前に配置されたフォントが優先されます',
     fontScope: {
       global: 'グローバル',
-      lyric: '歌詞のみ'
+      lyric: '歌詞のみ',
     },
     animation: 'アニメーション速度',
     animationDesc: 'アニメーションを有効にするかどうか',
     animationSpeed: {
       slow: '非常に遅い',
       normal: '通常',
-      fast: '非常に速い'
+      fast: '非常に速い',
     },
     fontPreview: {
       title: 'フォントプレビュー',
@@ -46,8 +46,8 @@ export default {
       chineseText: '静夜思 床前明月光 疑是地上霜',
       englishText: 'The quick brown fox jumps over the lazy dog',
       japaneseText: 'あいうえお かきくけこ さしすせそ',
-      koreanText: '가나다라마 바사아자차 카타파하'
-    }
+      koreanText: '가나다라마 바사아자차 카타파하',
+    },
   },
   playback: {
     quality: '音質設定',
@@ -61,7 +61,7 @@ export default {
       jyeffect: 'HD サラウンド',
       sky: 'イマーシブサラウンド',
       dolby: 'Dolby Atmos',
-      jymaster: '超高解像度マスター'
+      jymaster: '超高解像度マスター',
     },
     musicSources: '音源設定',
     musicSourcesDesc: '音楽解析に使用する音源プラットフォームを選択',
@@ -76,7 +76,7 @@ export default {
     autoPlayDesc: 'アプリを再起動した際に自動的に再生を継続するかどうか',
     showStatusBar: 'ステータスバーコントロール機能を表示するかどうか',
     showStatusBarContent:
-      'Macのステータスバーに音楽コントロール機能を表示できます（再起動後に有効）'
+      'Macのステータスバーに音楽コントロール機能を表示できます（再起動後に有効）',
   },
   application: {
     closeAction: '閉じる動作',
@@ -84,7 +84,7 @@ export default {
     closeOptions: {
       ask: '毎回確認',
       minimize: 'トレイに最小化',
-      close: '直接終了'
+      close: '直接終了',
     },
     shortcut: 'ショートカット設定',
     shortcutDesc: 'グローバルショートカットをカスタマイズ',
@@ -94,7 +94,7 @@ export default {
     unlimitedDownloadDesc:
       '有効にすると音楽を無制限でダウンロードします（ダウンロード失敗の可能性があります）、デフォルトは300曲制限',
     downloadPath: 'ダウンロードディレクトリ',
-    downloadPathDesc: '音楽ファイルのダウンロード場所を選択'
+    downloadPathDesc: '音楽ファイルのダウンロード場所を選択',
   },
   network: {
     apiPort: '音楽APIポート',
@@ -112,8 +112,8 @@ export default {
       proxySuccess: 'プロキシ設定を保存しました。アプリ再起動後に有効になります',
       proxyError: '入力が正しいかどうか確認してください',
       realIPSuccess: '実IPアドレス設定を保存しました',
-      realIPError: '有効なIPアドレスを入力してください'
-    }
+      realIPError: '有効なIPアドレスを入力してください',
+    },
   },
   system: {
     cache: 'キャッシュ管理',
@@ -122,43 +122,43 @@ export default {
     cacheTypes: {
       history: {
         label: '再生履歴',
-        description: '再生した楽曲の記録をクリア'
+        description: '再生した楽曲の記録をクリア',
       },
       favorite: {
         label: 'お気に入り記録',
-        description: 'ローカルのお気に入り楽曲記録をクリア（クラウドのお気に入りには影響しません）'
+        description: 'ローカルのお気に入り楽曲記録をクリア（クラウドのお気に入りには影響しません）',
       },
       user: {
         label: 'ユーザーデータ',
-        description: 'ログイン情報とユーザー関連データをクリア'
+        description: 'ログイン情報とユーザー関連データをクリア',
       },
       settings: {
         label: 'アプリ設定',
-        description: 'アプリのすべてのカスタム設定をクリア'
+        description: 'アプリのすべてのカスタム設定をクリア',
       },
       downloads: {
         label: 'ダウンロード記録',
-        description: 'ダウンロード履歴をクリア（ダウンロード済みファイルは削除されません）'
+        description: 'ダウンロード履歴をクリア（ダウンロード済みファイルは削除されません）',
       },
       resources: {
         label: '音楽リソース',
-        description: '読み込み済みの音楽ファイル、歌詞などのリソースキャッシュをクリア'
+        description: '読み込み済みの音楽ファイル、歌詞などのリソースキャッシュをクリア',
       },
       lyrics: {
         label: '歌詞リソース',
-        description: '読み込み済みの歌詞リソースキャッシュをクリア'
-      }
+        description: '読み込み済みの歌詞リソースキャッシュをクリア',
+      },
     },
     restart: '再起動',
     restartDesc: 'アプリを再起動',
     messages: {
-      clearSuccess: 'クリア成功。一部の設定は再起動後に有効になります'
-    }
+      clearSuccess: 'クリア成功。一部の設定は再起動後に有効になります',
+    },
   },
   validation: {
     selectProxyProtocol: 'プロキシプロトコルを選択してください',
     proxyHost: 'プロキシアドレスを入力してください',
-    portNumber: '有効なポート番号を入力してください(1-65535)'
+    portNumber: '有効なポート番号を入力してください(1-65535)',
   },
   lyricSettings: {
     title: '歌詞設定',
@@ -166,7 +166,7 @@ export default {
       display: '表示',
       interface: 'インターフェース',
       typography: 'テキスト',
-      mobile: 'モバイル'
+      mobile: 'モバイル',
     },
     pureMode: 'ピュアモード',
     hideCover: 'カバーを非表示',
@@ -180,40 +180,40 @@ export default {
     themeOptions: {
       default: 'デフォルト',
       light: 'ライト',
-      dark: 'ダーク'
+      dark: 'ダーク',
     },
     fontSize: 'フォントサイズ',
     fontSizeMarks: {
       small: '小',
       medium: '中',
-      large: '大'
+      large: '大',
     },
     letterSpacing: '文字間隔',
     letterSpacingMarks: {
       compact: 'コンパクト',
       default: 'デフォルト',
-      loose: 'ゆったり'
+      loose: 'ゆったり',
     },
     lineHeight: '行の高さ',
     lineHeightMarks: {
       compact: 'コンパクト',
       default: 'デフォルト',
-      loose: 'ゆったり'
+      loose: 'ゆったり',
     },
     mobileLayout: 'モバイルレイアウト',
     layoutOptions: {
       default: 'デフォルト',
       ios: 'iOSスタイル',
-      android: 'Androidスタイル'
+      android: 'Androidスタイル',
     },
     mobileCoverStyle: 'カバースタイル',
     coverOptions: {
       record: 'レコード',
       square: '正方形',
-      full: 'フルスクリーン'
+      full: 'フルスクリーン',
     },
     lyricLines: '歌詞行数',
-    mobileUnavailable: 'この設定はモバイルでのみ利用可能です'
+    mobileUnavailable: 'この設定はモバイルでのみ利用可能です',
   },
   themeColor: {
     title: '歌詞テーマカラー',
@@ -227,13 +227,13 @@ export default {
       'youtube-red': 'YouTube レッド',
       orange: 'バイタルオレンジ',
       purple: 'ミステリアスパープル',
-      pink: 'サクラピンク'
+      pink: 'サクラピンク',
     },
     tooltips: {
       openColorPicker: 'カラーパレットを開く',
-      closeColorPicker: 'カラーパレットを閉じる'
+      closeColorPicker: 'カラーパレットを閉じる',
     },
-    placeholder: '#1db954'
+    placeholder: '#1db954',
   },
   shortcutSettings: {
     title: 'ショートカット設定',
@@ -262,8 +262,8 @@ export default {
       saveError: 'ショートカットの保存に失敗しました。再試行してください',
       cancelEdit: '変更をキャンセルしました',
       disableAll: 'すべてのショートカットを無効にしました。保存を忘れずに',
-      enableAll: 'すべてのショートカットを有効にしました。保存を忘れずに'
-    }
+      enableAll: 'すべてのショートカットを有効にしました。保存を忘れずに',
+    },
   },
   cookie: {
     title: 'Cookie設定',
@@ -272,25 +272,25 @@ export default {
     help: {
       format: 'Cookieは通常「MUSIC_U=」で始まります',
       source: 'ブラウザの開発者ツールのネットワークリクエストから取得できます',
-      storage: 'Cookie設定後、自動的にローカルストレージに保存されます'
+      storage: 'Cookie設定後、自動的にローカルストレージに保存されます',
     },
     action: {
       save: 'Cookieを保存',
       paste: '貼り付け',
-      clear: 'クリア'
+      clear: 'クリア',
     },
     validation: {
       required: 'Cookieを入力してください',
-      format: 'Cookie形式が正しくない可能性があります。MUSIC_Uが含まれているか確認してください'
+      format: 'Cookie形式が正しくない可能性があります。MUSIC_Uが含まれているか確認してください',
     },
     message: {
       saveSuccess: 'Cookieの保存に成功しました',
       saveError: 'Cookieの保存に失敗しました',
       pasteSuccess: '貼り付けに成功しました',
-      pasteError: '貼り付けに失敗しました。手動でコピーしてください'
+      pasteError: '貼り付けに失敗しました。手動でコピーしてください',
     },
     info: {
-      length: '現在の長さ：{length} 文字'
-    }
-  }
+      length: '現在の長さ：{length} 文字',
+    },
+  },
 };

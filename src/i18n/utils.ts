@@ -42,7 +42,7 @@ export const getLanguageDisplayNames = (): Record<string, string> => {
 };
 
 // 生成语言选项数组，用于下拉选择等组件
-export const getLanguageOptions = (): Array<{ label: string; value: string }> => {
+export const getLanguageOptions = (): Array<{ label: string, value: string }> => {
   const supportedLanguages = getSupportedLanguages();
   const displayNames = getLanguageDisplayNames();
 
@@ -53,8 +53,7 @@ export const getLanguageOptions = (): Array<{ label: string; value: string }> =>
     return priorityA - priorityB;
   });
 
-  return sortedLanguages.map((lang) => ({
-    label: displayNames[lang] || lang,
-    value: lang
+  return sortedLanguages.map(lang => ({
+    label: displayNames[lang] || lang, value: lang,
   }));
 };

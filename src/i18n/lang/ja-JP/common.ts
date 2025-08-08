@@ -34,7 +34,7 @@ export default {
     required: 'この項目は必須です',
     invalidInput: '無効な入力です',
     selectRequired: 'オプションを選択してください',
-    numberRange: '{min}から{max}の間の数値を入力してください'
+    numberRange: '{min}から{max}の間の数値を入力してください',
   },
   viewMore: 'もっと見る',
   noMore: 'これ以上ありません',
@@ -51,6 +51,6 @@ export default {
     next: '次の曲',
     pause: '一時停止',
     play: '再生',
-    favorite: 'お気に入り'
-  }
+    favorite: 'お気に入り',
+  },
 };

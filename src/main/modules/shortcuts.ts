@@ -3,14 +3,14 @@ import { globalShortcut, ipcMain } from 'electron';
 import { getStore } from './config';
 
 // 添加获取平台信息的 IPC 处理程序
-ipcMain.on('get-platform', (event) => {
+ipcMain.on('get-platform', event => {
   event.returnValue = process.platform;
 });
 
 // 定义快捷键配置接口
 export interface ShortcutConfig {
-  key: string;
-  enabled: boolean;
+  key: string,
+  enabled: boolean,
   scope: 'global' | 'app';
 }
 
@@ -26,15 +26,13 @@ export const defaultShortcuts: ShortcutsConfig = {
   volumeUp: { key: 'Alt+Up', enabled: true, scope: 'app' },
   volumeDown: { key: 'Alt+Down', enabled: true, scope: 'app' },
   toggleFavorite: { key: 'CommandOrControl+Alt+L', enabled: true, scope: 'app' },
-  toggleWindow: { key: 'CommandOrControl+Alt+Shift+M', enabled: true, scope: 'global' }
+  toggleWindow: { key: 'CommandOrControl+Alt+Shift+M', enabled: true, scope: 'global' },
 };
 
 let mainWindowRef: Electron.BrowserWindow | null = null;
 
 // 注册快捷键
-export function registerShortcuts(
-  mainWindow: Electron.BrowserWindow,
-  shortcutsConfig?: ShortcutsConfig
+export function registerShortcuts(mainWindow: Electron.BrowserWindow, shortcutsConfig?: ShortcutsConfig
 ) {
   mainWindowRef = mainWindow;
   const store = getStore();
@@ -50,11 +48,11 @@ export function registerShortcuts(
     const oldShortcuts = { ...shortcuts } as unknown as Record<string, string>;
     const newShortcuts: ShortcutsConfig = {};
 
-    Object.entries(oldShortcuts).forEach(([key, value]) => {
-      newShortcuts[key] = {
+    Object.entries(oldShortcuts).forEach(([_key, value]) => {
+      newShortcuts[_key] = {
         key: value,
         enabled: true,
-        scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(key) ? 'app' : 'global'
+        scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(_key) ? 'app' : 'global',
       };
     });
 
@@ -82,6 +80,7 @@ export function registerShortcuts(
           });
           break;
         default:
+      break;
           globalShortcut.register(key, () => {
             mainWindow.webContents.send('global-shortcut', action);
           });

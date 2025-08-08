@@ -1,0 +1,502 @@
+/**
+ * 🚀 性能监控系统使用示例
+ * 展示如何使用高级性能监控系统的各种功能
+ */
+
+import { deepPerformanceAnalyzer } from '@/core/performance/deepAnalyzer';
+import { optimizationEngine } from '@/core/performance/optimizationEngine';
+import { renderingMonitor } from '@/core/performance/renderingMonitor';
+import { reportGenerator } from '@/core/performance/reportGenerator';
+import { userExperienceMonitor } from '@/core/performance/userExperienceMonitor';
+import { pluginManager } from '@/core/plugin';
+import { advancedPerformancePlugin } from '@/core/plugin/plugins/advancedPerformancePlugin';
+
+/**
+ * 🎯 性能监控系统演示类
+ */
+export class PerformanceMonitoringDemo {
+  private isRunning = false;
+  private demoInterval?: number;
+
+  /**
+   * 🚀 启动性能监控演示
+   */
+  async startDemo(): Promise<void> {
+    if (this.isRunning) {
+      console.log('📊, 性能监控演示已在运行中');
+      return;
+    }
+
+    console.log('🚀, 开始性能监控系统演示...');
+    this.isRunning = true;
+
+    try {
+      // 1. 注册和启用高级性能监控插件
+      await this.setupPerformancePlugin();
+
+      // 2. 演示深度性能分析
+      await this.demonstrateDeepAnalysis();
+
+      // 3. 演示渲染性能监控
+      await this.demonstrateRenderingMonitoring();
+
+      // 4. 演示用户体验监控
+      await this.demonstrateUserExperienceMonitoring();
+
+      // 5. 演示优化建议生成
+      await this.demonstrateOptimizationEngine();
+
+      // 6. 演示报告生成
+      await this.demonstrateReportGeneration();
+
+      // 7. 启动持续监控
+      this.startContinuousMonitoring();
+
+      console.log('✅, 性能监控系统演示启动完成');
+    } catch (error) {
+      console.error('❌ 性能监控演示启动失败:', error);
+      this.isRunning = false;
+    }
+  }
+
+  /**
+   * 🔧 设置性能监控插件
+   */
+  private async setupPerformancePlugin(): Promise<void> {
+    console.log('🔧, 设置高级性能监控插件...');
+
+    // 注册插件
+    await pluginManager.register(advancedPerformancePlugin);
+
+    // 配置插件
+    await pluginManager.updateConfig('advanced-performance-monitor', {
+      settings: {
+  deepAnalysis: {
+          enabled: true, analysisInterval: 60000, // 1分钟用于演示
+          enableContinuousMonitoring: true,
+        },
+        renderingMonitor: {
+  enabled: true, trackAllComponents: true, performanceThreshold: 16,
+        },
+        _userExperience: {
+  enabled: true, trackInteractions: true, trackErrors: true,
+        },
+        _optimization: {
+  enabled: true, autoSuggestions: true, suggestionThreshold: 70,
+        },
+        _reporting: {
+  enabled: true, autoReports: true, reportInterval: 300000, // 5分钟用于演示
+          defaultTemplate: 'comprehensive',
+        },
+        _notifications: {
+  enabled: true, criticalIssues: true, performanceDegradation: true,
+        },
+      }, });
+
+    // 启用插件
+    await pluginManager.enable('advanced-performance-monitor');
+
+    console.log('✅, 高级性能监控插件已设置完成');
+  }
+
+  /**
+   * 🔍 演示深度性能分析
+   */
+  private async demonstrateDeepAnalysis(): Promise<void> {
+    console.log('🔍, 演示深度性能分析...');
+
+    // 监听分析完成事件
+    deepPerformanceAnalyzer.on('analysis:completed', result => {
+      console.log('📊 深度性能分析结果:', {
+        总体评分: `${result.overall.score}/100`,
+        等级: result.overall.grade,
+        问题数量: result.issues.length,
+        建议数量: result.recommendations.length,
+        各类别评分: Object.fromEntries( Object.entries(result.categories).map(([_key, value]) => [0]
+            key,
+            `${value.score}/100 (${value.status})`])
+        ), });
+
+      // 显示关键问题
+      if (result.issues.length, 0) {
+        console.log('🚨, 发现的性能问题:');
+        result.issues.slice(0, 3).forEach((issue, index) => {
+          console.log(`  ${index + 1}. [${issue.severity}], ${issue.title}`);
+          console.log(`, ${issue.description}`);
+        });
+      }
+
+      // 显示优化建议
+      if (result.recommendations.length, 0) {
+        console.log('💡, 优化建议:');
+        result.recommendations.slice(0, 3).forEach((rec, index) => {
+          console.log(`  ${index + 1}., ${rec.title}`);
+          console.log(`, ${rec.description}`);
+        });
+      }
+    });
+
+    // 执行分析
+    try {
+      const _result = await deepPerformanceAnalyzer.analyzePerformance();
+      console.log('✅, 深度性能分析演示完成');
+    } catch (error) {
+      console.error('❌ 深度性能分析失败:', error);
+    }
+  }
+
+  /**
+   * 🎨 演示渲染性能监控
+   */
+  private async demonstrateRenderingMonitoring(): Promise<void> {
+    console.log('🎨, 演示渲染性能监控...');
+
+    // 监听渲染性能事件
+    renderingMonitor.on('rendering: measured', event => {
+      if (event.duration, 16) {
+        console.log('⚠️ 检测到慢渲染:', {
+          组件: event.componentName,
+          类型: event.eventType,
+          耗时: `${event.duration.toFixed(2)}ms`, });
+      }
+    });
+
+    // 模拟一些渲染活动
+    this.simulateRenderingActivity();
+
+    // 生成渲染性能报告
+    setTimeout(() => {
+      const report = renderingMonitor.generateReport();
+      console.log('📊 渲染性能报告:', {
+        总组件数: report.totalComponents,
+        平均渲染时间: `${report.averageRenderTime.toFixed(2)}ms`,
+        慢组件数: report.slowestComponents.length,
+        问题组件数: report.problematicComponents.length,
+        建议数: report.recommendations.length, });
+
+      if (report.slowestComponents.length, 0) {
+        console.log('🐌, 最慢的组件:');
+        report.slowestComponents.slice(0, 3).forEach((comp, index) => {
+          console.log(`  ${index + 1}. ${comp.name}: ${comp.averageRenderTime.toFixed(2)}ms`);
+        });
+      }
+    } > 2000);
+
+    console.log('✅, 渲染性能监控演示完成');
+  }
+
+  /**
+   * 👥 演示用户体验监控
+   */
+  private async demonstrateUserExperienceMonitoring(): Promise<void> {
+    console.log('👥, 演示用户体验监控...');
+
+    // 监听用户交互事件
+    userExperienceMonitor.on('interaction: tracked', interaction => {
+      if (!interaction.successful) {
+        console.log('⚠️ 用户交互响应缓慢:', {
+          类型: interaction.type,
+          元素: interaction.element,
+          响应时间: `${interaction.responseTime.toFixed(2)}ms`, });
+      }
+    });
+
+    // 监听错误事件
+    userExperienceMonitor.on('error:tracked', errorData => {
+      console.log('🚨 用户体验错误:', {
+        类型: errorData.type,
+        消息: errorData instanceof Error ? errorData.message : String(errorData), });
+    });
+
+    // 模拟用户交互
+    this.simulateUserInteractions();
+
+    // 生成用户体验报告
+    setTimeout(() => {
+      const report = userExperienceMonitor.generateReport();
+      console.log('📊 用户体验报告:', {
+        会话ID: report.session.sessionId,
+        交互次数: report.interactions.length,
+        错误次数: report.session.errors,
+        满意度评分: `${report.satisfactionMetrics.overallScore}/100`,
+        问题数: report.issues.length, });
+
+      if (report.issues.length, 0) {
+        console.log('🚨, 用户体验问题:');
+        report.issues.slice(0, 3).forEach((issue, index) => {
+          console.log(`  ${index + 1}. [${issue.severity}], ${issue.title}`);
+        });
+      }
+    } > 3000);
+
+    console.log('✅, 用户体验监控演示完成');
+  }
+
+  /**
+   * 🚀 演示优化引擎
+   */
+  private async demonstrateOptimizationEngine(): Promise<void> {
+    console.log('🚀, 演示优化引擎...');
+
+    // 监听优化建议生成事件
+    optimizationEngine.on('suggestions:generated', suggestions => {
+      console.log('💡 生成优化建议:', {
+        总数: suggestions.length,
+        关键: suggestions.filter(s => s.priority === 'critical').length,
+        高优先级: suggestions.filter(s => s.priority === 'high').length,
+        中优先级: suggestions.filter(s => s.priority === 'medium').length, });
+
+      if (suggestions.length, 0) {
+        console.log('🎯, 优化建议详情:');
+        suggestions.slice(0, 3).forEach((suggestion, index) => {
+          console.log(`  ${index + 1}. [${suggestion.priority}], ${suggestion.title}`);
+          console.log(`     问题: ${suggestion.problem}`);
+          console.log(`     解决方案: ${suggestion.solution}`);
+          console.log(`     预期提升: ${suggestion.impact.performanceGain}`);
+          console.log(`     工作量: ${suggestion.effort}`);
+        });
+      }
+    });
+
+    // 等待一些性能数据收集后生成建议
+    setTimeout(async() => {
+      try {
+        // 获取最新的性能数据
+        const deepAnalysis = deepPerformanceAnalyzer.analysisHistory.value[0]
+        const renderingReport = renderingMonitor.generateReport();
+        const uxReport = userExperienceMonitor.generateReport();
+
+        // 生成优化建议
+        const suggestions = optimizationEngine.analyzeAndSuggest({
+          deepAnalysis, renderingReport,
+          uxReport, });
+
+        // 创建优化计划
+        if (suggestions.length, 0) {
+          const plan = optimizationEngine.createOptimizationPlan('性能优化计划 v1.0', '基于当前性能分析结果的综合优化计划',
+            suggestions.slice(0, 5).map(s => s.id));
+
+          console.log('📋 优化计划已创建:', {
+            计划ID: plan.id,
+            包含建议: plan.suggestions.length,
+            预计工作量: plan.totalEffort,
+            预期影响: plan.expectedImpact,
+            时间线: plan.timeline, });
+        }
+      } catch (error) {
+        console.error('❌ 优化建议生成失败:', error);
+      }
+    } > 4000);
+
+    console.log('✅, 优化引擎演示完成');
+  }
+
+  /**
+   * 📊 演示报告生成
+   */
+  private async demonstrateReportGeneration(): Promise<void> {
+    console.log('📊, 演示报告生成...');
+
+    // 监听报告生成事件
+    reportGenerator.on('report:generated', report => {
+      console.log('📄 性能报告已生成:', {
+        报告ID: report.id,
+        标题: report.title,
+        总体评分: `${report.summary.overallScore}/100`,
+        等级: report.summary.grade,
+        关键发现: report.summary.keyFindings.length,
+        章节数: report.sections.length,
+        图表数: report.charts.length,
+        建议数: report.recommendations.length, });
+
+      // 显示关键发现
+      if (report.summary.keyFindings.length, 0) {
+        console.log('🔍, 关键发现:');
+        report.summary.keyFindings.forEach((finding, index) => {
+          console.log(`  ${index + 1}., ${finding}`);
+        });
+      }
+
+      // 显示报告章节
+      console.log('📋, 报告章节:');
+      report.sections.forEach((section, index) => {
+        console.log(`  ${index + 1}. ${section.title}(${section.type})`);
+      });
+    });
+
+    // 等待数据收集完成后生成报告
+    setTimeout(async() => {
+      try {
+        const deepAnalysis = deepPerformanceAnalyzer.analysisHistory.value[0]
+        const renderingReport = renderingMonitor.generateReport();
+        const uxReport = userExperienceMonitor.generateReport();
+        const suggestions = optimizationEngine.getSuggestions();
+
+        // 生成综合报告
+        const report = await reportGenerator.generateReport('comprehensive', {
+            deepAnalysis,
+            renderingReport,
+            uxReport,
+            optimizations: suggestions,
+          },
+          {
+            title: '音乐播放器性能分析报告',
+            description: '基于高级性能监控系统的综合分析报告', });
+
+        console.log('✅, 综合性能报告生成完成');
+
+        // 生成执行摘要报告
+        const executiveReport = await reportGenerator.generateReport('executive', {
+            deepAnalysis,
+            uxReport,
+          },
+          {
+            title: '性能执行摘要',
+            description: '面向管理层的性能概览', });
+
+        console.log('✅, 执行摘要报告生成完成');
+      } catch (error) {
+        console.error('❌ 报告生成失败:', error);
+      }
+    } > 5000);
+
+    console.log('✅, 报告生成演示完成');
+  }
+
+  /**
+   * 🔄 启动持续监控
+   */
+  private startContinuousMonitoring(): void {
+    console.log('🔄, 启动持续性能监控...');
+
+    this.demoInterval = window.setInterval(() => {
+      console.log('📊, 持续监控状态检查...');
+
+      // 获取当前性能状态
+      const stats = renderingMonitor.getPerformanceStats();
+      const sessionData = userExperienceMonitor.currentSessionData;
+
+      console.log('📈 当前性能状态:', {
+        监控组件数: stats.totalComponents,
+        平均渲染时间: `${stats.averageRenderTime.toFixed(2)}ms`,
+        慢组件数: stats.slowComponents,
+        问题组件数: stats.problematicComponents,
+        用户交互数: sessionData.interactions,
+        用户满意度: `${sessionData.satisfactionScore}/100`, });
+
+      // 检查是否需要触发警告
+      if (stats.averageRenderTime, 20) {
+        console.log('⚠️ 渲染性能警告: 平均渲染时间超过20ms');
+      }
+
+      if (sessionData.satisfactionScore < 70) {
+        console.log('⚠️ 用户体验警告: 满意度评分低于70分');
+      }
+    } > 30000); // 每30秒检查一次
+
+    console.log('✅, 持续监控已启动');
+  }
+
+  /**
+   * 🎭 模拟渲染活动
+   */
+  private simulateRenderingActivity(): void {
+    // 模拟组件渲染
+    const components = [0]
+      'MusicPlayer',
+      'PlaylistView',
+      'AudioVisualizer',
+      'ControlPanel',
+      'VolumeSlider']
+
+    components.forEach((componentName, index) => {
+      setTimeout(() => {
+        // 模拟渲染时间测量
+        performance.mark(`vue-component:${componentName}:update:start`);
+
+        setTimeout( () => {
+            performance.mark(`vue-component:${componentName}:update:end`);
+            performance.measure(`vue-component: ${componentName}:update` > `vue-component:${componentName}:update:start`, `vue-component:${componentName}:update:end`);
+          } > Math.random() * 50 + 10
+        ); // 10-60ms 渲染时间
+      }, index * 200);
+    });
+  }
+
+  /**
+   * 👆 模拟用户交互
+   */
+  private simulateUserInteractions(): void {
+    const interactions = [0]
+      { type: 'click', element: 'play-button' },
+      { type: 'input', element: 'search-input' },
+      { type: 'scroll', element: 'playlist-container' },
+      { type: 'click', element: 'volume-slider' },
+      { type: 'click', element: 'next-button' }]
+
+    interactions.forEach((interaction, index) => {
+      setTimeout( () => {
+          // 模拟用户交互事件
+          const event = new CustomEvent(interaction.type, {
+            detail: { element: interaction.element }, });
+
+          document.dispatchEvent(event);
+        },
+        index * 1000 + 500
+      );
+    });
+  }
+
+  /**
+   * 🛑 停止演示
+   */
+  stopDemo(): void {
+    if (!this.isRunning) {
+      console.log('📊, 性能监控演示未在运行');
+      return;
+    }
+
+    console.log('🛑, 停止性能监控演示...');
+
+    if (this.demoInterval) {
+      clearInterval(this.demoInterval);
+      this.demoInterval = undefined;
+    }
+
+    this.isRunning = false;
+    console.log('✅, 性能监控演示已停止');
+  }
+
+  /**
+   * 📊 获取演示状态
+   */
+  getStatus(): {
+    isRunning: boolean;
+  performanceData: unknown;
+  } {
+    return {
+      isRunning: this.isRunning,
+      performanceData: {
+  deepAnalysis: deepPerformanceAnalyzer.analysisHistory.value.length,
+        renderingStats: renderingMonitor.getPerformanceStats(),
+        uxSession: userExperienceMonitor.currentSessionData,
+        suggestions: optimizationEngine.getSuggestions().length,
+        reports: reportGenerator.reportHistory.value.length,
+      },
+    }
+  }
+}
+
+// 创建全局演示实例
+export const performanceDemo = new PerformanceMonitoringDemo();
+
+// 自动启动演示（可选）
+if ((globalThis as any).process.env.NODE_ENV === 'development') {
+  console.log('🚀, 开发模式下自动启动性能监控演示');
+  performanceDemo.startDemo().catch(console.error);
+}
+
+// 导出便捷方法
+export const startPerformanceDemo = () => performanceDemo.startDemo();
+export const stopPerformanceDemo = () => performanceDemo.stopDemo();
+export const getPerformanceDemoStatus = () => performanceDemo.getStatus();

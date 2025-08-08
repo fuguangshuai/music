@@ -2,9 +2,16 @@
   <div class="settings-panel transparent-popover">
     <div class="settings-title">{{ t('settings.lyricSettings.title') }}</div>
     <div class="settings-content">
-      <n-tabs type="line" animated size="small">
+      <n-tabs
+        type="line"
+        animated
+        size="small"
+      >
         <!-- 显示设置 -->
-        <n-tab-pane :name="'display'" :tab="t('settings.lyricSettings.tabs.display')">
+        <n-tab-pane
+          :name="'display'"
+          :tab="t('settings.lyricSettings.tabs.display')"
+        >
           <div class="tab-content">
             <div class="settings-grid">
               <div class="settings-item">
@@ -32,7 +39,10 @@
         </n-tab-pane>
 
         <!-- 界面设置 -->
-        <n-tab-pane :name="'interface'" :tab="t('settings.lyricSettings.tabs.interface')">
+        <n-tab-pane
+          :name="'interface'"
+          :tab="t('settings.lyricSettings.tabs.interface')"
+        >
           <div class="tab-content">
             <div class="settings-grid">
               <div class="settings-item">
@@ -42,7 +52,11 @@
             </div>
             <div class="theme-section">
               <div class="section-title">{{ t('settings.lyricSettings.backgroundTheme') }}</div>
-              <n-radio-group v-model:value="config.theme" name="theme" class="theme-radio-group">
+              <n-radio-group
+                v-model:value="config.theme"
+                name="theme"
+                class="theme-radio-group"
+              >
                 <n-space>
                   <n-radio value="default">{{
                     t('settings.lyricSettings.themeOptions.default')
@@ -60,7 +74,10 @@
         </n-tab-pane>
 
         <!-- 文字设置 -->
-        <n-tab-pane :name="'typography'" :tab="t('settings.lyricSettings.tabs.typography')">
+        <n-tab-pane
+          :name="'typography'"
+          :tab="t('settings.lyricSettings.tabs.typography')"
+        >
           <div class="tab-content">
             <div class="slider-section">
               <div class="slider-item">
@@ -73,7 +90,7 @@
                   :marks="{
                     12: t('settings.lyricSettings.fontSizeMarks.small'),
                     22: t('settings.lyricSettings.fontSizeMarks.medium'),
-                    32: t('settings.lyricSettings.fontSizeMarks.large')
+                    32: t('settings.lyricSettings.fontSizeMarks.large'),
                   }"
                 />
               </div>
@@ -88,7 +105,7 @@
                   :marks="{
                     '-2': t('settings.lyricSettings.letterSpacingMarks.compact'),
                     0: t('settings.lyricSettings.letterSpacingMarks.default'),
-                    10: t('settings.lyricSettings.letterSpacingMarks.loose')
+                    10: t('settings.lyricSettings.letterSpacingMarks.loose'),
                   }"
                 />
               </div>
@@ -103,7 +120,7 @@
                   :marks="{
                     1: t('settings.lyricSettings.lineHeightMarks.compact'),
                     1.5: t('settings.lyricSettings.lineHeightMarks.default'),
-                    3: t('settings.lyricSettings.lineHeightMarks.loose')
+                    3: t('settings.lyricSettings.lineHeightMarks.loose'),
                   }"
                 />
               </div>
@@ -116,157 +133,155 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { computed, onMounted, ref, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-import { DEFAULT_LYRIC_CONFIG, LyricConfig } from '@/types/lyric';
+  import { DEFAULT_LYRIC_CONFIG, LyricConfig } from '@/types/lyric';
 
-const { t } = useI18n();
-const config = ref<LyricConfig>({ ...DEFAULT_LYRIC_CONFIG });
-const emit = defineEmits(['themeChange']);
+  const { t } = useI18n();
+  const config = ref<LyricConfig>({ ...DEFAULT_LYRIC_CONFIG, });
+  const emit = defineEmits(['themeChange']);
 
-// 显示mini播放栏开关
-const showMiniPlayBar = computed({
-  get: () => !config.value.hideMiniPlayBar,
-  set: (value: boolean) => {
-    if (value) {
-      // 显示mini播放栏，隐藏普通播放栏
-      config.value.hideMiniPlayBar = false;
-      config.value.hidePlayBar = true;
-    } else {
-      // 显示普通播放栏，隐藏mini播放栏
-      config.value.hideMiniPlayBar = true;
-      config.value.hidePlayBar = false;
+  // 显示mini播放栏开关
+  const showMiniPlayBar = computed({
+    get: () =>  !config.value.hideMiniPlayBar,
+    set: (value: boolean) => {
+      if (value) {
+        // 显示mini播放栏，隐藏普通播放栏
+        config.value.hideMiniPlayBar = false;
+        config.value.hidePlayBar = true;
+      } else {
+        // 显示普通播放栏，隐藏mini播放栏
+        config.value.hideMiniPlayBar = true;
+        config.value.hidePlayBar = false;
+      }
+    },
+  });
+
+  watch(() => config.value,
+    newConfig => {
+      updateCSSVariables(newConfig);
+    },
+    { deep: true }
+  );
+
+  watch(() => config.value.theme,
+    newTheme => {
+      emit('themeChange', newTheme);
     }
+  );
+
+  const updateCSSVariables = (config: LyricConfig) => {
+    document.documentElement.style.setProperty('--lyric-font-_size', `${config.fontSize}px`);
+    document.documentElement.style.setProperty('--lyric-letter-spacing', `${config.letterSpacing}px`
+    );
+    document.documentElement.style.setProperty('--lyric-line-height', config.lineHeight.toString());
   }
-});
 
-watch(
-  () => config.value,
-  (newConfig) => {
-    updateCSSVariables(newConfig);
-  },
-  { deep: true }
-);
+  onMounted(() => {
+    const savedConfig = localStorage.getItem('music-full-config');
+    if (savedConfig) {
+      config.value = { ...config.value, ...JSON.parse(savedConfig) }
+      updateCSSVariables(config.value);
+    }
+  });
 
-watch(
-  () => config.value.theme,
-  (newTheme) => {
-    emit('themeChange', newTheme);
-  }
-);
-
-const updateCSSVariables = (config: LyricConfig) => {
-  document.documentElement.style.setProperty('--lyric-font-size', `${config.fontSize}px`);
-  document.documentElement.style.setProperty('--lyric-letter-spacing', `${config.letterSpacing}px`);
-  document.documentElement.style.setProperty('--lyric-line-height', config.lineHeight.toString());
-};
-
-onMounted(() => {
-  const savedConfig = localStorage.getItem('music-full-config');
-  if (savedConfig) {
-    config.value = { ...config.value, ...JSON.parse(savedConfig) };
-    updateCSSVariables(config.value);
-  }
-});
-
-defineExpose({
-  config
-});
+  defineExpose({
+    config, });
 </script>
 
 <style scoped lang="scss">
-.settings-panel {
-  @apply p-4 w-80 rounded-lg relative overflow-hidden backdrop-blur-lg bg-black/10;
+  .settings-panel {
+    @apply p-4 w-80 rounded-lg relative overflow-hidden backdrop-blur-lg bg-black/10;
 
-  .settings-title {
-    @apply text-base font-bold mb-4;
-    color: var(--text-color-active);
-  }
-
-  .settings-content {
-    :deep(.n-tabs-nav) {
-      @apply mb-3;
+    .settings-title {
+      @apply text-base font-bold mb-4;
+      color: var(--text-color-active);
     }
 
-    :deep(.n-tab-pane) {
-      @apply p-0;
-    }
+    .settings-content {
+      :deep(.n-tabs-nav) {
+        @apply mb-3;
+      }
 
-    :deep(.n-tabs-tab) {
-      @apply text-xs;
-      color: var(--text-color-primary);
+      :deep(.n-tab-pane) {
+        @apply p-0;
+      }
 
-      &.n-tabs-tab--active {
-        color: var(--text-color-active);
+      :deep(.n-tabs-tab) {
+        @apply text-xs;
+        color: var(--text-color-primary);
+
+        &.n-tabs-tab--active {
+          color: var(--text-color-active);
+        }
+      }
+
+      :deep(.n-tabs-tab-wrapper) {
+        @apply pb-0;
+      }
+
+      :deep(.n-tabs-pane-wrapper) {
+        @apply px-2;
+      }
+
+      :deep(.n-tabs-bar) {
+        background-color: var(--text-color-active);
       }
     }
 
-    :deep(.n-tabs-tab-wrapper) {
-      @apply pb-0;
+    .tab-content {
+      @apply py-2;
     }
 
-    :deep(.n-tabs-pane-wrapper) {
-      @apply px-2;
+    .settings-grid {
+      @apply grid grid-cols-1 gap-3;
     }
 
-    :deep(.n-tabs-bar) {
-      background-color: var(--text-color-active);
+    .settings-item {
+      @apply flex items-center justify-between;
+      span {
+        @apply text-sm;
+        color: var(--text-color-primary);
+      }
     }
-  }
 
-  .tab-content {
-    @apply py-2;
-  }
-
-  .settings-grid {
-    @apply grid grid-cols-1 gap-3;
-  }
-
-  .settings-item {
-    @apply flex items-center justify-between;
-    span {
-      @apply text-sm;
+    .section-title {
+      @apply text-sm font-medium mb-2;
       color: var(--text-color-primary);
     }
-  }
 
-  .section-title {
-    @apply text-sm font-medium mb-2;
-    color: var(--text-color-primary);
-  }
+    .theme-section {
+      @apply mt-4;
+    }
 
-  .theme-section {
-    @apply mt-4;
-  }
+    .slider-section {
+      @apply space-y-6;
+    }
 
-  .slider-section {
-    @apply space-y-6;
-  }
+    .slider-item {
+      @apply space-y-2 mb-10 !important;
+      span {
+        @apply text-sm;
+        color: var(--text-color-primary);
+      }
+    }
 
-  .slider-item {
-    @apply space-y-2 mb-10 !important;
-    span {
-      @apply text-sm;
-      color: var(--text-color-primary);
+    .theme-radio-group {
+      @apply flex;
     }
   }
 
-  .theme-radio-group {
-    @apply flex;
+  :deep(.n-slider-mark) {
+    color: var(--text-color-primary) !important;
   }
-}
 
-:deep(.n-slider-mark) {
-  color: var(--text-color-primary) !important;
-}
+  :deep(.n-radio__label) {
+    color: var(--text-color-active) !important;
+    @apply text-xs;
+  }
 
-:deep(.n-radio__label) {
-  color: var(--text-color-active) !important;
-  @apply text-xs;
-}
-
-.mobile-unavailable {
-  @apply text-center py-4 text-gray-500 text-sm;
-}
+  .mobile-unavailable {
+    @apply text-center py-4 text-gray-500 text-sm;
+  }
 </style>

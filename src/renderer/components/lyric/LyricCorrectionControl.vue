@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { defineEmits, defineProps } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-const props = defineProps<{
-  correctionTime: number;
-}>();
-const emit = defineEmits<{
-  (e: 'adjust', delta: number): void;
-}>();
+  const props = defineProps<{
+    correctionTime: number;
+  }>();
+  const emit = defineEmits<{
+    (e: 'adjust', delta: number): void;
+  }>();
 
-const { t } = useI18n();
+  const { t } = useI18n();
 </script>
 
 <template>
@@ -47,17 +47,17 @@ const { t } = useI18n();
 </template>
 
 <style scoped lang="scss">
-.lyric-correction {
-  @apply absolute right-0 bottom-4 flex flex-col items-center space-y-1 z-50 select-none transition-opacity duration-200 opacity-0 pointer-events-none;
-}
-
-.lyric-correction-btn {
-  @apply w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-white/20 dark:border-neutral-700/40 shadow-md backdrop-blur-2xl cursor-pointer transition-all duration-150 text-gray-700 dark:text-gray-200 hover:bg-green-500/80 hover:text-white hover:border-green-400/60 active:scale-95 bg-opacity-40 dark:hover:bg-green-500/80 dark:hover:text-white dark:hover:border-green-400/60 dark:hover:bg-opacity-40;
-}
-
-.mobile {
   .lyric-correction {
-    @apply opacity-100;
+    @apply absolute right-0 bottom-4 flex flex-col items-center space-y-1 z-50 select-none transition-opacity duration-200 opacity-0 pointer-events-none;
   }
-}
+
+  .lyric-correction-btn {
+    @apply w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-neutral-800 border border-white/20 dark:border-neutral-700/40 shadow-md backdrop-blur-2xl cursor-pointer transition-all duration-150 text-gray-700 dark:text-gray-200 hover:bg-green-500/80 hover:text-white hover:border-green-400/60 active:scale-95 bg-opacity-40 dark:hover:bg-green-500/80 dark:hover:text-white dark:hover:border-green-400/60 dark:hover:bg-opacity-40;
+  }
+
+  .mobile {
+    .lyric-correction {
+      @apply opacity-100;
+    }
+  }
 </style>

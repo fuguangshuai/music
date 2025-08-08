@@ -17,19 +17,19 @@ export default {
   playMode: {
     sequence: 'Sequence',
     loop: 'Loop',
-    random: 'Random'
+    random: 'Random',
   },
   fullscreen: {
     enter: 'Enter Fullscreen',
-    exit: 'Exit Fullscreen'
+    exit: 'Exit Fullscreen',
   },
   close: 'Close',
   modeHint: {
     single: 'Single',
-    list: 'Next'
+    list: 'Next',
   },
   lrc: {
-    noLrc: 'No lyrics, please enjoy'
+    noLrc: 'No lyrics, please enjoy',
   },
   reparse: {
     title: 'Select Music Source',
@@ -39,7 +39,7 @@ export default {
     warning: 'Please select a music source',
 
     processing: 'Processing...',
-    clear: 'Clear Custom Source'
+    clear: 'Clear Custom Source',
   },
   playBar: {
     expand: 'Expand Lyrics',
@@ -53,7 +53,7 @@ export default {
     playMode: {
       sequence: 'Sequence',
       loop: 'Loop',
-      random: 'Random'
+      random: 'Random',
     },
     play: 'Play',
     pause: 'Pause',
@@ -63,7 +63,7 @@ export default {
     favorite: 'Favorite {name}',
     unFavorite: 'Unfavorite {name}',
     playbackSpeed: 'Playback Speed',
-    advancedControls: 'Advanced Controls'
+    advancedControls: 'Advanced Controls',
   },
   eq: {
     title: 'Equalizer',
@@ -86,8 +86,8 @@ export default {
       vocal: 'Vocal',
       dance: 'Dance',
       acoustic: 'Acoustic',
-      custom: 'Custom'
-    }
+      custom: 'Custom',
+    },
   },
   // Sleep timer related
   sleepTimer: {
@@ -109,7 +109,7 @@ export default {
     timerEnded: 'Sleep timer ended',
     playbackStopped: 'Music playback stopped',
     minutesRemaining: '{minutes} min remaining',
-    songsRemaining: '{count} songs remaining'
+    songsRemaining: '{count} songs remaining',
   },
   playList: {
     clearAll: 'Clear Playlist',
@@ -118,6 +118,6 @@ export default {
     empty: 'Playlist is empty',
     clearConfirmTitle: 'Clear Playlist',
     clearConfirmContent:
-      'This will clear all songs in the playlist and stop the current playback. Continue?'
-  }
+      'This will clear all songs in the playlist and stop the current playback. Continue?',
+  },
 };

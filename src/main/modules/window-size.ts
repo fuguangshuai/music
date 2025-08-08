@@ -24,7 +24,7 @@ let ipcHandlersRegistered = false;
  * 窗口状态类型定义
  */
 export interface WindowState {
-  width: number;
+  width: number,
   height: number;
   x?: number;
   y?: number;
@@ -178,8 +178,7 @@ class WindowSizeManager {
       Math.abs(currentWidth - this.savedState.width) > 2 ||
       Math.abs(currentHeight - this.savedState.height) > 2
     ) {
-      console.log(
-        `强制调整窗口大小: 当前=${currentWidth}x${currentHeight}, 目标=${this.savedState.width}x${this.savedState.height}`
+      console.log(`强制调整窗口大小: 当前=${currentWidth}x${currentHeight}, 目标=${this.savedState.width}x${this.savedState.height}`
       );
 
       // 临时禁用minimum size限制
@@ -291,8 +290,8 @@ class WindowSizeManager {
       frame: false,
       webPreferences: {
         nodeIntegration: false,
-        contextIsolation: true
-      }
+        contextIsolation: true,
+      },
     };
 
     // 如果有保存的位置，且位置有效，则使用该位置
@@ -303,8 +302,7 @@ class WindowSizeManager {
       }
     }
 
-    console.log(
-      `窗口创建选项: 大小=${options.width}x${options.height}, 位置=(${options.x}, ${options.y})`
+    console.log(`窗口创建选项: 大小=${options.width}x${options.height}, 位置=(${options.x}, ${options.y})`
     );
 
     return options;
@@ -346,11 +344,9 @@ class WindowSizeManager {
     // 如果窗口已销毁，则返回之前的状态或默认状态
     console.log('win.isDestroyed()', win.isDestroyed());
     if (win.isDestroyed()) {
-      return (
-        this.savedState || {
-          width: DEFAULT_MAIN_WIDTH,
-          height: DEFAULT_MAIN_HEIGHT,
-          isMaximized: false
+      return (this.savedState || {
+          width: DEFAULT_MAIN_WIDTH, height: DEFAULT_MAIN_HEIGHT,
+          isMaximized: false,
         }
       );
     }
@@ -377,17 +373,15 @@ class WindowSizeManager {
         height: previousSize.height,
         x: currentBounds.x,
         y: currentBounds.y,
-        isMaximized: true
+        isMaximized: true,
       };
       console.log('state IsMaximized', state);
     } else if (win.isMinimized()) {
       // 最小化状态下不保存窗口大小，因为可能不准确
       console.log('state IsMinimized', this.savedState);
-      return (
-        this.savedState || {
-          width: DEFAULT_MAIN_WIDTH,
-          height: DEFAULT_MAIN_HEIGHT,
-          isMaximized: false
+      return (this.savedState || {
+          width: DEFAULT_MAIN_WIDTH, height: DEFAULT_MAIN_HEIGHT,
+          isMaximized: false,
         }
       );
     } else {
@@ -400,7 +394,7 @@ class WindowSizeManager {
         height,
         x,
         y,
-        isMaximized: false
+        isMaximized: false,
       };
       console.log('state IsNormal', state);
     }
@@ -439,7 +433,7 @@ class WindowSizeManager {
       height: Math.max(MIN_HEIGHT, state.height || DEFAULT_MAIN_HEIGHT),
       x: state.x,
       y: state.y,
-      isMaximized: !!state.isMaximized
+      isMaximized: !!state.isMaximized,
     };
 
     console.log(`读取保存的窗口状态: ${JSON.stringify(validatedState)}`);
@@ -531,8 +525,7 @@ class WindowSizeManager {
 
     if (app.isReady()) {
       try {
-        console.log(
-          `应用页面缩放因子: ${zoomFactor}, 系统缩放比: ${screen.getPrimaryDisplay().scaleFactor}`
+        console.log(`应用页面缩放因子: ${zoomFactor}, 系统缩放比: ${screen.getPrimaryDisplay().scaleFactor}`
         );
       } catch (error) {
         console.error('获取系统缩放比失败:', error);
@@ -579,7 +572,7 @@ class WindowSizeManager {
       }
     });
 
-    ipcMain.handle('get-content-zoom', (event) => {
+    ipcMain.handle('get-content-zoom', event => {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (win && !win.isDestroyed()) {
         return win.webContents.getZoomFactor();
@@ -600,7 +593,7 @@ class WindowSizeManager {
       }
     });
 
-    ipcMain.on('reset-content-zoom', (event) => {
+    ipcMain.on('reset-content-zoom', event => {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (win && !win.isDestroyed()) {
         this.store.delete('set.contentZoomFactor');
@@ -719,6 +712,6 @@ export const initWindowSizeHandlers = (mainWindow: BrowserWindow | null): void =
   }
 };
 
-export const calculateMinimumWindowSize = (): { minWidth: number; minHeight: number } => {
+export const calculateMinimumWindowSize = (): { minWidth: number, minHeight: number } => {
   return { minWidth: MIN_WIDTH, minHeight: MIN_HEIGHT };
 };

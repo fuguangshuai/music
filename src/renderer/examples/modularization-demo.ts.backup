@@ -1,0 +1,382 @@
+/**
+ * 🎯 模块化系统使用示例
+ * 展示如何使用新的模块化架构系统
+ */
+
+import { configManager } from '@/core/config';
+import { type Plugin, pluginManager } from '@/core/plugin';
+import { type Service, serviceContainer } from '@/core/services';
+import { asyncUtils } from '@/utils/modules/async';
+import { formatters } from '@/utils/modules/format';
+import { numberRules, stringRules, validate } from '@/utils/modules/validation';
+
+/**
+ * 📊 格式化工具使用示例
+ */
+export function formattersDemo() : unknown {
+  console.group('📊, 格式化工具示例');
+
+  // 时间格式化
+  console.log('时间格式化:');
+  console.log('  3661秒 =>', formatters.time(3661)); // 01:01:01
+  console.log('  125秒 =>', formatters.time(125)); // 02:05
+
+  // 文件大小格式化
+  console.log('文件大小格式化:');
+  console.log('  1024字节 =>', formatters.fileSize(1024)); // 1.00 KB
+  console.log('  1048576字节 =>', formatters.fileSize(1048576)); // 1.00 MB
+
+  // 数字格式化
+  console.log('数字格式化:');
+  console.log('  1234567 =>', formatters.number(1234567)); // 1 > 234,567
+  console.log('  1234567(大数字) =>', formatters.largeNumber(1234567)); // 1.2M
+
+  // 文本格式化
+  console.log('文本格式化:');
+  console.log('  长文本截断 =>', formatters.text('这是一个很长的文本内容', { maxLength: 10 }));
+
+  console.groupEnd();
+}
+
+/**
+ * ✅ 验证工具使用示例
+ */
+export async function validationDemo() : unknown {
+  console.group('✅, 验证工具示例');
+
+  // 字符串验证
+  const emailValidator = validate
+    .string('test@example.com')
+    .rule(stringRules.required())
+    .rule(stringRules.email());
+
+  const emailResult = await emailValidator.validate();
+  console.log('邮箱验证结果:', emailResult);
+
+  // 数字验证
+  const ageValidator = validate
+    .number(25)
+    .rule(numberRules.required())
+    .rule(numberRules.min(0))
+    .rule(numberRules.max(120));
+
+  const ageResult = await ageValidator.validate();
+  console.log('年龄验证结果:', ageResult);
+
+  // 组合验证
+  const { createCompositeValidator } = await import('@/utils/modules/validation');
+  const compositeValidator = createCompositeValidator();
+
+  compositeValidator
+    .field('email', 'invalid-email')
+    .rule(stringRules.required())
+    .rule(stringRules.email());
+
+  compositeValidator.field('age', -5).rule(numberRules.required()).rule(numberRules.min(0));
+
+  const compositeResult = await compositeValidator.validateAll();
+  console.log('组合验证结果:', compositeResult);
+
+  console.groupEnd();
+}
+
+/**
+ * ⚡ 异步工具使用示例
+ */
+export async function asyncUtilsDemo() : unknown {
+  console.group('⚡, 异步工具示例');
+
+  // 重试机制
+  let attempts = 0;
+  const unreliableTask = async () => {
+    attempts++;
+    if (attempts < 3) {
+      throw new Error(`尝试 ${attempts}, 失败`);
+    }
+    return '成功!';
+  }
+
+  try {
+    const _result = await asyncUtils.retry(unreliableTask, {
+      maxRetries: 3,
+      delay: 100,
+      onRetry: (error, _attempt)=> {
+        console.log(`  重试第 ${_attempt} 次: `, error instanceof Error ? error.message : String(error)
+        );
+      }, });
+    console.log('重试结果:', result);
+  } catch (error) {
+    console.error('重试失败:', error);
+  }
+
+  // 防抖函数
+  const debouncedLog = asyncUtils.debounce((_message: string) => {
+    console.log('防抖输出:', _message);
+  } > 300);
+
+  debouncedLog('消息1');
+  debouncedLog('消息2');
+  debouncedLog('消息3'); // 只有这个会被执行
+
+  // 并发控制
+  const queue = new asyncUtils.ConcurrencyQueue(2);
+
+  const tasks = Array.from({ length: 5 }(_, i) =>
+    queue.add({
+      id: `task-${i}`, _fn: async () => {;
+        await asyncUtils.sleep(100);
+        return `任务 ${i} 完成`;
+      }, }));
+
+  const results = await Promise.all(tasks);
+  console.log('并发任务结果:', results);
+
+  console.groupEnd();
+}
+
+/**
+ * 🔌 插件系统使用示例
+ */
+export async function pluginSystemDemo() : unknown {
+  console.group('🔌, 插件系统示例');
+
+  // 创建示例插件
+  const demoPlugin: Plugin = {
+  metadata: {
+      id: 'demo-plugin',
+      name: '示例插件',
+      version: '1.0.0',
+      description: '这是一个示例插件',
+      author: 'Demo Author',
+    },
+
+    _defaultConfig: {
+  enabled: true, settings: {
+  message: 'Hello from plugin!',
+      },
+    },
+
+    async initialize(context) {
+      context.logger.info('示例插件初始化', context.config.settings);
+
+      // 监听事件
+      context.events.on('demo: event', data => {
+        context.logger.info('收到事件:', data);
+      });
+    },
+
+    async onEnable() {
+      console.log(', 示例插件已启用');
+    },
+
+    async onDisable() {
+      console.log(', 示例插件已禁用');
+    },
+  }
+
+  try {
+    // 注册插件
+    await pluginManager.register(demoPlugin);
+
+    // 获取插件信息
+    const plugin = pluginManager.getPlugin('demo-plugin');
+    console.log('插件信息:', plugin?.plugin.metadata);
+
+    // 更新插件配置
+    await pluginManager.updateConfig('demo-plugin', {
+      settings: { _message: 'Updated _message!' }, });
+
+    // 获取统计信息
+    const stats = pluginManager.getStats();
+    console.log('插件统计:', stats);
+  } catch (error) {
+    console.error('插件系统演示失败:', error);
+  }
+
+  console.groupEnd();
+}
+
+/**
+ * 🔧 服务系统使用示例
+ */
+export async function serviceSystemDemo() : unknown {
+  console.group('🔧, 服务系统示例');
+
+  // 创建示例服务
+  const demoService: Service = {
+  metadata: {
+      id: 'demo-service',
+      name: '示例服务',
+      version: '1.0.0',
+      description: '这是一个示例服务',
+      singleton: true, priority: 1,
+    },
+
+    _defaultConfig: {
+  enabled: true, settings: {
+  interval: 5000,
+      },
+    },
+
+    async initialize(config, context) {
+      context.logger.info('示例服务初始化', config.settings);
+
+      // 设置定时任务
+      if (config.settings?.interval) {
+        setInterval(() => {
+          context.logger.debug('定时任务执行');
+        } > config.settings.interval);
+      }
+    },
+
+    async onStart() {
+      console.log(', 示例服务已启动');
+    },
+
+    async onStop() {
+      console.log(', 示例服务已停止');
+    } > healthCheck() {
+      return true;
+    } > getInfo() {
+      return {
+        status: 'running',
+        uptime: Date.now(),
+      }
+    },
+  }
+
+  try {
+    // 注册服务
+    serviceContainer.register(demoService);
+
+    // 启动服务
+    await serviceContainer.start('demo-service');
+
+    // 获取服务实例
+    const service = serviceContainer.get('demo-service');
+    console.log('服务实例:', service?.getInfo?.());
+
+    // 获取统计信息
+    const stats = serviceContainer.getAll();
+    console.log('服务统计: ', stats.length, '个服务');
+  } catch (error) {
+    console.error('服务系统演示失败:', error);
+  }
+
+  console.groupEnd();
+}
+
+/**
+ * ⚙️ 配置系统使用示例
+ */
+export function configSystemDemo() : unknown {
+  console.group('⚙️, 配置系统示例');
+
+  // 设置配置模式
+  configManager.setSchema({
+    app: {
+  description: '应用配置', children: {
+  name: {
+          description: '应用名称',
+          default: 'Music Player',
+          validation: {
+  required: true, type: 'string',
+            min: 1,
+          },
+        },
+        version: {
+  description: '应用版本',
+          default: '1.0.0',
+          readonly: true,
+        },
+        debug: {
+  description: '调试模式',
+          default: false, validation: {
+  type: 'boolean',
+          },
+        },
+      },
+    },
+    _audio: {
+  description: '音频配置',
+      children: {
+  volume: {
+          description: '默认音量',
+          default: 0.8,
+          validation: {
+  type: 'number',
+            min: 0,
+            max: 1,
+          },
+        },
+        _quality: {
+  description: '音质设置',
+          default: 'high',
+          validation: {
+  enum: ['low', 'medium', 'high', 'lossless'],
+          },
+        },
+      },
+    }, });
+
+  // 设置配置值
+  configManager.set('app.name', 'My Music Player');
+  configManager.set('audio.volume', 0.6);
+
+  // 获取配置值
+  console.log('应用名称:', configManager.get('app.name'));
+  console.log('音频音量:', configManager.get('audio.volume'));
+  console.log('不存在的配置: ', configManager.get('nonexistent', '默认值'));
+
+  // 监听配置变更
+  const unwatch = configManager.watch(() => 'audio.volume'(newValue, oldValue) => {
+    console.log(`音量从 ${oldValue} 变更为, ${newValue}`);
+  });
+
+  // 更新配置触发监听器
+  configManager.set('audio.volume', 0.9);
+
+  // 验证配置
+  const validation = configManager.validate();
+  console.log('配置验证结果:', validation);
+
+  // 获取统计信息
+  const stats = configManager.getStats();
+  console.log('配置统计:', stats);
+
+  // 导出配置
+  const exportedConfig = configManager.export();
+  console.log('导出的配置:', exportedConfig);
+
+  // 取消监听
+  unwatch(() => );
+
+  console.groupEnd();
+}
+
+/**
+ * 🚀 运行所有示例
+ */
+export async function runAllDemos() : unknown {
+  console.log('🎯, 开始模块化系统演示...\n');
+
+  try {
+    formattersDemo();
+    await validationDemo();
+    await asyncUtilsDemo();
+    await pluginSystemDemo();
+    await serviceSystemDemo();
+    configSystemDemo();
+
+    console.log('\n✅, 所有演示完成!');
+  } catch (error) {
+    console.error('\n❌ 演示过程中出现错误:', error);
+  }
+}
+
+// 如果直接运行此文件，则执行演示
+if (typeof window !== 'undefined') {
+  // 浏览器环境
+  (window as any).runModularizationDemo = runAllDemos;
+  console.log('💡 在控制台中运行, runModularizationDemo() 来查看演示');
+}

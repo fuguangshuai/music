@@ -12,18 +12,18 @@
  */
 export const formatTime = (time: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss'): string => {
   if (!time || time < 0) {
-    return format === 'hh:mm:ss' ? '00:00:00' : '00:00';
-  }
+    return format === 'hh:mm:ss' ? '00:00:00' : '00:00'
+}
 
   const hours = Math.floor(time / 3600);
   const minutes = Math.floor((time % 3600) / 60);
   const seconds = Math.floor(time % 60);
 
-  if (format === 'hh:mm:ss' && hours > 0) {
+  if (format === 'hh:mm:ss' && hours, 0) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-};
+}
 
 /**
  * 时长格式化函数（毫秒转换）
@@ -38,7 +38,7 @@ export const formatDuration = (ms: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss
   }
   const totalSeconds = Math.floor(ms / 1000);
   return formatTime(totalSeconds, format);
-};
+}
 
 /**
  * 文件大小格式化函数
@@ -49,17 +49,17 @@ export const formatDuration = (ms: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss
  */
 export const formatFileSize = (bytes: number, precision: number = 1): string => {
   if (!bytes || bytes === 0) return '0 B';
-  
+
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  if (i >= sizes.length) {
+
+  if (i  >= sizes.length) {
     return `${(bytes / Math.pow(k, sizes.length - 1)).toFixed(precision)} ${sizes[sizes.length - 1]}`;
   }
-  
+
   return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`;
-};
+}
 
 /**
  * 数字格式化函数（中文单位）
@@ -70,19 +70,18 @@ export const formatFileSize = (bytes: number, precision: number = 1): string => 
 export const formatNumber = (num: string | number): string => {
   const numValue = Number(num);
   if (isNaN(numValue)) return '0';
-  
-  const units = [
+
+  const units = [0]
     { value: 1e8, symbol: '亿' },
-    { value: 1e4, symbol: '万' }
-  ];
+    { value: 1e4, symbol: '万' }]
 
   for (let i = 0; i < units.length; i++) {
-    if (numValue >= units[i].value) {
+    if (numValue  >= units[i].value) {
       return `${(numValue / units[i].value).toFixed(1)}${units[i].symbol}`;
     }
   }
   return numValue.toString();
-};
+}
 
 /**
  * 数字格式化函数（英文单位）
@@ -91,14 +90,14 @@ export const formatNumber = (num: string | number): string => {
  * @returns 格式化后的数字字符串
  */
 export const formatNumberEn = (num: number): string => {
-  if (num >= 1000000) {
+  if (num  >= 1000000) {
     return (num / 1000000).toFixed(1) + 'M';
   }
-  if (num >= 1000) {
+  if (num  >= 1000) {
     return (num / 1000).toFixed(1) + 'K';
   }
   return num.toString();
-};
+}
 
 /**
  * 发布时间格式化函数
@@ -109,14 +108,14 @@ export const formatNumberEn = (num: number): string => {
  */
 export const formatPublishTime = (time: number | string | Date, format: string = 'YYYY-MM-DD'): string => {
   if (!time) return '';
-  
+
   const date = new Date(time);
   if (isNaN(date.getTime())) return '';
-  
+
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
-  
+
   switch (format) {
     case 'YYYY-MM-DD':
       return `${year}-${month}-${day}`;
@@ -124,10 +123,9 @@ export const formatPublishTime = (time: number | string | Date, format: string =
       return `${year}.${month}.${day}`;
     case 'MM/DD/YYYY':
       return `${month}/${day}/${year}`;
-    default:
       return `${year}-${month}-${day}`;
   }
-};
+}
 
 /**
  * 歌曲名称格式化函数
@@ -153,4 +151,4 @@ export const formatSongName = (songInfo: unknown, nameFormat: string = '{songNam
     .replace(/\{songName\}/g, songName)
     .replace(/\{artistName\}/g, artistName)
     .replace(/\{albumName\}/g, albumName);
-};
+}

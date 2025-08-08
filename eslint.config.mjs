@@ -11,7 +11,7 @@ import globals from 'globals';
 export default [
   // 忽略文件配置
   {
-    ignores: ['node_modules/**', 'dist/**', 'out/**', '.gitignore']
+    ignores: ['node_modules/**', 'dist/**', 'out/**', '.gitignore'],
   },
 
   // 基础 JavaScript 配置
@@ -25,13 +25,13 @@ export default [
       sourceType: 'module',
       globals: {
         ...globals.node,
-        ...globals.browser
-      }
+        ...globals.browser,
+      },
     },
     rules: {
       'no-console': 'off',
-      'no-undef': 'error'
-    }
+      'no-undef': 'error',
+    },
   },
 
   // TypeScript 文件配置
@@ -44,8 +44,8 @@ export default [
         sourceType: 'module',
         allowImportExportEverywhere: true,
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         ...globals.node,
@@ -55,12 +55,12 @@ export default [
         defineEmits: 'readonly',
         // TypeScript 全局类型
         NodeJS: 'readonly',
-        ScrollBehavior: 'readonly'
-      }
+        ScrollBehavior: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'simple-import-sort': simpleImportSort
+      'simple-import-sort': simpleImportSort,
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'error', // 🔧 启用any类型检查，使用error强制修复
@@ -72,17 +72,20 @@ export default [
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^value$|^loading$|^width$|^height$|^showPlaylist$|^id$|^enabledSources$|^progress$|^status$|^success$|^filePath$|^locale$|^channel$|^listener$|^url$|^songId$|^delta$|^item$|^err$|^gradient$|^theme$',
           varsIgnorePattern:
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^NONE$|^TIME$|^SONGS$|^PLAYLIST_END$|^c$|^l$|^Window$|^key$|^color$',
-          ignoreRestSiblings: true
-        }
+          ignoreRestSiblings: true,
+        },
       ],
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/ban-types': 'off',
-      '@typescript-eslint/explicit-function-return-type': ['warn', {
-        allowExpressions: true, // 允许表达式不需要返回类型
-        allowTypedFunctionExpressions: true, // 允许已类型化的函数表达式
-        allowHigherOrderFunctions: true // 允许高阶函数
-      }], // 🔧 启用函数返回类型检查
+      '@typescript-eslint/explicit-function-return-type': [
+        'warn',
+        {
+          allowExpressions: true, // 允许表达式不需要返回类型
+          allowTypedFunctionExpressions: true, // 允许已类型化的函数表达式
+          allowHigherOrderFunctions: true, // 允许高阶函数
+        },
+      ], // 🔧 启用函数返回类型检查
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       'no-console': 'off',
@@ -93,8 +96,8 @@ export default [
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^value$|^loading$|^width$|^height$|^showPlaylist$|^id$|^enabledSources$|^progress$|^status$|^success$|^filePath$|^locale$|^channel$|^listener$|^url$|^songId$|^delta$|^item$|^err$|^gradient$|^theme$',
           varsIgnorePattern:
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^NONE$|^TIME$|^SONGS$|^PLAYLIST_END$|^c$|^l$|^Window$|^key$|^color$',
-          ignoreRestSiblings: true
-        }
+          ignoreRestSiblings: true,
+        },
       ],
       'no-use-before-define': 'off',
       'max-classes-per-file': 'off',
@@ -123,8 +126,8 @@ export default [
       'valid-typeof': 'off',
       'consistent-return': 'off',
       'no-promise-executor-return': 'off',
-      'prefer-promise-reject-errors': 'off'
-    }
+      'prefer-promise-reject-errors': 'off',
+    },
   },
 
   // Vue 文件配置
@@ -136,7 +139,7 @@ export default [
         parser: typescriptParser,
         ecmaVersion: 'latest',
         sourceType: 'module',
-        allowImportExportEverywhere: true
+        allowImportExportEverywhere: true,
       },
       globals: {
         ...globals.browser,
@@ -160,15 +163,15 @@ export default [
         useMessage: 'readonly',
         // TypeScript 全局类型
         NodeJS: 'readonly',
-        ScrollBehavior: 'readonly'
-      }
+        ScrollBehavior: 'readonly',
+      },
     },
     plugins: {
       vue,
       '@typescript-eslint': typescript,
       prettier,
       'simple-import-sort': simpleImportSort,
-      'vue-scoped-css': vueScopedCss
+      'vue-scoped-css': vueScopedCss,
     },
     rules: {
       // Vue 3 推荐规则
@@ -185,16 +188,16 @@ export default [
       'vue-scoped-css/enforce-style-type': [
         'error',
         {
-          allows: ['scoped']
-        }
+          allows: ['scoped'],
+        },
       ],
       '@typescript-eslint/explicit-function-return-type': 'off', // Vue组件中关闭，避免过于严格
       '@typescript-eslint/no-explicit-any': 'warn', // Vue文件中使用warn，逐步改进
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       'prettier/prettier': 'error',
       'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error'
-    }
+      'simple-import-sort/exports': 'error',
+    },
   },
 
   // TypeScript 类型定义文件配置
@@ -204,8 +207,8 @@ export default [
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-empty-interface': 'off'
-    }
+      '@typescript-eslint/no-empty-interface': 'off',
+    },
   },
 
   // JavaScript 第三方库文件配置
@@ -215,8 +218,8 @@ export default [
       'no-unused-vars': 'off',
       'no-redeclare': 'off',
       'no-self-assign': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
 
   // 通用规则
@@ -245,9 +248,9 @@ export default [
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^value$|^loading$|^width$|^height$|^showPlaylist$|^id$|^enabledSources$|^progress$|^status$|^success$|^filePath$|^locale$|^channel$|^listener$|^url$|^songId$|^delta$|^item$|^err$|^gradient$|^theme$',
           varsIgnorePattern:
             '^_|^e$|^event$|^error$|^data$|^callback$|^args$|^NONE$|^TIME$|^SONGS$|^PLAYLIST_END$|^c$|^l$|^Window$|^key$|^color$',
-          ignoreRestSiblings: true
-        }
-      ]
-    }
-  }
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
 ];

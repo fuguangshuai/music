@@ -5,18 +5,20 @@
 
 declare module 'howler' {
   interface HowlSound {
-    _node?: HTMLMediaElement;
+_node?: HTMLMediaElement;
     _sounds?: Array<{
       _node?: HTMLMediaElement;
       _id?: number;
-    }>;
+    
+}>;
   }
 
   interface Howl {
-    _sounds?: Array<{
+_sounds?: Array<{
       _node?: HTMLMediaElement;
       _id?: number;
-    }>;
+    
+}>;
   }
 }
 
@@ -24,15 +26,17 @@ declare module 'howler' {
  * 音频节点相关类型定义
  */
 export interface AudioNodeInfo {
-  node: HTMLMediaElement;
+node: HTMLMediaElement;
   id?: number;
+
 }
 
 /**
  * EQ 设置相关类型
  */
 export interface EQSettings {
-  [frequency: string]: number;
+[frequency: string]: number;
+
 }
 
 /**
@@ -44,22 +48,19 @@ export type AudioContextState = 'suspended' | 'running' | 'closed';
  * 操作锁状态
  */
 export interface OperationLockState {
-  isLocked: boolean;
-  lockId: string;
-  startTime: number;
+isLocked: boolean,
+  lockId: string,
+  startTime: number,
   timeout: number;
+
 }
 
 /**
  * 音频服务错误类型
  */
 export class AudioServiceError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public details?: any
-  ) {
-    super(message);
+  constructor(_message: string, public code: string, public _details?: unknown) {
+    super(_message);
     this.name = 'AudioServiceError';
   }
 }
@@ -72,7 +73,7 @@ export const AudioErrorCodes = {
   AUDIO_LOAD_FAILED: 'AUDIO_LOAD_FAILED',
   AUDIO_PLAY_FAILED: 'AUDIO_PLAY_FAILED',
   EQ_SETUP_FAILED: 'EQ_SETUP_FAILED',
-  CONTEXT_UNAVAILABLE: 'CONTEXT_UNAVAILABLE'
+  CONTEXT_UNAVAILABLE: 'CONTEXT_UNAVAILABLE',
 } as const;
 
-export type AudioErrorCode = (typeof AudioErrorCodes)[keyof typeof AudioErrorCodes];
+export type AudioErrorCode = (typeof AudioErrorCodes)[keyof typeof AudioErrorCodes]

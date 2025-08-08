@@ -7,7 +7,7 @@ import {
   nativeImage,
   screen,
   session,
-  shell
+  shell,
 } from 'electron';
 import Store from 'electron-store';
 import { join } from 'path';
@@ -23,7 +23,7 @@ import {
   getWindowState,
   initWindowSizeHandlers,
   saveWindowState,
-  WindowState
+  WindowState,
 } from './window-size';
 
 const store = new Store();
@@ -38,7 +38,7 @@ let preMiniModeState: WindowState = {
   height: DEFAULT_MAIN_HEIGHT,
   x: undefined,
   y: undefined,
-  isMaximized: false
+  isMaximized: false,
 };
 
 /**
@@ -56,13 +56,13 @@ function initializeProxy() {
     enable: false,
     protocol: 'http',
     host: '127.0.0.1',
-    port: 7890
+    port: 7890,
   };
 
   const proxyConfig = store.get('set.proxyConfig', defaultConfig) as {
-    enable: boolean;
-    protocol: string;
-    host: string;
+    enable: boolean,
+    protocol: string,
+    host: string,
     port: number;
   };
 
@@ -77,11 +77,10 @@ function initializeProxy() {
 function setThumbarButtons(window: BrowserWindow) {
   window.setThumbarButtons([
     {
-      tooltip: 'prev',
-      icon: nativeImage.createFromPath(join(app.getAppPath(), 'resources/icons', 'prev.png')),
+      tooltip: 'prev', icon: nativeImage.createFromPath(join(app.getAppPath(), 'resources/icons', 'prev.png')),
       click() {
         window.webContents.send('global-shortcut', 'prevPlay');
-      }
+      },
     },
 
     {
@@ -91,7 +90,7 @@ function setThumbarButtons(window: BrowserWindow) {
       ),
       click() {
         window.webContents.send('global-shortcut', 'togglePlay');
-      }
+      },
     },
 
     {
@@ -99,8 +98,8 @@ function setThumbarButtons(window: BrowserWindow) {
       icon: nativeImage.createFromPath(join(app.getAppPath(), 'resources/icons', 'next.png')),
       click() {
         window.webContents.send('global-shortcut', 'nextPlay');
-      }
-    }
+      },
+    },
   ]);
 }
 
@@ -111,14 +110,14 @@ export function initializeWindowManager() {
   // 初始化代理设置
   initializeProxy();
 
-  ipcMain.on('minimize-window', (event) => {
+  ipcMain.on('minimize-window', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       win.minimize();
     }
   });
 
-  ipcMain.on('maximize-window', (event) => {
+  ipcMain.on('maximize-window', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       if (win.isMaximized()) {
@@ -130,7 +129,7 @@ export function initializeWindowManager() {
     }
   });
 
-  ipcMain.on('close-window', (event) => {
+  ipcMain.on('close-window', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       // 在 macOS 上，关闭窗口不应该退出应用，而是隐藏窗口
@@ -143,14 +142,14 @@ export function initializeWindowManager() {
     }
   });
 
-  ipcMain.on('mini-tray', (event) => {
+  ipcMain.on('mini-tray', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       win.hide();
     }
   });
 
-  ipcMain.on('mini-window', (event) => {
+  ipcMain.on('mini-window', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       // 保存当前窗口状态，以便之后恢复
@@ -167,9 +166,7 @@ export function initializeWindowManager() {
       win.setMaximumSize(DEFAULT_MINI_WIDTH, DEFAULT_MINI_HEIGHT);
       win.setSize(DEFAULT_MINI_WIDTH, DEFAULT_MINI_HEIGHT, false); // 禁用动画
       // 将迷你窗口放在工作区的右上角，留出一些边距
-      win.setPosition(
-        screenX + screenWidth - DEFAULT_MINI_WIDTH - 20,
-        display.workArea.y + 20,
+      win.setPosition(screenX + screenWidth - DEFAULT_MINI_WIDTH - 20, display.workArea.y + 20,
         false
       );
       win.setAlwaysOnTop(true);
@@ -188,7 +185,7 @@ export function initializeWindowManager() {
   });
 
   // 恢复窗口
-  ipcMain.on('restore-window', (event) => {
+  ipcMain.on('restore-window', event => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
       // 恢复窗口的大小调整功能
@@ -198,8 +195,7 @@ export function initializeWindowManager() {
       console.log('从迷你模式恢复，使用保存的状态:', JSON.stringify(preMiniModeState));
 
       // 设置适当的最小尺寸
-      win.setMinimumSize(
-        Math.max(DEFAULT_MAIN_WIDTH * 0.5, 600),
+      win.setMinimumSize(Math.max(DEFAULT_MAIN_WIDTH * 0.5, 600),
         Math.max(DEFAULT_MAIN_HEIGHT * 0.5, 400)
       );
 
@@ -242,8 +238,7 @@ export function initializeWindowManager() {
               Math.abs(width - preMiniModeState.width) > 2 ||
               Math.abs(height - preMiniModeState.height) > 2
             ) {
-              console.log(
-                `恢复后窗口大小不一致，再次调整: 当前=${width}x${height}, 目标=${preMiniModeState.width}x${preMiniModeState.height}`
+              console.log(`恢复后窗口大小不一致，再次调整: 当前=${width}x${height}, 目标=${preMiniModeState.width}x${preMiniModeState.height}`
               );
               win.setSize(preMiniModeState.width, preMiniModeState.height, false);
             }
@@ -297,17 +292,15 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
     webSecurity: true, // 🔒 安全修复: 启用webSecurity以符合Electron安全最佳实践
     nodeIntegration: false, // 🔒 安全加固: 明确禁用nodeIntegration
     nodeIntegrationInWorker: false, // 🔒 安全加固: 禁用Worker中的Node.js集成
-    allowRunningInsecureContent: false // 🔒 安全加固: 禁止运行不安全内容
+    allowRunningInsecureContent: false, // 🔒 安全加固: 禁止运行不安全内容
   };
 
-  console.log(
-    `创建窗口，使用选项: ${JSON.stringify({
-      width: options.width,
-      height: options.height,
+  console.log(`创建窗口，使用选项: ${JSON.stringify({
+      width: options.width, height: options.height,
       x: options.x,
       y: options.y,
       minWidth: options.minWidth,
-      minHeight: options.minHeight
+      minHeight: options.minHeight,
     })}`
   );
 
@@ -318,17 +311,16 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [
+        ...details.responseHeaders, 'Content-Security-Policy': [
           "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-          "style-src 'self' 'unsafe-inline'; " +
-          "img-src 'self' data: https: http:; " +
-          "media-src 'self' data: https: http: blob:; " +
-          "connect-src 'self' https: http: ws: wss:; " +
-          "font-src 'self' data:;"
-        ]
-      }
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data: https: http:; " +
+            "media-src 'self' data: https: http: blob:; " +
+            "connect-src 'self' https: http: ws: wss:; " +
+            "font-src 'self' data:;",
+        ],
+      },
     });
   });
 
@@ -349,7 +341,7 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
   });
 
   // 处理窗口关闭事件
-  mainWindow.on('close', (event) => {
+  mainWindow.on('close', event => {
     // 在 macOS 上，阻止默认的关闭行为，改为隐藏窗口
     if (process.platform === 'darwin') {
       // 检查是否是应用正在退出
@@ -385,8 +377,7 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
             Math.abs(currentWidth - savedState.width) > 2 ||
             Math.abs(currentHeight - savedState.height) > 2
           ) {
-            console.log(
-              `窗口大小不匹配，再次调整: 当前=${currentWidth}x${currentHeight}, 目标=${savedState.width}x${savedState.height}`
+            console.log(`窗口大小不匹配，再次调整: 当前=${currentWidth}x${currentHeight}, 目标=${savedState.width}x${savedState.height}`
             );
             mainWindow.setSize(savedState.width, savedState.height, false);
           }
@@ -395,7 +386,7 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
     }, 100);
   });
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  mainWindow.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });

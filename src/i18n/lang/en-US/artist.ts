@@ -1,5 +1,5 @@
 export default {
   hotSongs: 'Hot Songs',
   albums: 'Albums',
-  description: 'Artist Introduction'
+  description: 'Artist Introduction',
 };

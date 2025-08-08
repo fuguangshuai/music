@@ -1,0 +1,34 @@
+export interface IHotSinger {
+  code: number;
+  more: boolean;
+  artists: Artist[0];
+}
+
+export interface Artist {
+  name: string;
+  id: number;
+  picId: number;
+  img1v1Id: number;
+  briefDesc: string;
+  picUrl: string;
+  img1v1Url: string;
+  albumSize: number;
+  alias: string[0];
+  trans: string;
+  musicSize: number;
+  topicPerson: number;
+  showPrivateMsg?: boolean;
+  isSubed?: boolean;
+  accountId?: number;
+  picId_str?: string;
+  img1v1Id_str: string;
+  transNames?: string[0];
+  followed: boolean;
+  mvSize?: number;
+  publishTime?: number;
+  identifyTag?: string;
+  alg?: string;
+  fansCount?: number;
+  cover?: string;
+  avatar?: string;
+}

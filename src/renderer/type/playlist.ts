@@ -1,7 +1,7 @@
 export interface IPlayListSort {
-  code: number;
-  all: SortAll;
-  sub: SortAll[];
+  code: number,
+  all: SortAll,
+  sub: SortAll[],
   categories: SortCategories;
 }
 

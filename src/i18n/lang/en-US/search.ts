@@ -2,25 +2,25 @@ export default {
   title: {
     hotSearch: 'Hot Search',
     searchList: 'Search Results',
-    searchHistory: 'Search History'
+    searchHistory: 'Search History',
   },
   button: {
     clear: 'Clear',
     back: 'Back',
-    playAll: 'Play All'
+    playAll: 'Play All',
   },
   loading: {
     more: 'Loading...',
-    failed: 'Search failed'
+    failed: 'Search failed',
   },
   noMore: 'No more results',
   error: {
-    searchFailed: 'Search failed'
+    searchFailed: 'Search failed',
   },
   search: {
     single: 'Single',
     album: 'Album',
     playlist: 'Playlist',
-    mv: 'MV'
-  }
+    mv: 'MV',
+  },
 };

@@ -7,7 +7,7 @@ export default {
     playback: 'Playback Settings',
     application: 'Application Settings',
     network: 'Network Settings',
-    system: 'System Management'
+    system: 'System Management',
   },
   basic: {
     themeMode: 'Theme Mode',
@@ -28,7 +28,7 @@ export default {
     fontDesc: 'Select fonts, prioritize fonts in order',
     fontScope: {
       global: 'Global',
-      lyric: 'Lyrics Only'
+      lyric: 'Lyrics Only',
     },
     animation: 'Animation Speed',
     animationSpeedPlaceholder: 'Enter animation speed',
@@ -36,7 +36,7 @@ export default {
     animationSpeed: {
       slow: 'Very Slow',
       normal: 'Normal',
-      fast: 'Very Fast'
+      fast: 'Very Fast',
     },
     fontPreview: {
       title: 'Font Preview',
@@ -47,8 +47,8 @@ export default {
       chineseText: '静夜思 床前明月光 疑是地上霜',
       englishText: 'The quick brown fox jumps over the lazy dog',
       japaneseText: 'あいうえお かきくけこ さしすせそ',
-      koreanText: '가나다라마 바사아자차 카타파하'
-    }
+      koreanText: '가나다라마 바사아자차 카타파하',
+    },
   },
   playback: {
     quality: 'Audio Quality',
@@ -62,7 +62,7 @@ export default {
       jyeffect: 'HD Surround',
       sky: 'Immersive',
       dolby: 'Dolby Atmos',
-      jymaster: 'Master'
+      jymaster: 'Master',
     },
     musicSources: 'Music Sources',
     musicSourcesDesc: 'Select music sources for song resolution',
@@ -78,7 +78,7 @@ export default {
     autoPlayDesc: 'Auto resume playback when reopening the app',
     showStatusBar: 'Show Status Bar',
     showStatusBarContent:
-      'You can display the music control function in your mac status bar (effective after a restart)'
+      'You can display the music control function in your mac status bar (effective __after a, restart)',
   },
   application: {
     closeAction: 'Close Action',
@@ -86,7 +86,7 @@ export default {
     closeOptions: {
       ask: 'Ask Every Time',
       minimize: 'Minimize to Tray',
-      close: 'Exit Directly'
+      close: 'Exit Directly',
     },
     shortcut: 'Shortcut Settings',
     shortcutDesc: 'Customize global shortcuts',
@@ -95,7 +95,7 @@ export default {
     unlimitedDownload: 'Unlimited Download',
     unlimitedDownloadDesc: 'Enable unlimited download mode for music , default limit 300 songs',
     downloadPath: 'Download Directory',
-    downloadPathDesc: 'Choose download location for music files'
+    downloadPathDesc: 'Choose download location for music files',
   },
   network: {
     apiPort: 'Music API Port',
@@ -112,8 +112,8 @@ export default {
       proxySuccess: 'Proxy settings saved, restart required to take effect',
       proxyError: 'Please check your input',
       realIPSuccess: 'RealIP settings saved',
-      realIPError: 'Please enter a valid IP address'
-    }
+      realIPError: 'Please enter a valid IP address',
+    },
   },
   system: {
     cache: 'Cache Management',
@@ -122,43 +122,43 @@ export default {
     cacheTypes: {
       history: {
         label: 'Play History',
-        description: 'Clear played song records'
+        description: 'Clear played song records',
       },
       favorite: {
         label: 'Favorites',
-        description: 'Clear local favorite songs (cloud favorites not affected)'
+        description: 'Clear local favorite songs (cloud favorites not, affected)',
       },
       user: {
         label: 'User Data',
-        description: 'Clear login info and user-related data'
+        description: 'Clear login info and user-related data',
       },
       settings: {
         label: 'App Settings',
-        description: 'Clear all custom app settings'
+        description: 'Clear all custom app settings',
       },
       downloads: {
         label: 'Download History',
-        description: 'Clear download history (downloaded files not affected)'
+        description: 'Clear download history (downloaded files not, affected)',
       },
       resources: {
         label: 'Music Resources',
-        description: 'Clear cached music files, lyrics and other resources'
+        description: 'Clear cached music files, lyrics and other resources',
       },
       lyrics: {
         label: 'Lyrics Resources',
-        description: 'Clear cached lyrics resources'
-      }
+        description: 'Clear cached lyrics resources',
+      },
     },
     restart: 'Restart',
     restartDesc: 'Restart application',
     messages: {
-      clearSuccess: 'Cache cleared successfully, some settings will take effect after restart'
-    }
+      clearSuccess: 'Cache cleared successfully, some settings will take effect after restart',
+    },
   },
   validation: {
     selectProxyProtocol: 'Please select proxy protocol',
     proxyHost: 'Please enter proxy host',
-    portNumber: 'Please enter a valid port number (1-65535)'
+    portNumber: 'Please enter a valid port number (1-65535)',
   },
   lyricSettings: {
     title: 'Lyric Settings',
@@ -166,7 +166,7 @@ export default {
       display: 'Display',
       interface: 'Interface',
       typography: 'Typography',
-      mobile: 'Mobile'
+      mobile: 'Mobile',
     },
     pureMode: 'Pure Mode',
     hideCover: 'Hide Cover',
@@ -180,40 +180,40 @@ export default {
     themeOptions: {
       default: 'Default',
       light: 'Light',
-      dark: 'Dark'
+      dark: 'Dark',
     },
     fontSize: 'Font Size',
     fontSizeMarks: {
       small: 'Small',
       medium: 'Medium',
-      large: 'Large'
+      large: 'Large',
     },
     letterSpacing: 'Letter Spacing',
     letterSpacingMarks: {
       compact: 'Compact',
       default: 'Default',
-      loose: 'Loose'
+      loose: 'Loose',
     },
     lineHeight: 'Line Height',
     lineHeightMarks: {
       compact: 'Compact',
       default: 'Default',
-      loose: 'Loose'
+      loose: 'Loose',
     },
     mobileLayout: 'Mobile Layout',
     layoutOptions: {
       default: 'Default',
       ios: 'iOS Style',
-      android: 'Android Style'
+      android: 'Android Style',
     },
     mobileCoverStyle: 'Cover Style',
     coverOptions: {
       record: 'Record',
       square: 'Square',
-      full: 'Full Screen'
+      full: 'Full Screen',
     },
     lyricLines: 'Lyric Lines',
-    mobileUnavailable: 'This setting is only available on mobile devices'
+    mobileUnavailable: 'This setting is only available on mobile devices',
   },
   themeColor: {
     title: 'Lyric Theme Color',
@@ -227,13 +227,13 @@ export default {
       'youtube-red': 'YouTube Red',
       orange: 'Vibrant Orange',
       purple: 'Mystic Purple',
-      pink: 'Cherry Pink'
+      pink: 'Cherry Pink',
     },
     tooltips: {
       openColorPicker: 'Open Color Picker',
-      closeColorPicker: 'Close Color Picker'
+      closeColorPicker: 'Close Color Picker',
     },
-    placeholder: '#1db954'
+    placeholder: '#1db954',
   },
   shortcutSettings: {
     title: 'Shortcut Settings',
@@ -262,8 +262,8 @@ export default {
       saveError: 'Failed to save shortcuts',
       cancelEdit: 'Edit cancelled',
       disableAll: 'All shortcuts disabled, please save to apply',
-      enableAll: 'All shortcuts enabled, please save to apply'
-    }
+      enableAll: 'All shortcuts enabled, please save to apply',
+    },
   },
   cookie: {
     title: 'Cookie Settings',
@@ -272,25 +272,25 @@ export default {
     help: {
       format: 'Cookie usually starts with "MUSIC_U="',
       source: 'Can be obtained from browser developer tools network requests',
-      storage: 'Cookie will be automatically saved to local storage after setting'
+      storage: 'Cookie will be automatically saved to local storage after setting',
     },
     action: {
       save: 'Save Cookie',
       paste: 'Paste',
-      clear: 'Clear'
+      clear: 'Clear',
     },
     validation: {
       required: 'Please enter Cookie',
-      format: 'Cookie format may be incorrect, please check if it contains MUSIC_U'
+      format: 'Cookie format may be incorrect, please check if it contains MUSIC_U',
     },
     message: {
       saveSuccess: 'Cookie saved successfully',
       saveError: 'Failed to save Cookie',
       pasteSuccess: 'Pasted successfully',
-      pasteError: 'Paste failed, please copy manually'
+      pasteError: 'Paste failed, please copy manually',
     },
     info: {
-      length: 'Current length: {length} characters'
-    }
-  }
+      length: 'Current length: {length} characters',
+    },
+  },
 };

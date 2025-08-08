@@ -7,29 +7,29 @@ enum CacheType {
   IMAGE = 'images',
   AUDIO_METADATA = 'audioMetadata',
   API_RESPONSE = 'apiResponses',
-  USER_DATA = 'userData'
+  USER_DATA = 'userData',
 }
 
 // 通用缓存数据接口
 interface CacheData<T = unknown> {
-  id: string;
-  data: T;
+  id: string,
+  data: T,
   timestamp: number;
   ttl?: number; // 生存时间（毫秒）
-  accessCount: number;
+  accessCount: number,
   lastAccessed: number;
   size?: number; // 数据大小（字节）
 }
 
 // 缓存统计接口
 interface CacheStats {
-  totalItems: number;
-  totalSize: number;
-  hitCount: number;
-  missCount: number;
-  hitRate: number;
-  oldestItem: number;
-  newestItem: number;
+  totalItems: number,
+  totalSize: number,
+  hitCount: number,
+  missCount: number,
+  hitRate: number,
+  oldestItem: number,
+  newestItem: number,
   memoryUsage: number;
 }
 
@@ -49,8 +49,8 @@ interface StoreSchema {
   userData: Record<string, CacheData>;
   cacheStats: Record<string, CacheStats>;
   cacheConfig: {
-    maxSize: number;
-    defaultTTL: number;
+    maxSize: number,
+    defaultTTL: number,
     enableLRU: boolean;
   };
 }
@@ -70,8 +70,7 @@ class SmartCacheManager {
 
   constructor() {
     this.store = new Store<StoreSchema>({
-      name: 'smart-cache',
-      defaults: {
+      name: 'smart-cache', defaults: {
         lyrics: {},
         images: {},
         audioMetadata: {},
@@ -81,9 +80,9 @@ class SmartCacheManager {
         cacheConfig: {
           maxSize: this.maxMemorySize,
           defaultTTL: 24 * 60 * 60 * 1000, // 24小时
-          enableLRU: true
-        }
-      }
+          enableLRU: true,
+        },
+      },
     });
 
     // 初始化统计数据
@@ -103,12 +102,7 @@ class SmartCacheManager {
   /**
    * 💾 通用缓存数据方法
    */
-  async cacheData<T>(
-    type: CacheType,
-    key: string,
-    data: T,
-    ttl?: number
-  ): Promise<boolean> {
+  async cacheData<T>(type: CacheType, key: string, data: T, ttl?: number): Promise<boolean> {
     try {
       // 检查内存压力
       await this.handleMemoryPressure();
@@ -124,7 +118,7 @@ class SmartCacheManager {
         ttl: ttl || this.store.get('cacheConfig').defaultTTL,
         accessCount: 0,
         lastAccessed: now,
-        size
+        size,
       };
 
       // 获取对应类型的缓存存储
@@ -170,7 +164,7 @@ class SmartCacheManager {
       const now = Date.now();
 
       // 检查TTL过期
-      if (result.ttl && (now - result.timestamp > result.ttl)) {
+      if (result.ttl && now - result.timestamp, result.ttl) {
         await this.removeFromCache(type, key);
         this.updateStats(type, 'miss');
         console.log(`⏰ 缓存过期 [${type}:${key}]`);
@@ -230,7 +224,7 @@ class SmartCacheManager {
         hitRate: 0,
         oldestItem: 0,
         newestItem: 0,
-        memoryUsage: 0
+        memoryUsage: 0,
       });
 
       console.log(`🗑️ 清理缓存完成 [${type}] 释放: ${size}字节`);
@@ -321,7 +315,7 @@ class SmartCacheManager {
       const size = await this.removeFromCache(type as CacheType, id);
       cleanedSize += size;
 
-      if (cleanedSize > this.maxMemorySize * 0.2) break; // 最多清理20%
+      if (cleanedSize >= this.maxMemorySize * 0.2) break; // 最多清理20%
     }
 
     console.log(`🧹 内存清理完成，释放: ${cleanedSize}字节`);
@@ -363,7 +357,7 @@ class SmartCacheManager {
       hitRate: 0,
       oldestItem: Date.now(),
       newestItem: Date.now(),
-      memoryUsage: 0
+      memoryUsage: 0,
     };
 
     switch (operation) {
@@ -392,16 +386,18 @@ class SmartCacheManager {
    */
   getCacheStats(type?: CacheType): CacheStats | Map<string, CacheStats> {
     if (type) {
-      return this.stats.get(type) || {
-        totalItems: 0,
-        totalSize: 0,
-        hitCount: 0,
-        missCount: 0,
-        hitRate: 0,
-        oldestItem: 0,
-        newestItem: 0,
-        memoryUsage: 0
-      };
+      return (
+        this.stats.get(type) || {
+          totalItems: 0,
+          totalSize: 0,
+          hitCount: 0,
+          missCount: 0,
+          hitRate: 0,
+          oldestItem: 0,
+          newestItem: 0,
+          memoryUsage: 0,
+        }
+      );
     }
     return this.stats;
   }
@@ -430,7 +426,7 @@ class SmartCacheManager {
         hitRate: 0,
         oldestItem: Date.now(),
         newestItem: Date.now(),
-        memoryUsage: 0
+        memoryUsage: 0,
       });
     });
   }
@@ -439,9 +435,12 @@ class SmartCacheManager {
    * ⏰ 启动定期清理
    */
   private startPeriodicCleanup(): void {
-    setInterval(() => {
-      this.cleanupExpiredItems();
-    }, 60 * 60 * 1000); // 每小时清理一次过期项
+    setInterval(
+      () => {
+        this.cleanupExpiredItems();
+      },
+      60 * 60 * 1000
+    ); // 每小时清理一次过期项
   }
 
   /**
@@ -456,7 +455,7 @@ class SmartCacheManager {
       const toDelete: string[] = [];
 
       Object.entries(typeCache).forEach(([key, item]) => {
-        if (item.ttl && (now - item.timestamp > item.ttl)) {
+        if (item.ttl && now - item.timestamp, item.ttl) {
           toDelete.push(key);
         }
       });
@@ -498,8 +497,9 @@ export function initializeCacheManager(): void {
 
   // 新增通用缓存IPC处理
   ipcMain.handle('cache-data', async (_, type: CacheType, key: string, data: unknown, ttl?: number) => {
-    return await smartCacheManager.cacheData(type, key, data, ttl);
-  });
+      return await smartCacheManager.cacheData(type, key, data, ttl);
+    }
+  );
 
   ipcMain.handle('get-cached-data', async (_, type: CacheType, key: string) => {
     return await smartCacheManager.getCachedData(type, key);

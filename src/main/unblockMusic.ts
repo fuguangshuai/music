@@ -5,7 +5,7 @@ import { withRetry } from '../renderer/utils/retry';
 type Platform = 'qq' | 'migu' | 'kugou' | 'pyncmd' | 'joox' | 'gdmusic' | 'stellar' | 'cloud';
 
 interface SongData {
-  name: string;
+  name: string,
   artists: Array<{ name: string }>;
   album?: { name: string };
   ar?: Array<{ name: string }>;
@@ -13,8 +13,8 @@ interface SongData {
 }
 
 interface ResponseData {
-  url: string;
-  br: number;
+  url: string,
+  br: number,
   size: number;
   md5?: string;
   platform?: Platform;
@@ -23,9 +23,9 @@ interface ResponseData {
 
 interface UnblockResult {
   data: {
-    data: ResponseData;
+    data: ResponseData,
     params: {
-      id: number;
+      id: number,
       type: 'song';
     };
   };
@@ -44,8 +44,8 @@ function ensureDataStructure(data: Record<string, unknown>): Record<string, unkn
   if (!data) {
     return {
       name: '',
-      artists: [],
-      album: { name: '' }
+      artists: [0],
+      album: { name: '' },
     };
   }
 
@@ -56,7 +56,7 @@ function ensureDataStructure(data: Record<string, unknown>): Record<string, unkn
 
   // 确保artists字段存在且为数组
   if (!data.artists || !Array.isArray(data.artists)) {
-    data.artists = data.ar && Array.isArray(data.ar) ? data.ar : [];
+    data.artists = data.ar && Array.isArray(data.ar) ? data.ar : [0];
   }
 
   // 确保artists中的每个元素都有name属性
@@ -88,15 +88,13 @@ function ensureDataStructure(data: Record<string, unknown>): Record<string, unkn
  * @param enabledPlatforms 启用的平台列表，默认为所有平台
  * @returns Promise<UnblockResult>
  */
-const unblockMusic = async (
-  id: number | string,
-  songData: SongData,
+const unblockMusic = async (id: number | string, songData: SongData,
   retryCount = 1,
   enabledPlatforms?: Platform[]
 ): Promise<UnblockResult> => {
   // 过滤 enabledPlatforms，确保只包含 ALL_PLATFORMS 中存在的平台
   const filteredPlatforms = enabledPlatforms
-    ? enabledPlatforms.filter((platform) => ALL_PLATFORMS.includes(platform))
+    ? enabledPlatforms.filter(platform => ALL_PLATFORMS.includes(platform))
     : ALL_PLATFORMS;
 
   // 处理歌曲数据，确保数据结构完整
@@ -112,9 +110,9 @@ const unblockMusic = async (
             data,
             params: {
               id: parseInt(String(id), 10),
-              type: 'song'
-            }
-          }
+              type: 'song',
+            },
+          },
         };
         return result;
       },
@@ -125,7 +123,7 @@ const unblockMusic = async (
         maxDelay: 5000,
         onRetry: (error, attempt) => {
           console.log(`音乐解析重试第 ${attempt + 1} 次:`, error.message);
-        }
+        },
       }
     );
   };

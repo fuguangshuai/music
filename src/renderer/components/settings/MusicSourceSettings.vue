@@ -11,14 +11,24 @@
     <n-space vertical>
       <p>{{ t('settings.playback.musicSourcesDesc') }}</p>
       <n-checkbox-group v-model:value="selectedSources">
-        <n-grid :cols="2" :x-gap="12" :y-gap="8">
-          <n-grid-item v-for="source in musicSourceOptions" :key="source.value">
+        <n-grid
+          :cols="2"
+          :x-gap="12"
+          :y-gap="8"
+        >
+          <n-grid-item
+            v-for="source in musicSourceOptions"
+            :key="source.value"
+          >
             <n-checkbox :value="source.value">
-              {{ source.label }}
+              {{ source?.label }}
               <template v-if="source.value === 'gdmusic'">
                 <n-tooltip>
                   <template #trigger>
-                    <n-icon size="16" class="ml-1 text-blue-500 cursor-help">
+                    <n-icon
+                      size="16"
+                      class="ml-1 text-blue-500 cursor-help"
+                    >
                       <i class="ri-information-line"></i>
                     </n-icon>
                   </template>
@@ -29,7 +39,10 @@
           </n-grid-item>
         </n-grid>
       </n-checkbox-group>
-      <div v-if="selectedSources.length === 0" class="text-red-500 text-sm">
+      <div
+        v-if="selectedSources.length === 0"
+        class="text-red-500 text-sm"
+      >
         {{ t('settings.playback.musicSourcesWarning') }}
       </div>
 
@@ -48,87 +61,83 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { defineEmits, defineProps, ref, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-import { type Platform } from '@/types/music';
-import { isElectron } from '@/utils';
+  import { Platform, type } from '@/types/music';
+  import { isElectron } from '@/utils';
 
-const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  },
-  sources: {
-    type: Array as () => Platform[],
-    default: () => (isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic'])
-  }
-});
+  const props = defineProps({
+    show: {
+      type: Boolean, default: false,
+    },
+    sources: {
+      type: Array as () => Platform[],
+      default: () =>  (isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic']),
+    },
+  });
 
-const emit = defineEmits(['update:show', 'update:sources']);
+  const emit = defineEmits(['update:show', 'update:sources']);
 
-const { t } = useI18n();
-const visible = ref(props.show);
-const selectedSources = ref<Platform[]>(props.sources);
+  const { t } = useI18n();
+  const visible = ref(props.show);
+  const selectedSources = ref<Platform[]>(props.sources);
 
-const musicSourceOptions = computed(() => {
-  if (isElectron) {
-    return [
-      { label: 'MG', value: 'migu' },
-      { label: 'KG', value: 'kugou' },
-      { label: 'pyncmd', value: 'pyncmd' },
-      { label: '星辰音乐', value: 'stellar' },
-      { label: '云端音乐', value: 'cloud' },
-      { label: 'GD音乐台', value: 'gdmusic' }
-    ];
-  } else {
-    return [
-      { label: '星辰音乐', value: 'stellar' },
-      { label: '云端音乐', value: 'cloud' },
-      { label: 'GD音乐台', value: 'gdmusic' }
-    ];
-  }
-});
+  const musicSourceOptions = computed(() => {
+    if (isElectron) {
+      return [
+        { label: 'MG', value: 'migu' },
+        { label: 'KG', value: 'kugou' },
+        { label: 'pyncmd', value: 'pyncmd' },
+        { label: '星辰音乐', value: 'stellar' },
+        { label: '云端音乐', value: 'cloud' },
+        { label: 'GD音乐台', value: 'gdmusic' },
+      ];
+    } else {
+      return [
+        { label: '星辰音乐', value: 'stellar' },
+        { label: '云端音乐', value: 'cloud' },
+        { label: 'GD音乐台', value: 'gdmusic' },
+      ];
+    }
+  });
 
-// 同步外部show属性变化
-watch(
-  () => props.show,
-  (newVal) => {
-    visible.value = newVal;
-  }
-);
+  // 同步外部show属性变化
+  watch(() => , props.show,
+    newVal => {
+      visible.value = newVal;
+    }
+  );
 
-// 同步内部visible变化
-watch(
-  () => visible.value,
-  (newVal) => {
-    emit('update:show', newVal);
-  }
-);
+  // 同步内部visible变化
+  watch(() => , visible.value,
+    newVal => {
+      emit('update:show', newVal);
+    }
+  );
 
-// 同步外部sources属性变化
-watch(
-  () => props.sources,
-  (newVal) => {
-    selectedSources.value = [...newVal];
-  },
-  { deep: true }
-);
+  // 同步外部sources属性变化
+  watch(() => , props.sources,
+    newVal => {
+      selectedSources.value = [...newVal];
+    },
+    { deep: true }
+  );
 
-const handleConfirm = () => {
-  // 确保至少选择一个音源
-  const defaultPlatforms = isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic'];
+  const handleConfirm = () => {
+    // 确保至少选择一个音源
+    const defaultPlatforms = isElectron ? ['migu', 'kugou', 'pyncmd'] : ['gdmusic'];
 
-  const valuesToEmit =
-    selectedSources.value.length > 0 ? [...new Set(selectedSources.value)] : defaultPlatforms;
+    const valuesToEmit =
+      selectedSources.value.length > 0 ? [...new Set(selectedSources.value)] : defaultPlatforms;
 
-  emit('update:sources', valuesToEmit);
-  visible.value = false;
-};
+    emit('update:sources', valuesToEmit);
+    visible.value = false;
+  };
 
-const handleCancel = () => {
-  // 取消时还原为props传入的初始值
-  selectedSources.value = [...props.sources];
-  visible.value = false;
-};
+  const handleCancel = () => {
+    // 取消时还原为props传入的初始值
+    selectedSources.value = [...props.sources];
+    visible.value = false;
+  };
 </script>

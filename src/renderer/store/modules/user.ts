@@ -5,20 +5,21 @@ import { logout } from '@/api/login';
 import { getLikedList } from '@/api/music';
 
 interface UserData {
-  userId: number;
+userId: number;
   [key: string]: unknown;
+
 }
 
-function getLocalStorageItem<T>(key: string, defaultValue: T): T {
+function getLocalStorageItem<T>(_key: string, defaultValue: T): T {
   try {
-    const item = localStorage.getItem(key);
+    const item = localStorage.getItem(_key);
     return item ? JSON.parse(item) : defaultValue;
   } catch {
     return defaultValue;
   }
 }
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore('user'() => {
   // 状态
   const user = ref<UserData | null>(getLocalStorageItem('user', null));
   const searchValue = ref('');
@@ -28,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
   const setUser = (userData: UserData) => {
     user.value = userData;
     localStorage.setItem('user', JSON.stringify(userData));
-  };
+  }
 
   const handleLogout = async () => {
     try {
@@ -41,15 +42,15 @@ export const useUserStore = defineStore('user', () => {
     } catch (error) {
       console.error('登出失败:', error);
     }
-  };
+  }
 
   const setSearchValue = (value: string) => {
     searchValue.value = value;
-  };
+  }
 
   const setSearchType = (type: number) => {
     searchType.value = type;
-  };
+  }
 
   // 初始化
   const initializeUser = async () => {
@@ -60,15 +61,15 @@ export const useUserStore = defineStore('user', () => {
       if (localStorage.getItem('token')) {
         try {
           const { data } = await getLikedList(savedUser.userId);
-          return data?.ids || [];
+          return data?.ids || [0]
         } catch (error) {
           console.error('获取收藏列表失败:', error);
-          return [];
+          return [0]
         }
       }
     }
-    return [];
-  };
+    return [0]
+  }
 
   return {
     // 状态
@@ -81,6 +82,6 @@ export const useUserStore = defineStore('user', () => {
     handleLogout,
     setSearchValue,
     setSearchType,
-    initializeUser
-  };
+    initializeUser,
+  }
 });

@@ -6,23 +6,23 @@ export default {
   settings: '設定',
   tabs: {
     downloading: 'ダウンロード中',
-    downloaded: 'ダウンロード済み'
+    downloaded: 'ダウンロード済み',
   },
   empty: {
     noTasks: 'ダウンロードタスクがありません',
-    noDownloaded: 'ダウンロード済みの楽曲がありません'
+    noDownloaded: 'ダウンロード済みの楽曲がありません',
   },
   progress: {
-    total: '全体の進行状況: {progress}%'
+    total: '全体の進行状況: {progress}%',
   },
   status: {
     downloading: 'ダウンロード中',
     completed: '完了',
     failed: '失敗',
-    unknown: '不明'
+    unknown: '不明',
   },
   artist: {
-    unknown: '不明なアーティスト'
+    unknown: '不明なアーティスト',
   },
   delete: {
     title: '削除確認',
@@ -32,7 +32,7 @@ export default {
     success: '削除成功',
     failed: '削除失敗',
     fileNotFound: 'ファイルが存在しないか移動されました。記録から削除しました',
-    recordRemoved: 'ファイルの削除に失敗しましたが、記録から削除しました'
+    recordRemoved: 'ファイルの削除に失敗しましたが、記録から削除しました',
   },
   clear: {
     title: 'ダウンロード記録をクリア',
@@ -40,18 +40,18 @@ export default {
       'すべてのダウンロード記録をクリアしますか？この操作はダウンロード済みの音楽ファイルを削除しませんが、すべての記録をクリアします。',
     confirm: 'クリア確認',
     cancel: 'キャンセル',
-    success: 'ダウンロード記録をクリアしました'
+    success: 'ダウンロード記録をクリアしました',
   },
   message: {
     downloadComplete: '{filename}のダウンロードが完了しました',
-    downloadFailed: '{filename}のダウンロードに失敗しました: {error}'
+    downloadFailed: '{filename}のダウンロードに失敗しました: {error}',
   },
   loading: '読み込み中...',
   playStarted: '再生開始: {name}',
   playFailed: '再生失敗: {name}',
   path: {
     copied: 'パスをクリップボードにコピーしました',
-    copyFailed: 'パスのコピーに失敗しました'
+    copyFailed: 'パスのコピーに失敗しました',
   },
   settingsPanel: {
     title: 'ダウンロード設定',
@@ -68,7 +68,7 @@ export default {
     separators: {
       dash: 'スペース-スペース',
       underscore: 'アンダースコア',
-      space: 'スペース'
+      space: 'スペース',
     },
     dragToArrange: 'ドラッグで並び替えまたは矢印ボタンで順序を調整：',
     formatVariables: '使用可能な変数',
@@ -77,12 +77,12 @@ export default {
     presets: {
       songArtist: '楽曲名 - アーティスト名',
       artistSong: 'アーティスト名 - 楽曲名',
-      songOnly: '楽曲名のみ'
+      songOnly: '楽曲名のみ',
     },
     components: {
       songName: '楽曲名',
       artistName: 'アーティスト名',
-      albumName: 'アルバム名'
-    }
-  }
+      albumName: 'アルバム名',
+    },
+  },
 };

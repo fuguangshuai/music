@@ -17,19 +17,19 @@ export default {
   playMode: {
     sequence: '顺序播放',
     loop: '单曲循环',
-    random: '随机播放'
+    random: '随机播放',
   },
   fullscreen: {
     enter: '全屏',
-    exit: '退出全屏'
+    exit: '退出全屏',
   },
   close: '关闭',
   modeHint: {
     single: '单曲循环',
-    list: '自动播放下一个'
+    list: '自动播放下一个',
   },
   lrc: {
-    noLrc: '暂无歌词, 请欣赏'
+    noLrc: '暂无歌词, 请欣赏',
   },
   reparse: {
     title: '选择解析音源',
@@ -39,7 +39,7 @@ export default {
     warning: '请选择一个音源',
 
     processing: '解析中...',
-    clear: '清除自定义音源'
+    clear: '清除自定义音源',
   },
   playBar: {
     expand: '展开歌词',
@@ -53,7 +53,7 @@ export default {
     playMode: {
       sequence: '顺序播放',
       loop: '循环播放',
-      random: '随机播放'
+      random: '随机播放',
     },
     play: '开始播放',
     pause: '暂停播放',
@@ -64,7 +64,7 @@ export default {
     unFavorite: '已取消收藏{name}',
     miniPlayBar: '迷你播放栏',
     playbackSpeed: '播放速度',
-    advancedControls: '更多设置s'
+    advancedControls: '更多设置s',
   },
   eq: {
     title: '均衡器',
@@ -87,8 +87,8 @@ export default {
       vocal: '人声',
       dance: '舞曲',
       acoustic: '原声',
-      custom: '自定义'
-    }
+      custom: '自定义',
+    },
   },
   // 定时关闭功能相关
   sleepTimer: {
@@ -110,7 +110,7 @@ export default {
     timerEnded: '定时关闭已触发',
     playbackStopped: '音乐播放已停止',
     minutesRemaining: '剩余{minutes}分钟',
-    songsRemaining: '剩余{count}首歌'
+    songsRemaining: '剩余{count}首歌',
   },
   playList: {
     clearAll: '清空播放列表',
@@ -118,6 +118,6 @@ export default {
     cleared: '已清空播放列表',
     empty: '播放列表为空',
     clearConfirmTitle: '清空播放列表',
-    clearConfirmContent: '这将清空所有播放列表中的歌曲并停止当前播放。是否继续？'
-  }
+    clearConfirmContent: '这将清空所有播放列表中的歌曲并停止当前播放。是否继续？',
+  },
 };

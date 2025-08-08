@@ -9,5 +9,5 @@ export default {
   downloading: 'ダウンロード中です。しばらくお待ちください...',
   selectSongsFirst: 'まずダウンロードする楽曲を選択してください',
   descending: '降順',
-  ascending: '昇順'
+  ascending: '昇順',
 };

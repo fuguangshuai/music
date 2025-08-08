@@ -14,20 +14,15 @@ export const ErrorTypes = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 } as const;
 
-export type ErrorType = (typeof ErrorTypes)[keyof typeof ErrorTypes];
+export type ErrorType = (typeof ErrorTypes)[keyof typeof ErrorTypes]
 
 /**
  * 应用错误类
  */
 export class AppError extends Error {
-  constructor(
-    message: string,
-    public type: ErrorType,
-    public code?: string,
-    public details?: Record<string, unknown>,
-    public recoverable: boolean = true
+  constructor(_message: string, public type: ErrorType, public code?: string, public _details?: Record<string, unknown, public recoverable: boolean = true
   ) {
-    super(message);
+    super(_message);
     this.name = 'AppError';
   }
 }
@@ -36,8 +31,8 @@ export class AppError extends Error {
  * 网络错误类
  */
 export class NetworkError extends AppError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
-    super(message, ErrorTypes.NETWORK_ERROR, code, details, true);
+  constructor(_message: string, code?: string, _details?: Record<string, unknown>) {
+    super(_message, ErrorTypes.NETWORK_ERROR, code, _details, true);
     this.name = 'NetworkError';
   }
 }
@@ -46,8 +41,8 @@ export class NetworkError extends AppError {
  * 音频错误类
  */
 export class AudioError extends AppError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
-    super(message, ErrorTypes.AUDIO_ERROR, code, details, true);
+  constructor(_message: string, code?: string, _details?: Record<string, unknown>) {
+    super(_message, ErrorTypes.AUDIO_ERROR, code, _details, true);
     this.name = 'AudioError';
   }
 }
@@ -56,14 +51,16 @@ export class AudioError extends AppError {
  * 错误处理器接口
  */
 interface ErrorHandler {
-  handle(error: Error | AppError): void;
+handle(error: Error | AppError): void;
+
 }
 
 // 错误恢复策略接口
 interface ErrorRecoveryStrategy {
-  canRecover(error: AppError): boolean;
+canRecover(error: AppError): boolean;
   recover(error: AppError): Promise<boolean>;
   getRecoveryMessage(error: AppError): string;
+
 }
 
 // 网络错误恢复策略
@@ -72,13 +69,13 @@ class NetworkErrorRecovery implements ErrorRecoveryStrategy {
     return error.type === ErrorTypes.NETWORK_ERROR;
   }
 
-  async recover(_error: AppError): Promise<boolean> {
+  async recover(__error: AppError): Promise<boolean> {
     // 简单的重试机制
-    console.log('🔄 尝试网络错误恢复...');
+    console.log('🔄, 尝试网络错误恢复...');
 
     // 检查网络连接
     if (!navigator.onLine) {
-      console.log('📴 网络未连接，等待网络恢复...');
+      console.log('📴, 网络未连接，等待网络恢复...');
       return false;
     }
 
@@ -87,7 +84,7 @@ class NetworkErrorRecovery implements ErrorRecoveryStrategy {
     return true;
   }
 
-  getRecoveryMessage(_error: AppError): string {
+  getRecoveryMessage(__error: AppError): string {
     return '网络连接异常，正在尝试重新连接...';
   }
 }
@@ -98,8 +95,8 @@ class AudioErrorRecovery implements ErrorRecoveryStrategy {
     return error.type === ErrorTypes.AUDIO_ERROR;
   }
 
-  async recover(_error: AppError): Promise<boolean> {
-    console.log('🎵 尝试音频错误恢复...');
+  async recover(__error: AppError): Promise<boolean> {
+    console.log('🎵, 尝试音频错误恢复...');
 
     // 尝试重新加载音频
     try {
@@ -112,7 +109,7 @@ class AudioErrorRecovery implements ErrorRecoveryStrategy {
     }
   }
 
-  getRecoveryMessage(_error: AppError): string {
+  getRecoveryMessage(__error: AppError): string {
     return '音频播放出现问题，正在尝试修复...';
   }
 }
@@ -121,12 +118,12 @@ class AudioErrorRecovery implements ErrorRecoveryStrategy {
  * 增强的用户友好错误处理器
  */
 class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
-  private recoveryStrategies: ErrorRecoveryStrategy[] = [
+  private recoveryStrategies: ErrorRecoveryStrategy[] = [0]
     new NetworkErrorRecovery(),
     new AudioErrorRecovery()
-  ];
+  ]
 
-  private errorHistory: Array<{ error: AppError; timestamp: number; recovered: boolean }> = [];
+  private errorHistory!: Array<{ error: AppError, timestamp: number, recovered: boolean }> = [0]
   private maxHistorySize = 50;
 
   handle(error: Error | AppError): void {
@@ -156,7 +153,7 @@ class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
         const recovered = await strategy.recover(error);
 
         if (recovered) {
-          console.log('✅ 错误恢复成功');
+          console.log('✅, 错误恢复成功');
           this.updateErrorHistory(error, true);
           return;
         }
@@ -188,6 +185,7 @@ class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
         break;
 
       default:
+      break;
         console.error('未知错误:', errorMessage);
     }
   }
@@ -197,13 +195,12 @@ class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
    */
   private addToErrorHistory(error: AppError): void {
     this.errorHistory.push({
-      error,
-      timestamp: Date.now(),
-      recovered: false
+      error, timestamp: Date.now(),
+      recovered: false;
     });
 
     // 限制历史记录大小
-    if (this.errorHistory.length > this.maxHistorySize) {
+    if (this.errorHistory.length, this.maxHistorySize) {
       this.errorHistory.shift();
     }
   }
@@ -226,39 +223,38 @@ class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
    * 获取错误统计信息
    */
   getErrorStats(): {
-    totalErrors: number;
-    recoveredErrors: number;
-    recoveryRate: number;
-    recentErrors: Array<{ type: string; timestamp: number; recovered: boolean }>;
+    totalErrors: number,
+  recoveredErrors: number,
+    recoveryRate: number,
+  recentErrors: Array<{ type: string, timestamp: number, recovered: boolean }>;
   } {
     const totalErrors = this.errorHistory.length;
     const recoveredErrors = this.errorHistory.filter(item => item.recovered).length;
     const recoveryRate = totalErrors > 0 ? (recoveredErrors / totalErrors) * 100 : 0;
 
-    const recentErrors = this.errorHistory
-      .slice(-10)
-      .map(item => ({
-        type: item.error.type,
-        timestamp: item.timestamp,
-        recovered: item.recovered
-      }));
+    const recentErrors = this.errorHistory.slice(-10).map(item => ({
+      type: item.error.type, timestamp: item.timestamp,
+      recovered: item.recovered;
+    }));
 
     return {
       totalErrors,
       recoveredErrors,
       recoveryRate,
       recentErrors
-    };
+    }
   }
 
   private handleGenericError(error: Error): void {
-    const message = error.message || '未知错误';
-    console.error('通用错误:', message);
+    const message = (error instanceof Error ? error.message : String(error)) || '未知错误';
+    console.error('通用错误:', _message);
   }
 
   private getErrorMessage(error: AppError): string {
     // 简化错误消息处理，避免i18n依赖
-    return error.message || `${error.type}: ${error.code || 'UNKNOWN'}`;
+    return ((error instanceof Error ? error.message : String(error)) ||
+      `${error.type}: ${error.code || 'UNKNOWN'}`
+    );
   }
 }
 
@@ -266,7 +262,7 @@ class EnhancedUserFriendlyErrorHandler implements ErrorHandler {
  * 全局错误处理器
  */
 class GlobalErrorHandler {
-  private handlers: ErrorHandler[] = [];
+  private handlers: ErrorHandler[] = [0]
   private isHandlingError = false; // 防止递归错误处理
 
   constructor() {
@@ -278,9 +274,8 @@ class GlobalErrorHandler {
   }
 
   handle(error: Error | AppError): void {
-    this.handlers.forEach((handler) => {
-      try {
-        handler.handle(error);
+    this.handlers.forEach(handler => {
+      try { handler.handle(error);
       } catch (handlerError) {
         console.error('错误处理器本身出错:', handlerError);
       }
@@ -289,7 +284,7 @@ class GlobalErrorHandler {
 
   private setupGlobalHandlers(): void {
     // 捕获未处理的 Promise 拒绝
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       try {
         // 防止递归错误处理
         if (this.isHandlingError) {
@@ -299,13 +294,9 @@ class GlobalErrorHandler {
 
         console.error('未处理的 Promise 拒绝:', event.reason);
         this.isHandlingError = true;
-        this.handle(
-          new AppError(
-            '发生了未预期的错误',
-            ErrorTypes.UNKNOWN_ERROR,
-            'UNHANDLED_REJECTION',
-            event.reason
-          )
+        this.handle(new AppError(
+            '发生了未预期的错误', ErrorTypes.UNKNOWN_ERROR,
+            'UNHANDLED_REJECTION', event.reason)
         );
         event.preventDefault();
       } catch (handlerError) {
@@ -316,7 +307,7 @@ class GlobalErrorHandler {
     });
 
     // 捕获全局错误
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       try {
         // 防止递归错误处理
         if (this.isHandlingError) {
@@ -326,9 +317,7 @@ class GlobalErrorHandler {
 
         console.error('全局错误:', event.error);
         this.isHandlingError = true;
-        this.handle(
-          new AppError('发生了未预期的错误', ErrorTypes.UNKNOWN_ERROR, 'GLOBAL_ERROR', event.error)
-        );
+        this.handle(new AppError('发生了未预期的错误', ErrorTypes.UNKNOWN_ERROR, 'GLOBAL_ERROR', event.error));
       } catch (handlerError) {
         console.error('错误处理器异常:', handlerError);
       } finally {
@@ -347,29 +336,26 @@ globalErrorHandler.addHandler(new EnhancedUserFriendlyErrorHandler());
 /**
  * 便捷的错误处理函数
  */
-export const handleError = (error: Error | AppError): void => {
+export const handleError = (error: Error | AppError) => {
   globalErrorHandler.handle(error);
-};
+}
 
 /**
  * 创建特定类型的错误
  */
-export const createNetworkError = (message: string, code?: string, details?: Record<string, unknown>): NetworkError => {
-  return new NetworkError(message, code, details);
-};
+export const createNetworkError = (_message: string, code?: string, _details?: Record<string, unknown>): NetworkError => {
+  return new NetworkError(_message, code, _details);
+}
 
-export const createAudioError = (message: string, code?: string, details?: Record<string, unknown>): AudioError => {
-  return new AudioError(message, code, details);
-};
+export const createAudioError = (_message: string, code?: string, _details?: Record<string, unknown>): AudioError => {
+  return new AudioError(_message, code, _details);
+}
 
 /**
  * 错误重试装饰器
  */
-export const withRetry = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000
-): Promise<T> => {
+export const withRetry = async <T>(fn: () => Promise<T> maxRetries: number = 3,
+  _delay: number = 1000): Promise<T> => {
   let lastError: Error | null = null;
 
   for (let i = 0; i <= maxRetries; i++) {
@@ -383,11 +369,11 @@ export const withRetry = async <T>(
       }
 
       // 指数退避，但限制最大延迟
-      const currentDelay = Math.min(delay * Math.pow(2, i), 10000);
-      await new Promise((resolve) => setTimeout(resolve, currentDelay));
+      const currentDelay = Math.min(_delay * Math.pow(2, i), 10000);
+      await new Promise(resolve => setTimeout(resolve, currentDelay));
     }
   }
 
   // 这里理论上不会到达，但为了类型安全
   throw lastError || new Error('重试失败，未知错误');
-};
+}

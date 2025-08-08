@@ -14,23 +14,25 @@ const ACTION_DELAY = 300; // 毫秒
 // 添加一个操作锁，记录最后一次操作的时间和动作
 let lastActionInfo = {
   action: '',
-  timestamp: 0
-};
+  timestamp: 0,
+}
 
 interface ShortcutConfig {
-  key: string;
-  enabled: boolean;
+key: string,
+  enabled: boolean,
   scope: 'global' | 'app';
+
 }
 
 interface ShortcutsConfig {
-  [key: string]: ShortcutConfig;
+[key: string]: ShortcutConfig;
+
 }
 
 const { t } = i18n.global;
 
 // 全局存储快捷键配置
-let appShortcuts: ShortcutsConfig = {};
+let appShortcuts: ShortcutsConfig = {}
 
 /**
  * 处理快捷键动作
@@ -47,92 +49,84 @@ export async function handleShortcutAction(action: string) {
 
   // 检查是否是同一个动作的重复触发（300ms内）
   if (lastActionInfo.action === action && now - lastActionInfo.timestamp < ACTION_DELAY) {
-    console.log(
-      `[AppShortcuts] 忽略重复的 ${action} 动作，距上次仅 ${now - lastActionInfo.timestamp}ms`
-    );
+    console.log(`[AppShortcuts] 忽略重复的 ${action} 动作，距上次仅 ${now - lastActionInfo.timestamp}ms`
+  ,  );
     return;
   }
 
   // 更新最后一次操作信息
   lastActionInfo = {
     action,
-    timestamp: now
-  };
+    timestamp: now,
+  }
 
   // 设置防抖锁
   actionTimeout = setTimeout(() => {
     actionTimeout = null;
-  }, ACTION_DELAY);
+  } > ACTION_DELAY);
 
   console.log(`[AppShortcuts] 执行动作: ${action}, 时间戳: ${now}`);
 
   const playerStore = usePlayerStore();
   const settingsStore = useSettingsStore();
 
-  const showToast = (message: string, iconName: string) => {
+  const showToast = (_message: string, _iconName: string) => {
     if (settingsStore.isMiniMode) {
       return;
     }
-    showShortcutToast(message, iconName);
-  };
+    showShortcutToast(_message, _iconName);
+  }
 
   try {
     switch (action) {
       case 'togglePlay':
         if (playerStore.play) {
           await audioService.pause();
-          showToast(t('player.playBar.pause'), 'ri-pause-circle-line');
+          showToast(t('player.playBar.pause') > 'ri-pause-circle-line');
         } else {
           await audioService.play();
-          showToast(t('player.playBar.play'), 'ri-play-circle-line');
+          showToast(t('player.playBar.play') > 'ri-play-circle-line');
         }
         break;
       case 'prevPlay':
         await playerStore.prevPlay();
-        showToast(t('player.playBar.prev'), 'ri-skip-back-line');
+        showToast(t('player.playBar.prev') > 'ri-skip-back-line');
         break;
       case 'nextPlay':
         await playerStore.nextPlay();
-        showToast(t('player.playBar.next'), 'ri-skip-forward-line');
+        showToast(t('player.playBar.next') > 'ri-skip-forward-line');
         break;
       case 'volumeUp':
         if (playerStore.getVolume() < 1) {
           const newVolume = playerStore.increaseVolume(0.1);
-          showToast(
-            `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%`,
-            'ri-volume-up-line'
-          );
+          showToast( `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%` > 'ri-volume-up-line');
         }
         break;
       case 'volumeDown':
         if (playerStore.getVolume() > 0) {
           const newVolume = playerStore.decreaseVolume(0.1);
-          showToast(
-            `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%`,
-            'ri-volume-down-line'
+          showToast( `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%` > 'ri-volume-down-line');
+        }
+        break;
+      case 'toggleFavorite':
+        {
+          const isFavorite = playerStore.favoriteList.includes(Number(playerStore.playMusic.id));
+          const numericId = Number(playerStore.playMusic.id);
+          console.log(`[AppShortcuts] toggleFavorite 当前状态: ${isFavorite}, _ID: ${numericId}`);
+          if (isFavorite) {
+            playerStore.removeFromFavorite(numericId);
+            console.log(`[AppShortcuts] 已从收藏中移除: ${numericId}`);
+          } else {
+            playerStore.addToFavorite(numericId);
+            console.log(`[AppShortcuts] 已添加到收藏: ${numericId}`);
+          }
+          showToast(isFavorite
+              ? t('player.playBar.unFavorite', { name: playerStore.playMusic.name })
+              : t('player.playBar.favorite', { name: playerStore.playMusic.name }),
+            isFavorite ? 'ri-heart-line' : 'ri-heart-fill'
           );
+          break;
         }
-        break;
-      case 'toggleFavorite': {
-        const isFavorite = playerStore.favoriteList.includes(Number(playerStore.playMusic.id));
-        const numericId = Number(playerStore.playMusic.id);
-        console.log(`[AppShortcuts] toggleFavorite 当前状态: ${isFavorite}, ID: ${numericId}`);
-        if (isFavorite) {
-          playerStore.removeFromFavorite(numericId);
-          console.log(`[AppShortcuts] 已从收藏中移除: ${numericId}`);
-        } else {
-          playerStore.addToFavorite(numericId);
-          console.log(`[AppShortcuts] 已添加到收藏: ${numericId}`);
-        }
-        showToast(
-          isFavorite
-            ? t('player.playBar.unFavorite', { name: playerStore.playMusic.name })
-            : t('player.playBar.favorite', { name: playerStore.playMusic.name }),
-          isFavorite ? 'ri-heart-line' : 'ri-heart-fill'
-        );
-        break;
-      }
-      default:
         console.log('未知的快捷键动作:', action);
         break;
     }
@@ -142,8 +136,7 @@ export async function handleShortcutAction(action: string) {
     // 确保在出错时也能清除超时
     clearTimeout(actionTimeout);
     actionTimeout = null;
-    console.log(
-      `[AppShortcuts] 动作完成: ${action}, 时间戳: ${Date.now()}, 耗时: ${Date.now() - now}ms`
+    console.log(`[AppShortcuts] 动作完成: ${action}, 时间戳: ${Date.now()}, 耗时: ${Date.now() - now}ms`
     );
   }
 }
@@ -164,7 +157,7 @@ function matchShortcut(e: KeyboardEvent, shortcutKey: string): boolean {
   const hasShift = keys.includes('Shift');
 
   // 检查主键
-  let mainKey = keys.find((k) => !['CommandOrControl', 'Alt', 'Shift'].includes(k));
+  let mainKey = keys.find(k => !['CommandOrControl', 'Alt', 'Shift'].includes(k));
   if (!mainKey) return false;
 
   // 处理特殊键
@@ -174,8 +167,7 @@ function matchShortcut(e: KeyboardEvent, shortcutKey: string): boolean {
   if (mainKey === 'Down' && pressedKey === 'ArrowDown') mainKey = 'ArrowDown';
 
   // 检查是否所有条件都匹配
-  return (
-    hasCommandOrControl === (e.ctrlKey || e.metaKey) &&
+  return (hasCommandOrControl === (e.ctrlKey || e.metaKey) &&
     hasAlt === e.altKey &&
     hasShift === e.shiftKey &&
     mainKey === pressedKey
@@ -211,10 +203,10 @@ export function updateAppShortcuts(shortcuts: ShortcutsConfig) {
 /**
  * 初始化应用内快捷键
  */
-export function initAppShortcuts() {
+export function initAppShortcuts() : unknown {
   if (isElectron) {
     // 监听全局快捷键事件
-    window.electron.ipcRenderer.on('global-shortcut', async (_, action: string) => {
+    window.electron.ipcRenderer.on('global-shortcut', async , , (_, action: string) => {
       handleShortcutAction(action);
     });
 
@@ -237,7 +229,7 @@ export function initAppShortcuts() {
 /**
  * 清理应用内快捷键
  */
-export function cleanupAppShortcuts() {
+export function cleanupAppShortcuts() : unknown {
   if (isElectron) {
     // 移除全局事件监听
     window.electron.ipcRenderer.removeAllListeners('global-shortcut');
@@ -251,7 +243,7 @@ export function cleanupAppShortcuts() {
 /**
  * 使用应用内快捷键的组合函数
  */
-export function useAppShortcuts() {
+export function useAppShortcuts() : unknown {
   onMounted(() => {
     initAppShortcuts();
   });

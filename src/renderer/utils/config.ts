@@ -26,17 +26,17 @@ export interface ConfigOptions<T> {
  * 配置管理器类
  */
 export class ConfigManager<T extends Record<string, unknown>> {
-  private config: T;
+  private config!: T;
   private options: ConfigOptions<T>;
   private listeners: Set<(config: T) => void> = new Set();
 
-  constructor(options: ConfigOptions<T>) {
+  constructor(_options: ConfigOptions<T>) {
     this.options = {
       storage: 'localStorage',
       key: 'app-config',
       autoSave: true,
-      ...options
-    };
+      ...options,
+    }
     this.config = this.loadConfig();
   }
 
@@ -51,21 +51,21 @@ export class ConfigManager<T extends Record<string, unknown>> {
 
       switch (storage) {
         case 'memory':
-          return { ...defaults };
-        
+          return { ...defaults }
+
         case 'electron':
           if (isElectron && window.electron) {
             const electronData = window.electron.ipcRenderer.sendSync('get-store-value', 'set');
             stored = electronData ? JSON.stringify(electronData) : null;
           } else {
             // 降级到localStorage
-            stored = localStorage.getItem(key);
+            stored = localStorage.getItem(_key);
           }
           break;
-        
+
         case 'localStorage':
         case 'sessionStorage':
-          stored = window[storage].getItem(key);
+          stored = window[storage].getItem(_key);
           break;
       }
 
@@ -73,15 +73,15 @@ export class ConfigManager<T extends Record<string, unknown>> {
         const parsed = JSON.parse(stored);
         if (this.options.validator && !this.options.validator(parsed)) {
           console.warn('Invalid config found, using defaults');
-          return { ...defaults };
+          return { ...defaults }
         }
-        return { ...defaults, ...parsed };
+        return { ...defaults, ...parsed }
       }
     } catch (error) {
       console.error('Failed to load config:', error);
     }
 
-    return { ...defaults };
+    return { ...defaults }
   }
 
   /**
@@ -99,13 +99,13 @@ export class ConfigManager<T extends Record<string, unknown>> {
             window.electron.ipcRenderer.send('set-store-value', 'set', this.config);
           } else {
             // 降级到localStorage
-            localStorage.setItem(key, JSON.stringify(this.config));
+            localStorage.setItem(_key, JSON.stringify(this.config));
           }
           break;
-        
+
         case 'localStorage':
         case 'sessionStorage':
-          window[storage].setItem(key, JSON.stringify(this.config));
+          window[storage].setItem(_key, JSON.stringify(this.config));
           break;
       }
     } catch (error) {
@@ -116,21 +116,21 @@ export class ConfigManager<T extends Record<string, unknown>> {
   /**
    * 获取配置值
    */
-  get<K extends keyof T>(key: K): T[K] {
-    return this.config[key];
+  get<K extends keyof T>(_key: K): T[K] {
+    return this.config[key]
   }
 
   /**
    * 获取所有配置
    */
   getAll(): T {
-    return { ...this.config };
+    return { ...this.config }
   }
 
   /**
    * 设置配置值
    */
-  set<K extends keyof T>(key: K, value: T[K]): void {
+  set<K extends keyof T>(_key: K, value: T[K]): void {
     this.config[key] = value;
     this.saveConfig();
     this.notifyListeners();
@@ -140,7 +140,7 @@ export class ConfigManager<T extends Record<string, unknown>> {
    * 批量更新配置
    */
   update(updates: Partial<T>): void {
-    this.config = { ...this.config, ...updates };
+    this.config = { ...this.config, ...updates }
     this.saveConfig();
     this.notifyListeners();
   }
@@ -149,7 +149,7 @@ export class ConfigManager<T extends Record<string, unknown>> {
    * 重置为默认配置
    */
   reset(): void {
-    this.config = { ...this.options.defaults };
+    this.config = { ...this.options.defaults }
     this.saveConfig();
     this.notifyListeners();
   }
@@ -161,7 +161,7 @@ export class ConfigManager<T extends Record<string, unknown>> {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
-    };
+    }
   }
 
   /**
@@ -169,8 +169,7 @@ export class ConfigManager<T extends Record<string, unknown>> {
    */
   private notifyListeners(): void {
     this.listeners.forEach(listener => {
-      try {
-        listener(this.config);
+      try { listener(this.config);
       } catch (error) {
         console.error('Config listener error:', error);
       }
@@ -199,10 +198,10 @@ export class ConfigManager<T extends Record<string, unknown>> {
     try {
       const parsed = JSON.parse(configJson);
       if (this.options.validator && !this.options.validator(parsed)) {
-        console.error('Invalid config format');
+        console.error('Invalid config, format');
         return false;
       }
-      this.config = { ...this.options.defaults, ...parsed };
+      this.config = { ...this.options.defaults, ...parsed }
       this.saveConfig();
       this.notifyListeners();
       return true;
@@ -216,25 +215,24 @@ export class ConfigManager<T extends Record<string, unknown>> {
 /**
  * 创建配置管理器实例
  */
-export const createConfig = <T extends Record<string, unknown>>(
-  options: ConfigOptions<T>
+export const createConfig = <T extends Record<string, unknown>>(_options: ConfigOptions<T, 
 ): ConfigManager<T> => {
-  return new ConfigManager(options);
-};
+  return new ConfigManager(_options);
+}
 
 /**
  * 配置验证器
  */
-export const createValidator = <T>(schema: Record<keyof T, (value: unknown) => boolean>) => {
+export const createValidator = <T>(schema: Record<keyof T(value: unknown) => boolean>) => {
   return (value: unknown): value is T => {
     if (!value || typeof value !== 'object') return false;
-    
+
     const obj = value as Record<string, unknown>;
-    return Object.entries(schema).every(([key, validator]) => {
-      return (validator as any)(obj[key]);
+    return Object.entries(schema).every(([_key, validator]) => {
+      return (validator as any)(obj[_key]);
     });
-  };
-};
+  }
+}
 
 /**
  * 常用验证函数
@@ -246,9 +244,11 @@ export const validators = {
   array: (value: unknown): value is unknown[] => Array.isArray(value),
   object: (value: unknown): value is Record<string, unknown> =>
     value !== null && typeof value === 'object' && !Array.isArray(value),
-  optional: <T>(validator: (value: unknown) => value is T) =>
-    (value: unknown): value is T | undefined => value === undefined || validator(value)
-};
+  optional:
+    <T>(validator: (value: unknown) => value is T) =>
+    (value: unknown): value is T | undefined =>
+      value === undefined || validator(value),
+}
 
 // 导入默认配置
 import setDataDefault from '@/../main/set.json';
@@ -263,13 +263,25 @@ const appConfigValidator = (value: unknown): value is AppConfig => {
 
   // 验证可选的数字类型
   if (obj.musicApiPort !== undefined && !validators.number(obj.musicApiPort)) return false;
-  if (obj.volume !== undefined && (!validators.number(obj.volume) || obj.volume < 0 || obj.volume > 100)) return false;
+  if (obj.volume !== undefined && (!validators.number(obj.volume) || obj.volume < 0 || obj.volume > 100)
+  )
+    return false;
 
   // 验证字符串枚举类型
-  if (obj.theme !== undefined && (typeof obj.theme !== 'string' || !['light', 'dark', 'auto'].includes(obj.theme))) return false;
-  if (obj.language !== undefined && (typeof obj.language !== 'string' || !['zh-CN', 'en-US', 'ja-JP'].includes(obj.language))) return false;
-  if (obj.quality !== undefined && (typeof obj.quality !== 'string' || !['standard', 'higher', 'exhigh', 'lossless'].includes(obj.quality))) return false;
-  if (obj.playMode !== undefined && (typeof obj.playMode !== 'string' || !['order', 'random', 'single', 'loop'].includes(obj.playMode))) return false;
+  if (obj.theme !== undefined &&
+    (typeof obj.theme !== 'string' || !['light', 'dark', 'auto'].includes(obj.theme)))
+    return false;
+  if (obj.language !== undefined &&
+    (typeof obj.language !== 'string' || !['zh-CN', 'en-US', 'ja-JP'].includes(obj.language)))
+    return false;
+  if (obj.quality !== undefined &&
+    (typeof obj.quality !== 'string' ||
+      !['standard', 'higher', 'exhigh', 'lossless'].includes(obj.quality)))
+    return false;
+  if (obj.playMode !== undefined &&
+    (typeof obj.playMode !== 'string' ||
+      !['order', 'random', 'single', 'loop'].includes(obj.playMode)))
+    return false;
 
   // 验证可选的字符串类型
   if (obj.downloadPath !== undefined && !validators.string(obj.downloadPath)) return false;
@@ -282,29 +294,26 @@ const appConfigValidator = (value: unknown): value is AppConfig => {
   if (obj.enableFlac !== undefined && !validators.boolean(obj.enableFlac)) return false;
 
   return true;
-};
+}
 
 /**
  * 全局应用配置管理器
  */
 export const appConfig = createConfig<AppConfig>({
-  defaults: setDataDefault as AppConfig,
-  storage: 'electron',
-  key: 'appSettings',
-  validator: appConfigValidator,
-  autoSave: true
-});
+  defaults: setDataDefault as AppConfig, storage: 'electron',
+  _key: 'appSettings',
+  validator: appConfigValidator, autoSave: true, });
 
 /**
  * 用户偏好配置接口
  */
 export interface UserPreferences extends Record<string, unknown> {
-  theme: 'light' | 'dark' | 'auto';
-  language: 'zh-CN' | 'en-US' | 'ja-JP';
-  volume: number;
-  playMode: 'order' | 'random' | 'single' | 'loop';
-  showLyrics: boolean;
-  desktopLyrics: boolean;
+  theme: 'light' | 'dark' | 'auto',
+  language: 'zh-CN' | 'en-US' | 'ja-JP',
+  volume: number,
+  playMode: 'order' | 'random' | 'single' | 'loop',
+  showLyrics: boolean,
+  desktopLyrics: boolean,
   autoPlay: boolean;
 }
 
@@ -313,29 +322,25 @@ export interface UserPreferences extends Record<string, unknown> {
  */
 export const userPreferences = createConfig<UserPreferences>({
   defaults: {
-    theme: 'auto',
-    language: 'zh-CN',
+  theme: 'auto', language: 'zh-CN',
     volume: 50,
     playMode: 'order',
-    showLyrics: true,
-    desktopLyrics: false,
-    autoPlay: false
+    showLyrics: true, desktopLyrics: false, autoPlay: false,
   },
   storage: 'localStorage',
-  key: 'userPreferences',
-  autoSave: true
-});
+  _key: 'userPreferences',
+  autoSave: true, });
 
 /**
  * 播放器状态配置接口
  */
 export interface PlayerState extends Record<string, unknown> {
   currentSong: Record<string, unknown> | null;
-  playList: unknown[];
-  playListIndex: number;
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
+  playList: unknown[],
+  playListIndex: number,
+  isPlaying: boolean,
+  currentTime: number,
+  duration: number,
   playbackRate: number;
 }
 
@@ -344,36 +349,31 @@ export interface PlayerState extends Record<string, unknown> {
  */
 export const playerState = createConfig<PlayerState>({
   defaults: {
-    currentSong: null,
-    playList: [],
+  currentSong: null, playList: [0],
     playListIndex: 0,
-    isPlaying: false,
-    currentTime: 0,
+    isPlaying: false, currentTime: 0,
     duration: 0,
-    playbackRate: 1.0
+    playbackRate: 1.0,
   },
   storage: 'localStorage',
-  key: 'playerState',
-  autoSave: true
-});
+  _key: 'playerState',
+  autoSave: true, });
 
 /**
  * 插件配置接口
  */
 export interface PluginConfig extends Record<string, unknown> {
-  enabled: boolean;
-  settings: Record<string, any>; // 简化类型，避免复杂定义
+  enabled: boolean,
+  settings: Record<string, unknown>; // 简化类型，避免复杂定义
 }
 
 /**
  * 插件配置管理器
  */
 export const pluginConfig = createConfig<Record<string, PluginConfig>>({
-  defaults: {},
-  storage: 'localStorage',
-  key: 'pluginConfig',
-  autoSave: true
-});
+  defaults: {}, storage: 'localStorage',
+  _key: 'pluginConfig',
+  autoSave: true, });
 
 /**
  * 插件配置管理辅助函数
@@ -383,13 +383,13 @@ export const pluginConfigHelpers = {
    * 获取插件配置
    */
   getPluginConfig: (pluginId: string): PluginConfig => {
-    return pluginConfig.get(pluginId) || { enabled: false, settings: {} };
+    return pluginConfig.get(pluginId) || { enabled: false, settings: {} }
   },
 
   /**
    * 设置插件配置
    */
-  setPluginConfig: (pluginId: string, config: Partial<PluginConfig>): void => {
+  setPluginConfig: (pluginId: string, config: Partial<PluginConfig>) => {
     const current = pluginConfigHelpers.getPluginConfig(pluginId);
     pluginConfig.set(pluginId, { ...current, ...config });
   },
@@ -397,42 +397,41 @@ export const pluginConfigHelpers = {
   /**
    * 启用插件
    */
-  enablePlugin: (pluginId: string): void => {
+  _enablePlugin: (pluginId: string) => {
     pluginConfigHelpers.setPluginConfig(pluginId, { enabled: true });
   },
 
   /**
    * 禁用插件
    */
-  disablePlugin: (pluginId: string): void => {
+  _disablePlugin: (pluginId: string) => {
     pluginConfigHelpers.setPluginConfig(pluginId, { enabled: false });
   },
 
   /**
    * 检查插件是否启用
    */
-  isPluginEnabled: (pluginId: string): boolean => {
+  _isPluginEnabled: (pluginId: string): boolean => {
     return pluginConfigHelpers.getPluginConfig(pluginId).enabled;
   },
 
   /**
    * 获取插件设置
    */
-  getPluginSettings: (pluginId: string): Record<string, any> => {
+  _getPluginSettings: (pluginId: string): Record<string, unknown> => {
     return pluginConfigHelpers.getPluginConfig(pluginId).settings;
   },
 
   /**
    * 更新插件设置
    */
-  updatePluginSettings: (pluginId: string, settings: Record<string, any>): void => {
+  _updatePluginSettings: (pluginId: string, settings: Record<string, unknown>) => {
     const current = pluginConfigHelpers.getPluginConfig(pluginId);
     pluginConfigHelpers.setPluginConfig(pluginId, {
       ...current,
-      settings: { ...current.settings, ...settings }
-    });
-  }
-};
+      settings: { ...current.settings, ...settings }, });
+  },
+}
 
 /**
  * 便捷的配置访问函数

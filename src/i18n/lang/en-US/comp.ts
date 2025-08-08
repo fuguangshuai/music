@@ -16,22 +16,22 @@ export default {
     count: 'songs',
     loginFirst: 'Please login first',
     getPlaylistFailed: 'Get playlist failed',
-    inputPlaylistName: 'Please enter the playlist name'
+    inputPlaylistName: 'Please enter the playlist name',
   },
   playlistType: {
     title: 'Playlist Category',
     showAll: 'Show all',
-    hide: 'Hide some'
+    hide: 'Hide some',
   },
   recommendAlbum: {
-    title: 'Latest Album'
+    title: 'Latest Album',
   },
   recommendSinger: {
     title: 'Daily Recommendation',
-    songlist: 'Daily Recommendation List'
+    songlist: 'Daily Recommendation List',
   },
   recommendSonglist: {
-    title: 'Weekly Hot Music'
+    title: 'Weekly Hot Music',
   },
   searchBar: {
     login: 'Login',
@@ -46,17 +46,17 @@ export default {
     zoom: 'Zoom',
     zoom100: 'Zoom 100%',
     resetZoom: 'Reset Zoom',
-    zoomDefault: 'Default Zoom'
+    zoomDefault: 'Default Zoom',
   },
   titleBar: {
     closeTitle: 'Choose how to close',
     minimizeToTray: 'Minimize to Tray',
     exitApp: 'Exit App',
     rememberChoice: 'Remember my choice',
-    closeApp: 'Close App'
+    closeApp: 'Close App',
   },
   userPlayList: {
-    title: "{name}'s Playlist"
+    title: "{name}'s Playlist",
   },
   musicList: {
     searchSongs: 'Search Songs',
@@ -71,7 +71,7 @@ export default {
     addToPlaylist: 'Add to Playlist',
     addToPlaylistSuccess: 'Add to Playlist Success',
     operationFailed: 'Operation Failed',
-    songsAlreadyInPlaylist: 'Songs already in playlist'
+    songsAlreadyInPlaylist: 'Songs already in playlist',
   },
   playlist: {
     import: {
@@ -131,8 +131,8 @@ export default {
       confirm: 'Confirm',
       cancel: 'Cancel',
       clearTasksSuccess: 'Task list cleared',
-      clearTasksFailed: 'Failed to clear task list'
-    }
+      clearTasksFailed: 'Failed to clear task list',
+    },
   },
   settings: 'Settings',
   user: 'User',
@@ -141,5 +141,5 @@ export default {
   list: 'Playlist',
   mv: 'MV',
   home: 'Home',
-  search: 'Search'
+  search: 'Search',
 };

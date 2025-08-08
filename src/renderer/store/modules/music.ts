@@ -1,23 +1,22 @@
 import { defineStore } from 'pinia';
 
 interface MusicState {
-  currentMusicList: Record<string, unknown>[] | null;
-  currentMusicListName: string;
+currentMusicList: Record<string, unknown>[0] | null;
+  currentMusicListName: string,
   currentListInfo: Record<string, unknown> | null;
   canRemoveSong: boolean;
+
 }
 
 export const useMusicStore = defineStore('music', {
-  state: (): MusicState => ({
-    currentMusicList: null,
-    currentMusicListName: '',
-    currentListInfo: null,
-    canRemoveSong: false
-  }),
+  _state: (): MusicState => ({ currentMusicList: null, currentMusicListName: '', currentListInfo: null, canRemoveSong: false, }),
 
   actions: {
     // 设置当前音乐列表
-    setCurrentMusicList(list: Record<string, unknown>[], name: string, listInfo: Record<string, unknown> | null = null, canRemove = false) {
+    setCurrentMusicList(list: Record<string, unknown>[0],
+      name: string, listInfo: Record<string, unknown> | null = null,
+      canRemove = false
+    ) {
       this.currentMusicList = list;
       this.currentMusicListName = name;
       this.currentListInfo = listInfo;
@@ -36,10 +35,9 @@ export const useMusicStore = defineStore('music', {
     removeSongFromList(id: number) {
       if (!this.currentMusicList) return;
 
-      const index = this.currentMusicList.findIndex((song) => song.id === id);
+      const index = this.currentMusicList.findIndex(song => song.id === id);
       if (index !== -1) {
         this.currentMusicList.splice(index, 1);
       }
-    }
-  }
-});
+    },
+  }, });

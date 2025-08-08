@@ -6,25 +6,25 @@ export default {
   settings: 'Settings',
   tabs: {
     downloading: 'Downloading',
-    downloaded: 'Downloaded'
+    downloaded: 'Downloaded',
   },
   empty: {
     noTasks: 'No download tasks',
     noDownloaded: 'No downloaded songs',
-    noDownloadedHint: 'Download your favorite songs to listen offline'
+    noDownloadedHint: 'Download your favorite songs to listen offline',
   },
   progress: {
-    total: 'Total Progress: {progress}%'
+    total: 'Total Progress: {progress}%',
   },
   items: 'items',
   status: {
     downloading: 'Downloading',
     completed: 'Completed',
     failed: 'Failed',
-    unknown: 'Unknown'
+    unknown: 'Unknown',
   },
   artist: {
-    unknown: 'Unknown Artist'
+    unknown: 'Unknown Artist',
   },
   delete: {
     title: 'Delete Confirmation',
@@ -34,7 +34,7 @@ export default {
     success: 'Successfully deleted',
     failed: 'Failed to delete',
     fileNotFound: 'File not found or moved, removed from records',
-    recordRemoved: 'Failed to delete file, but removed from records'
+    recordRemoved: 'Failed to delete file, but removed from records',
   },
   clear: {
     title: 'Clear Download Records',
@@ -42,19 +42,19 @@ export default {
       'Are you sure you want to clear all download records? This will not delete the actual music files, but will clear all records.',
     confirm: 'Clear',
     cancel: 'Cancel',
-    success: 'Download records cleared'
+    success: 'Download records cleared',
   },
   message: {
     downloadComplete: '{filename} download completed',
     downloadFailed: '{filename} download failed: {error}',
-    alreadyDownloading: '{filename} is already downloading'
+    alreadyDownloading: '{filename} is already downloading',
   },
   loading: 'Loading...',
   playStarted: 'Play started: {name}',
   playFailed: 'Play failed: {name}',
   path: {
     copied: 'Path copied to clipboard',
-    copyFailed: 'Failed to copy path'
+    copyFailed: 'Failed to copy path',
   },
   settingsPanel: {
     title: 'Download Settings',
@@ -71,7 +71,7 @@ export default {
     separators: {
       dash: 'Space-dash-space',
       underscore: 'Underscore',
-      space: 'Space'
+      space: 'Space',
     },
     dragToArrange: 'Sort or use arrow buttons to arrange:',
     formatVariables: 'Available variables',
@@ -80,12 +80,12 @@ export default {
     presets: {
       songArtist: 'Song - Artist',
       artistSong: 'Artist - Song',
-      songOnly: 'Song only'
+      songOnly: 'Song only',
     },
     components: {
       songName: 'Song name',
       artistName: 'Artist name',
-      albumName: 'Album name'
-    }
-  }
+      albumName: 'Album name',
+    },
+  },
 };

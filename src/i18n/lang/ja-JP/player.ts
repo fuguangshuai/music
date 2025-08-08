@@ -17,19 +17,19 @@ export default {
   playMode: {
     sequence: '順次再生',
     loop: 'リピート再生',
-    random: 'ランダム再生'
+    random: 'ランダム再生',
   },
   fullscreen: {
     enter: 'フルスクリーン',
-    exit: 'フルスクリーン終了'
+    exit: 'フルスクリーン終了',
   },
   close: '閉じる',
   modeHint: {
     single: 'リピート再生',
-    list: '自動で次の曲を再生'
+    list: '自動で次の曲を再生',
   },
   lrc: {
-    noLrc: '歌詞がありません。お楽しみください'
+    noLrc: '歌詞がありません。お楽しみください',
   },
   reparse: {
     title: '解析音源を選択',
@@ -39,7 +39,7 @@ export default {
     warning: '音源を選択してください',
     bilibiliNotSupported: 'Bilibili動画は再解析をサポートしていません',
     processing: '解析中...',
-    clear: 'カスタム音源をクリア'
+    clear: 'カスタム音源をクリア',
   },
   playBar: {
     expand: '歌詞を展開',
@@ -53,7 +53,7 @@ export default {
     playMode: {
       sequence: '順次再生',
       loop: 'ループ再生',
-      random: 'ランダム再生'
+      random: 'ランダム再生',
     },
     play: '再生開始',
     pause: '再生一時停止',
@@ -64,7 +64,7 @@ export default {
     unFavorite: '{name}をお気に入りから削除しました',
     miniPlayBar: 'ミニ再生バー',
     playbackSpeed: '再生速度',
-    advancedControls: 'その他の設定'
+    advancedControls: 'その他の設定',
   },
   eq: {
     title: 'イコライザー',
@@ -87,8 +87,8 @@ export default {
       vocal: 'ボーカル',
       dance: 'ダンス',
       acoustic: 'アコースティック',
-      custom: 'カスタム'
-    }
+      custom: 'カスタム',
+    },
   },
   // タイマー機能関連
   sleepTimer: {
@@ -110,7 +110,7 @@ export default {
     timerEnded: 'スリープタイマーが作動しました',
     playbackStopped: '音楽再生を停止しました',
     minutesRemaining: '残り{minutes}分',
-    songsRemaining: '残り{count}曲'
+    songsRemaining: '残り{count}曲',
   },
   playList: {
     clearAll: 'プレイリストをクリア',
@@ -119,6 +119,6 @@ export default {
     empty: 'プレイリストが空です',
     clearConfirmTitle: 'プレイリストをクリア',
     clearConfirmContent:
-      'これによりプレイリスト内のすべての楽曲がクリアされ、現在の再生が停止されます。続行しますか？'
-  }
+      'これによりプレイリスト内のすべての楽曲がクリアされ、現在の再生が停止されます。続行しますか？',
+  },
 };

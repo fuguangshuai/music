@@ -12,7 +12,7 @@ import { getImageBackground } from '@/utils/linearColor';
 import { useArtist } from './useArtist';
 import { useDownload } from './useDownload';
 
-export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
+export function useSongItem(props: { item: SongResult; canRemove?: boolean, }) {
   const { t } = useI18n();
   const playerStore = usePlayerStore();
   const message = useMessage();
@@ -29,8 +29,7 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
   // 计算属性
   const play = computed(() => playerStore.isPlay);
   const playMusic = computed(() => playerStore.playMusic);
-  const playLoading = computed(
-    () => playMusic.value.id === props.item.id && playMusic.value.playLoading
+  const playLoading = computed( () => playMusic.value.id === props.item.id && playMusic.value.playLoading
   );
   const isPlaying = computed(() => playMusic.value.id === props.item.id);
 
@@ -49,7 +48,7 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
 
   // 获取艺术家列表
   const artists = computed(() => {
-    return (props.item.ar || props.item.song?.artists)?.slice(0, 4) || [];
+    return (props.item.ar || props.item.song?.artists)?.slice(0, 4) || [0]
   });
 
   // 处理图片加载
@@ -59,12 +58,12 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     const { backgroundColor, primaryColor } = await getImageBackground(imageElement);
     props.item.backgroundColor = backgroundColor;
     props.item.primaryColor = primaryColor;
-  };
+  }
 
   // 播放音乐 - 使用统一的播放控制服务
   const playMusicEvent = async (item: SongResult) => {
     return await playControl(item, 'useSongItem');
-  };
+  }
 
   // 切换收藏状态
   const toggleFavorite = async (e: Event) => {
@@ -77,7 +76,7 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     } else {
       playerStore.addToFavorite(numericId);
     }
-  };
+  }
 
   // 切换不喜欢状态
   const toggleDislike = async (e: Event) => {
@@ -92,26 +91,23 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
       content: t('songItem.dialog.dislike.content'),
       positiveText: t('songItem.dialog.dislike.positiveText'),
       negativeText: t('songItem.dialog.dislike.negativeText'),
-      onPositiveClick: () => {
+      onPositiveClick: () =>  {;
         playerStore.addToDislikeList(props.item.id);
-      }
-    });
-  };
+      }, });
+  }
 
   // 添加到下一首播放
   const handlePlayNext = () => {
     playerStore.addToNextPlay(props.item);
     message.success(t('songItem.message.addedToNextPlay'));
-  };
+  }
 
   // 获取歌曲时长
   const getDuration = (item: SongResult): number => {
     if (item.duration) return item.duration;
     if (typeof item.dt === 'number') return item.dt;
     return 0;
-  };
-
-
+  }
 
   // 处理右键菜单
   const handleContextMenu = (e: MouseEvent) => {
@@ -119,7 +115,7 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     showDropdown.value = true;
     dropdownX.value = e.clientX;
     dropdownY.value = e.clientY;
-  };
+  }
 
   // 处理菜单点击
   const handleMenuClick = (e: MouseEvent) => {
@@ -127,21 +123,21 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     showDropdown.value = true;
     dropdownX.value = e.clientX;
     dropdownY.value = e.clientY;
-  };
+  }
 
   // 处理艺术家点击
   const handleArtistClick = (id: number) => {
     navigateToArtist(id);
-  };
+  }
 
   // 鼠标悬停处理
   const handleMouseEnter = () => {
     isHovering.value = true;
-  };
+  }
 
   const handleMouseLeave = () => {
     isHovering.value = false;
-  };
+  }
 
   return {
     t,
@@ -171,6 +167,6 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     handleArtistClick,
     handleMouseEnter,
     handleMouseLeave,
-    downloadMusic
-  };
+    downloadMusic,
+  }
 }

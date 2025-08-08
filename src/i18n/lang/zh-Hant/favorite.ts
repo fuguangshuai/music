@@ -9,5 +9,5 @@ export default {
   downloading: '正在下載中，請稍候...',
   selectSongsFirst: '請先選擇要下載的歌曲',
   descending: '降',
-  ascending: '升'
+  ascending: '升',
 };

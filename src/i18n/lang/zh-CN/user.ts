@@ -2,17 +2,17 @@ export default {
   profile: {
     followers: '粉丝',
     following: '关注',
-    level: '等级'
+    level: '等级',
   },
   playlist: {
     created: '创建的歌单',
     mine: '我创建的',
     trackCount: '{count}首',
-    playCount: '播放{count}次'
+    playCount: '播放{count}次',
   },
   ranking: {
     title: '听歌排行',
-    playCount: '{count}次'
+    playCount: '{count}次',
   },
   follow: {
     title: '关注列表',
@@ -21,14 +21,14 @@ export default {
     loadMore: '加载更多',
     noSignature: '这个家伙很懒，什么都没留下',
     userFollowsTitle: '的关注',
-    myFollowsTitle: '我的关注'
+    myFollowsTitle: '我的关注',
   },
   follower: {
     title: '粉丝列表',
     noFollowers: '暂无粉丝',
     loadMore: '加载更多',
     userFollowersTitle: '的粉丝',
-    myFollowersTitle: '我的粉丝'
+    myFollowersTitle: '我的粉丝',
   },
   detail: {
     playlists: '歌单',
@@ -38,11 +38,11 @@ export default {
     artist: '歌手',
     noSignature: '这个人很懒，什么都没留下',
     invalidUserId: '用户ID无效',
-    noRecordPermission: '{name}不让你看听歌排行'
+    noRecordPermission: '{name}不让你看听歌排行',
   },
   message: {
     loadFailed: '加载用户页面失败',
     deleteSuccess: '删除成功',
-    deleteFailed: '删除失败'
-  }
+    deleteFailed: '删除失败',
+  },
 };

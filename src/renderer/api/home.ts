@@ -8,7 +8,7 @@ import { IHotSinger } from '@/type/singer';
 import request from '@/utils/request';
 
 interface IHotSingerParams {
-  offset: number;
+  offset: number,
   limit: number;
 }
 

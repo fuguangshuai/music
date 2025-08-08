@@ -12,25 +12,35 @@
         <div class="shortcut-content">
           <n-scrollbar>
             <n-space vertical>
-              <div v-for="(shortcut, key) in tempShortcuts" :key="key" class="shortcut-item">
+              <div
+                v-for="(shortcut, _key) in tempShortcuts"
+                :key="_key"
+                class="shortcut-item"
+              >
                 <div class="shortcut-info">
-                  <span class="shortcut-label">{{ getShortcutLabel(key) }}</span>
+                  <span class="shortcut-label">{{ getShortcutLabel(_key) }}</span>
                 </div>
                 <div class="shortcut-controls">
                   <div class="shortcut-input">
                     <n-input
-                      :value="formatShortcut(shortcut.key)"
-                      :status="duplicateKeys[key] ? 'error' : undefined"
+                      :value="formatShortcut(shortcut._key)"
+                      :status="duplicateKeys[_key] ? 'error' : undefined"
                       :placeholder="t('settings.shortcutSettings.inputPlaceholder')"
                       :disabled="!shortcut.enabled"
                       readonly
-                      @keydown="(e) => handleKeyDown(e, key)"
-                      @focus="() => startRecording(key)"
+                      @keydown="e => handleKeyDown(e, _key)"
+                      @focus="() => startRecording(_key)"
                       @blur="stopRecording"
                     />
-                    <n-tooltip v-if="duplicateKeys[key]" trigger="hover">
+                    <n-tooltip
+                      v-if="duplicateKeys[_key]"
+                      trigger="hover"
+                    >
                       <template #trigger>
-                        <n-icon class="error-icon" size="18">
+                        <n-icon
+                          class="error-icon"
+                          size="18"
+                        >
                           <i class="ri-error-warning-line"></i>
                         </n-icon>
                       </template>
@@ -40,7 +50,10 @@
                   <div class="shortcut-options">
                     <n-tooltip trigger="hover">
                       <template #trigger>
-                        <n-switch v-model:value="shortcut.enabled" size="small" />
+                        <n-switch
+                          v-model:value="shortcut.enabled"
+                          size="small"
+                        />
                       </template>
                       {{
                         shortcut.enabled
@@ -48,7 +61,10 @@
                           : t('settings.shortcutSettings.disabled')
                       }}
                     </n-tooltip>
-                    <n-tooltip v-if="shortcut.enabled" trigger="hover">
+                    <n-tooltip
+                      v-if="shortcut.enabled"
+                      trigger="hover"
+                    >
                       <template #trigger>
                         <n-select
                           v-model:value="shortcut.scope"
@@ -72,17 +88,34 @@
 
         <div class="shortcut-footer">
           <n-space justify="end">
-            <n-button size="small" @click="handleCancel">{{ t('common.cancel') }}</n-button>
-            <n-button size="small" @click="resetShortcuts">{{
-              t('settings.shortcutSettings.resetShortcuts')
-            }}</n-button>
-            <n-button size="small" type="warning" @click="disableAllShortcuts">{{
-              t('settings.shortcutSettings.disableAll')
-            }}</n-button>
-            <n-button size="small" type="success" @click="enableAllShortcuts">{{
-              t('settings.shortcutSettings.enableAll')
-            }}</n-button>
-            <n-button type="primary" size="small" :disabled="hasConflict" @click="handleSave">
+            <n-button
+              size="small"
+              @click="handleCancel"
+              >{{ t('common.cancel') }}</n-button
+            >
+            <n-button
+              size="small"
+              @click="resetShortcuts"
+              >{{ t('settings.shortcutSettings.resetShortcuts') }}</n-button
+            >
+            <n-button
+              size="small"
+              type="warning"
+              @click="disableAllShortcuts"
+              >{{ t('settings.shortcutSettings.disableAll') }}</n-button
+            >
+            <n-button
+              size="small"
+              type="success"
+              @click="enableAllShortcuts"
+              >{{ t('settings.shortcutSettings.enableAll') }}</n-button
+            >
+            <n-button
+              type="primary"
+              size="small"
+              :disabled="hasConflict"
+              @click="handleSave"
+            >
               {{ t('common.save') }}
             </n-button>
           </n-space>
@@ -93,388 +126,386 @@
 </template>
 
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash';
-import { useMessage } from 'naive-ui';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+    import { cloneDeep } from 'lodash';
+    import { useMessage } from 'naive-ui';
+    import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+    import { useI18n } from 'vue-i18n';
 
-import { isElectron } from '@/utils';
+    import { isElectron } from '@/utils';
 
-const { t } = useI18n();
+    const { t } = useI18n();
 
-interface ShortcutConfig {
-  key: string;
-  enabled: boolean;
-  scope: 'global' | 'app';
-}
+    interface ShortcutConfig {
+  key: string,
+    enabled: boolean,
+      scope: 'global' | 'app';
 
-interface Shortcuts {
-  togglePlay: ShortcutConfig;
-  prevPlay: ShortcutConfig;
-  nextPlay: ShortcutConfig;
-  volumeUp: ShortcutConfig;
-  volumeDown: ShortcutConfig;
-  toggleFavorite: ShortcutConfig;
-  toggleWindow: ShortcutConfig;
-}
+  }
 
-const defaultShortcuts: Shortcuts = {
-  togglePlay: { key: 'CommandOrControl+Alt+P', enabled: true, scope: 'global' },
-  prevPlay: { key: 'Alt+Left', enabled: true, scope: 'global' },
-  nextPlay: { key: 'Alt+Right', enabled: true, scope: 'global' },
-  volumeUp: { key: 'Alt+Up', enabled: true, scope: 'app' },
-  volumeDown: { key: 'Alt+Down', enabled: true, scope: 'app' },
-  toggleFavorite: { key: 'CommandOrControl+Alt+L', enabled: true, scope: 'app' },
-  toggleWindow: { key: 'CommandOrControl+Alt+Shift+M', enabled: true, scope: 'global' }
-};
+    interface Shortcuts {
+  togglePlay: ShortcutConfig,
+    prevPlay: ShortcutConfig,
+      nextPlay: ShortcutConfig,
+    volumeUp: ShortcutConfig,
+      volumeDown: ShortcutConfig,
+    toggleFavorite: ShortcutConfig,
+      toggleWindow: ShortcutConfig;
 
-const scopeOptions = [
-  { label: t('settings.shortcutSettings.scopeGlobal'), value: 'global' },
-  { label: t('settings.shortcutSettings.scopeApp'), value: 'app' }
-];
+  }
 
-const shortcuts = ref<Shortcuts>(
-  isElectron
-    ? window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts') || defaultShortcuts
-    : { ...defaultShortcuts }
-);
-
-// 临时存储编辑中的快捷键
-const tempShortcuts = ref<Shortcuts>(cloneDeep(shortcuts.value));
-
-// 监听快捷键更新
-if (isElectron) {
-  window.electron.ipcRenderer.on('shortcuts-updated', () => {
-    const newShortcuts = window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts');
-    if (newShortcuts) {
-      shortcuts.value = newShortcuts;
-      tempShortcuts.value = cloneDeep(newShortcuts);
-    }
-  });
-}
-
-// 组件挂载时禁用快捷键
-onMounted(() => {
-  if (isElectron) {
-    // 禁用全局快捷键
-    window.electron.ipcRenderer.send('disable-shortcuts');
-
-    const storedShortcuts = window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts');
-    console.log('storedShortcuts', storedShortcuts);
-    if (storedShortcuts) {
-      shortcuts.value = storedShortcuts;
-      tempShortcuts.value = cloneDeep(storedShortcuts);
-    } else {
-      shortcuts.value = { ...defaultShortcuts };
-      tempShortcuts.value = cloneDeep(defaultShortcuts);
-      window.electron.ipcRenderer.send('set-store-value', 'shortcuts', defaultShortcuts);
+    const defaultShortcuts: Shortcuts = {
+    togglePlay: { key: 'CommandOrControl+Alt+P', enabled: true, scope: 'global' },
+      prevPlay: { key: 'Alt+Left', enabled: true, scope: 'global' },
+      nextPlay: { key: 'Alt+Right', enabled: true, scope: 'global' },
+      volumeUp: { key: 'Alt+Up', enabled: true, scope: 'app' },
+      volumeDown: { key: 'Alt+Down', enabled: true, scope: 'app' },
+      toggleFavorite: { key: 'CommandOrControl+Alt+L', enabled: true, scope: 'app' },
+      toggleWindow: { key: 'CommandOrControl+Alt+Shift+M', enabled: true, scope: 'global' },
     }
 
-    // 转换旧格式的快捷键数据到新格式
-    if (storedShortcuts && typeof storedShortcuts.togglePlay === 'string') {
-      const convertedShortcuts = {} as Shortcuts;
-      Object.entries(storedShortcuts).forEach(([key, value]) => {
-        convertedShortcuts[key as keyof Shortcuts] = {
-          key: value as string,
-          enabled: true,
-          scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(key) ? 'app' : 'global'
-        };
+    const scopeOptions = [
+      { label: t('settings.shortcutSettings.scopeGlobal'), value: 'global' },
+      { label: t('settings.shortcutSettings.scopeApp'), value: 'app' }]
+
+    const shortcuts = ref<Shortcuts>(isElectron
+        ? window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts') || defaultShortcuts
+        : { ...defaultShortcuts }
+    );
+
+    // 临时存储编辑中的快捷键
+    const tempShortcuts = ref<Shortcuts>(cloneDeep(shortcuts.value));
+
+    // 监听快捷键更新
+    if (isElectron) {
+      window.electron.ipcRenderer.on('shortcuts-updated'() => {
+        const newShortcuts = window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts');
+        if (newShortcuts) {
+          shortcuts.value = newShortcuts;
+          tempShortcuts.value = cloneDeep(newShortcuts);
+        }
       });
-      shortcuts.value = convertedShortcuts;
-      tempShortcuts.value = cloneDeep(convertedShortcuts);
-      window.electron.ipcRenderer.send('set-store-value', 'shortcuts', convertedShortcuts);
     }
-  }
-});
 
-const shortcutLabels: Record<keyof Shortcuts, string> = {
-  togglePlay: t('settings.shortcutSettings.togglePlay'),
-  prevPlay: t('settings.shortcutSettings.prevPlay'),
-  nextPlay: t('settings.shortcutSettings.nextPlay'),
-  volumeUp: t('settings.shortcutSettings.volumeUp'),
-  volumeDown: t('settings.shortcutSettings.volumeDown'),
-  toggleFavorite: t('settings.shortcutSettings.toggleFavorite'),
-  toggleWindow: t('settings.shortcutSettings.toggleWindow')
-};
+    // 组件挂载时禁用快捷键
+    onMounted(() => {
+      if (isElectron) {
+        // 禁用全局快捷键
+        window.electron.ipcRenderer.send('disable-shortcuts');
 
-const getShortcutLabel = (key: keyof Shortcuts) => shortcutLabels[key];
+        const storedShortcuts = window.electron.ipcRenderer.sendSync('get-store-value', 'shortcuts');
+        console.log('storedShortcuts', storedShortcuts);
+        if (storedShortcuts) {
+          shortcuts.value = storedShortcuts;
+          tempShortcuts.value = cloneDeep(storedShortcuts);
+        } else {
+          shortcuts.value = { ...defaultShortcuts }
+          tempShortcuts.value = cloneDeep(defaultShortcuts);
+          window.electron.ipcRenderer.send('set-store-value', 'shortcuts', defaultShortcuts);
+        }
 
-const isRecording = ref(false);
-const currentKey = ref<keyof Shortcuts | ''>('');
-const message = useMessage();
-
-// 检查快捷键冲突
-const duplicateKeys = computed(() => {
-  const result: Record<string, boolean> = {};
-  const usedShortcuts = new Map<string, string>();
-
-  Object.entries(tempShortcuts.value).forEach(([key, shortcut]) => {
-    // 只检查启用的快捷键
-    if (!shortcut.enabled) return;
-
-    const conflictKey = usedShortcuts.get(shortcut.key);
-    if (conflictKey) {
-      // 只有相同作用域的快捷键才会被认为冲突
-      const conflictScope = tempShortcuts.value[conflictKey as keyof Shortcuts].scope;
-      if (shortcut.scope === conflictScope) {
-        result[key] = true;
+        // 转换旧格式的快捷键数据到新格式
+        if (storedShortcuts && typeof storedShortcuts.togglePlay === 'string') {
+          const convertedShortcuts = {} as Shortcuts;
+          Object.entries(storedShortcuts).forEach(([_key, value]) => {
+            convertedShortcuts[_key as keyof Shortcuts] = {
+              key: value as string,
+              enabled: true,
+              scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(_key) ? 'app' : 'global',
+            }
+          });
+          shortcuts.value = convertedShortcuts;
+          tempShortcuts.value = cloneDeep(convertedShortcuts);
+          window.electron.ipcRenderer.send('set-store-value', 'shortcuts', convertedShortcuts);
+        }
       }
-    } else {
-      usedShortcuts.set(shortcut.key, key);
+    });
+
+    const shortcutLabels: Record<keyof Shortcuts, string> = {
+      togglePlay: t('settings.shortcutSettings.togglePlay'),
+      prevPlay: t('settings.shortcutSettings.prevPlay'),
+      nextPlay: t('settings.shortcutSettings.nextPlay'),
+      volumeUp: t('settings.shortcutSettings.volumeUp'),
+      volumeDown: t('settings.shortcutSettings.volumeDown'),
+      toggleFavorite: t('settings.shortcutSettings.toggleFavorite'),
+      toggleWindow: t('settings.shortcutSettings.toggleWindow'),
     }
-  });
 
-  return result;
-});
+    const getShortcutLabel = (_key: keyof Shortcuts) => shortcutLabels[_key]
 
-// 是否存在冲突
-const hasConflict = computed(() => Object.keys(duplicateKeys.value).length > 0);
+    const isRecording = ref(false);
+    const currentKey = ref<keyof Shortcuts | ''>('');
+    const message = useMessage();
 
-const startRecording = (key: keyof Shortcuts) => {
-  if (!tempShortcuts.value[key].enabled) return;
+    // 检查快捷键冲突
+    const duplicateKeys = computed(() => {
+      const result: Record<string, boolean> = {}
+      const usedShortcuts = new Map<string, string>();
 
-  isRecording.value = true;
-  currentKey.value = key;
-  // 禁用全局快捷键
-  if (isElectron) {
-    window.electron.ipcRenderer.send('disable-shortcuts');
-  }
-};
+      Object.entries(tempShortcuts.value).forEach(([_key, shortcut]) => {
+        // 只检查启用的快捷键
+        if (!shortcut.enabled) return;
 
-const stopRecording = () => {
-  isRecording.value = false;
-  currentKey.value = '';
-  // 重新启用全局快捷键
-  if (isElectron) {
-    window.electron.ipcRenderer.send('enable-shortcuts');
-  }
-};
+        const conflictKey = usedShortcuts.get(shortcut._key);
+        if (conflictKey) {
+          // 只有相同作用域的快捷键才会被认为冲突
+          const conflictScope = tempShortcuts.value[conflictKey as keyof Shortcuts].scope;
+          if (shortcut.scope === conflictScope) {
+            result[_key] = true;
+          }
+        } else {
+          usedShortcuts.set(shortcut._key, _key);
+        }
+      });
 
-const handleKeyDown = (e: KeyboardEvent, key: keyof Shortcuts) => {
-  if (!isRecording.value || currentKey.value !== key) return;
+      return result;
+    });
 
-  e.preventDefault();
-  e.stopPropagation();
+    // 是否存在冲突
+    const hasConflict = computed(() => Object.keys(duplicateKeys.value).length > 0);
 
-  const modifiers: string[] = [];
+    const startRecording = (_key: keyof Shortcuts) => {
+      if (!tempShortcuts.value[_key].enabled) return;
 
-  // 统一使用 CommandOrControl
-  if (e.ctrlKey || e.metaKey) {
-    modifiers.push('CommandOrControl');
-  }
-  if (e.altKey) modifiers.push('Alt');
-  if (e.shiftKey) modifiers.push('Shift');
-
-  let keyName = e.key;
-
-  // 特殊按键处理
-  switch (e.key) {
-    case 'ArrowLeft':
-      keyName = 'Left';
-      break;
-    case 'ArrowRight':
-      keyName = 'Right';
-      break;
-    case 'ArrowUp':
-      keyName = 'Up';
-      break;
-    case 'ArrowDown':
-      keyName = 'Down';
-      break;
-    case 'Control':
-    case 'Alt':
-    case 'Shift':
-    case 'Meta':
-    case 'Command':
-      return; // 忽略单独的修饰键
-    default:
-      keyName = e.key.length === 1 ? e.key.toUpperCase() : e.key;
-  }
-
-  if (!['Control', 'Alt', 'Shift', 'Meta', 'Command'].includes(keyName)) {
-    tempShortcuts.value[key].key = [...modifiers, keyName].join('+');
-  }
-};
-
-const resetShortcuts = () => {
-  tempShortcuts.value = cloneDeep(defaultShortcuts);
-  message.success(t('settings.shortcutSettings.messages.resetSuccess'));
-};
-
-const saveShortcuts = () => {
-  if (hasConflict.value) {
-    message.error(t('settings.shortcutSettings.messages.conflict'));
-    return;
-  }
-
-  // 创建一个新的 Shortcuts 对象
-  const shortcutsToSave = cloneDeep(tempShortcuts.value);
-
-  shortcuts.value = shortcutsToSave;
-
-  if (isElectron) {
-    try {
-      // 先保存到 store
-      window.electron.ipcRenderer.send('set-store-value', 'shortcuts', shortcutsToSave);
-      // 然后更新快捷键
-      window.electron.ipcRenderer.send('update-shortcuts', shortcutsToSave);
-      message.success(t('settings.shortcutSettings.messages.saveSuccess'));
-    } catch (error) {
-      console.error('保存快捷键失败:', error);
-      message.error(t('settings.shortcutSettings.messages.saveError'));
+      isRecording.value = true;
+      currentKey.value = _key;
+      // 禁用全局快捷键
+      if (isElectron) {
+        window.electron.ipcRenderer.send('disable-shortcuts');
+      }
     }
-  }
-};
 
-const cancelEdit = () => {
-  tempShortcuts.value = cloneDeep(shortcuts.value);
-  message.info(t('settings.shortcutSettings.messages.cancelEdit'));
-  emit('update:show', false);
-};
+    const stopRecording = () => {
+      isRecording.value = false;
+      currentKey.value = '';
+      // 重新启用全局快捷键
+      if (isElectron) {
+        window.electron.ipcRenderer.send('enable-shortcuts');
+      }
+    }
 
-// 组件卸载时确保快捷键被重新启用
-onUnmounted(() => {
-  if (isElectron) {
-    window.electron.ipcRenderer.send('enable-shortcuts');
-  }
-});
+    const handleKeyDown = (e: KeyboardEvent, _key: keyof Shortcuts) => {
+      if (!isRecording.value || currentKey.value !== _key) return;
 
-// 格式化快捷键显示
-const formatShortcut = (shortcut: string) => {
-  const isMac = isElectron
-    ? window.electron.ipcRenderer.sendSync('get-platform') === 'darwin'
-    : false;
-  return shortcut
-    .replace(/CommandOrControl/g, isMac ? '⌘' : 'Ctrl')
-    .replace(/\+/g, ' + ')
-    .replace(/Meta/g, isMac ? '⌘' : 'Win')
-    .replace(/Control/g, isMac ? '⌃' : 'Ctrl')
-    .replace(/Alt/g, isMac ? '⌥' : 'Alt')
-    .replace(/Shift/g, isMac ? '⇧' : 'Shift')
-    .replace(/ArrowUp/g, '↑')
-    .replace(/ArrowDown/g, '↓')
-    .replace(/ArrowLeft/g, '←')
-    .replace(/ArrowRight/g, '→');
-};
+      e.preventDefault();
+      e.stopPropagation();
 
-const visible = ref(false);
-const emit = defineEmits(['update:show', 'change']);
+      const modifiers: string[] = [0]
 
-// 接收外部的 show 属性
-const props = defineProps<{
-  show?: boolean;
-}>();
+      // 统一使用 CommandOrControl
+      if (e.ctrlKey || e.metaKey) {
+        modifiers.push('CommandOrControl');
+      }
+      if (e.altKey) modifiers.push('Alt');
+      if (e.shiftKey) modifiers.push('Shift');
 
-// 监听 show 属性变化
-watch(
-  () => props.show,
-  (newVal) => {
-    visible.value = newVal;
-  }
-);
+      let keyName = e._key;
 
-// 监听内部 visible 变化
-watch(visible, (newVal) => {
-  emit('update:show', newVal);
-});
+      // 特殊按键处理
+      switch (e._key) {
+        case 'ArrowLeft':
+          keyName = 'Left';
+          break;
+        case 'ArrowRight':
+          keyName = 'Right';
+          break;
+        case 'ArrowUp':
+          keyName = 'Up';
+          break;
+        case 'ArrowDown':
+          keyName = 'Down';
+          break;
+        case 'Control':
+        case 'Alt':
+        case 'Shift':
+        case 'Meta':
+        case 'Command':
+          return; // 忽略单独的修饰键
+        default:
+      break;
+          keyName = e._key.length === 1 ? e._key.toUpperCase() : e._key;
+      }
 
-// 处理弹窗关闭后的事件
-const handleAfterLeave = () => {
-  // 重置临时数据
-  tempShortcuts.value = cloneDeep(shortcuts.value);
-};
+      if (!['Control', 'Alt', 'Shift', 'Meta', 'Command'].includes(keyName)) {
+        tempShortcuts.value[_key].key = [...modifiers, keyName].join('+');
+      }
+    }
 
-// 处理取消按钮点击
-const handleCancel = () => {
-  visible.value = false;
-  cancelEdit();
-};
+    const resetShortcuts = () => {
+      tempShortcuts.value = cloneDeep(defaultShortcuts);
+      message.success(t('settings.shortcutSettings.messages.resetSuccess'));
+    }
 
-// 处理保存按钮点击
-const handleSave = () => {
-  saveShortcuts();
-  visible.value = false;
-  emit('change', shortcuts.value);
-};
+    const saveShortcuts = () => {
+      if (hasConflict.value) {
+        message.error(t('settings.shortcutSettings.messages.conflict'));
+        return;
+      }
 
-// 全部禁用快捷键
-const disableAllShortcuts = () => {
-  Object.keys(tempShortcuts.value).forEach((key) => {
-    tempShortcuts.value[key as keyof Shortcuts].enabled = false;
-  });
-  message.info(t('settings.shortcutSettings.messages.disableAll'));
-};
+      // 创建一个新的 Shortcuts 对象
+      const shortcutsToSave = cloneDeep(tempShortcuts.value);
 
-// 全部启用快捷键
-const enableAllShortcuts = () => {
-  Object.keys(tempShortcuts.value).forEach((key) => {
-    tempShortcuts.value[key as keyof Shortcuts].enabled = true;
-  });
-  message.info(t('settings.shortcutSettings.messages.enableAll'));
-};
+      shortcuts.value = shortcutsToSave;
+
+      if (isElectron) {
+        try {
+          // 先保存到 store
+          window.electron.ipcRenderer.send('set-store-value', 'shortcuts', shortcutsToSave);
+          // 然后更新快捷键
+          window.electron.ipcRenderer.send('update-shortcuts', shortcutsToSave);
+          message.success(t('settings.shortcutSettings.messages.saveSuccess'));
+        } catch (error) {
+          console.error('保存快捷键失败:', error);
+          message.error(t('settings.shortcutSettings.messages.saveError'));
+        }
+      }
+    }
+
+    const cancelEdit = () => {
+      tempShortcuts.value = cloneDeep(shortcuts.value);
+      message.info(t('settings.shortcutSettings.messages.cancelEdit'));
+      emit('update:show', false);
+    }
+
+    // 组件卸载时确保快捷键被重新启用
+    onUnmounted(() => {
+      if (isElectron) {
+        window.electron.ipcRenderer.send('enable-shortcuts');
+      }
+    });
+
+    // 格式化快捷键显示
+    const formatShortcut = (shortcut: string) => {
+      const isMac = isElectron
+        ? window.electron.ipcRenderer.sendSync('get-platform') === 'darwin'
+        : false;
+      return shortcut
+        .replace(/CommandOrControl/g, isMac ? '⌘' : 'Ctrl')
+        .replace(/\+/g, ' + ')
+        .replace(/Meta/g, isMac ? '⌘' : 'Win')
+        .replace(/Control/g, isMac ? '⌃' : 'Ctrl')
+        .replace(/Alt/g, isMac ? '⌥' : 'Alt')
+        .replace(/Shift/g, isMac ? '⇧' : 'Shift')
+        .replace(/ArrowUp/g, '↑')
+        .replace(/ArrowDown/g, '↓')
+        .replace(/ArrowLeft/g, '←')
+        .replace(/ArrowRight/g, '→');
+    }
+
+    const visible = ref(false);
+    const emit = defineEmits(['update:show', 'change']);
+
+    // 接收外部的 show 属性
+    const props = defineProps<{
+      show?: boolean;
+    }>();
+
+    // 监听 show 属性变化
+    watch(() => props.show,
+      newVal => {
+        visible.value = newVal;
+      }
+    );
+
+    // 监听内部 visible 变化
+    watch(() => visible, newVal => {
+      emit('update:show', newVal);
+    });
+
+    // 处理弹窗关闭后的事件
+    const handleAfterLeave = () => {
+      // 重置临时数据
+      tempShortcuts.value = cloneDeep(shortcuts.value);
+    }
+
+    // 处理取消按钮点击
+    const handleCancel = () => {
+      visible.value = false;
+      cancelEdit();
+    }
+
+    // 处理保存按钮点击
+    const handleSave = () => {
+      saveShortcuts();
+      visible.value = false;
+      emit('change', shortcuts.value);
+    }
+
+    // 全部禁用快捷键
+    const disableAllShortcuts = () => {
+      Object.keys(tempShortcuts.value).forEach(_key => {
+        tempShortcuts.value[_key as keyof Shortcuts].enabled = false; });
+      message.info(t('settings.shortcutSettings.messages.disableAll'));
+    }
+
+    // 全部启用快捷键
+    const enableAllShortcuts = () => {
+      Object.keys(tempShortcuts.value).forEach(_key => {
+        tempShortcuts.value[_key as keyof Shortcuts].enabled = true; });
+      message.info(t('settings.shortcutSettings.messages.enableAll'));
+    }
 </script>
 
 <style lang="scss" scoped>
-.shortcut-settings {
-  height: 500px;
+  .shortcut-settings {
+    height: 500px;
 
-  .shortcut-card {
-    @apply flex flex-col h-full;
+    .shortcut-card {
+      @apply flex flex-col h-full;
 
-    .shortcut-footer {
-      @apply p-4 border-t border-gray-100 dark:border-gray-800;
-    }
+      .shortcut-footer {
+        @apply p-4 border-t border-gray-100 dark:border-gray-800;
+      }
 
-    .shortcut-content {
-      @apply flex-1 overflow-hidden;
+      .shortcut-content {
+        @apply flex-1 overflow-hidden;
 
-      :deep(.n-scrollbar) {
-        @apply h-full;
+        :deep(.n-scrollbar) {
+          @apply h-full;
 
-        .n-scrollbar-content {
-          @apply p-4;
+          .n-scrollbar-content {
+            @apply p-4;
+          }
         }
       }
     }
-  }
 
-  .shortcut-item {
-    @apply flex items-center justify-between p-3 rounded-lg transition-all mb-3;
-    @apply bg-gray-50 dark:bg-gray-800;
+    .shortcut-item {
+      @apply flex items-center justify-between p-3 rounded-lg transition-all mb-3;
+      @apply bg-gray-50 dark:bg-gray-800;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .shortcut-info {
-      @apply flex flex-col min-w-[150px];
-
-      .shortcut-label {
-        @apply text-base font-medium;
+      &:last-child {
+        margin-bottom: 0;
       }
-    }
 
-    .shortcut-controls {
-      @apply flex items-center gap-3 flex-1;
+      .shortcut-info {
+        @apply flex flex-col min-w-[150px]
 
-      .shortcut-input {
-        @apply flex items-center gap-2 flex-1;
+        .shortcut-label {
+          @apply text-base font-medium;
+        }
+      }
 
-        :deep(.n-input) {
-          .n-input__input-el {
-            @apply text-center font-mono;
+      .shortcut-controls {
+        @apply flex items-center gap-3 flex-1;
+
+        .shortcut-input {
+          @apply flex items-center gap-2 flex-1;
+
+          :deep(.n-input) {
+            .n-input__input-el {
+              @apply text-center font-mono;
+            }
+          }
+
+          .error-icon {
+            @apply text-red-500;
           }
         }
 
-        .error-icon {
-          @apply text-red-500;
+        .shortcut-options {
+          @apply flex items-center gap-2;
         }
-      }
-
-      .shortcut-options {
-        @apply flex items-center gap-2;
       }
     }
   }
-}
 </style>

@@ -3,15 +3,17 @@ import type { IListDetail } from '@/type/listDetail';
 import request from '@/utils/request';
 
 interface IListByTagParams {
-  tag: string;
-  before: number;
+tag: string,
+  before: number,
   limit: number;
+
 }
 
 interface IListByCatParams {
-  cat: string;
-  offset: number;
+cat: string,
+  offset: number,
   limit: number;
+
 }
 
 // 根据tag 获取歌单列表
@@ -22,8 +24,7 @@ export function getListByTag(params: IListByTagParams) {
 // 根据cat 获取歌单列表
 export function getListByCat(params: IListByCatParams) {
   return request.get('/top/playlist', {
-    params
-  });
+    params, });
 }
 
 // 获取推荐歌单
@@ -42,6 +43,6 @@ export function getAlbum(id: number | string) {
 }
 
 // 获取榜单列表
-export function getToplist() {
+export function getToplist(): Promise<unknown> {
   return request.get('/toplist');
 }

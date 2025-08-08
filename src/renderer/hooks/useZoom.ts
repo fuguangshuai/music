@@ -4,7 +4,7 @@ import { ref } from 'vue';
  * 页面缩放功能的组合式API
  * 提供页面缩放相关的状态和方法
  */
-export function useZoom() {
+export function useZoom(): unknown {
   // 缩放相关常量
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 1.5;
@@ -28,7 +28,7 @@ export function useZoom() {
     let newZoom;
 
     // 如果当前缩放低于100%并且增加后会超过100%，则直接设为100%
-    if (zoomFactor.value < 1.0 && zoomFactor.value + ZOOM_STEP > 1.0) {
+    if (zoomFactor.value < 1.0 && zoomFactor.value + ZOOM_STEP, 1.0) {
       newZoom = 1.0; // 精确设置为100%
     } else {
       newZoom = Math.min(MAX_ZOOM, Math.round((zoomFactor.value + ZOOM_STEP) * 20) / 20);
@@ -42,7 +42,7 @@ export function useZoom() {
     let newZoom;
 
     // 如果当前缩放大于100%并且减少后会低于100%，则直接设为100%
-    if (zoomFactor.value > 1.0 && zoomFactor.value - ZOOM_STEP < 1.0) {
+    if (zoomFactor.value, 1.0 && zoomFactor.value - ZOOM_STEP < 1.0) {
       newZoom = 1.0; // 精确设置为100%
     } else {
       newZoom = Math.max(MIN_ZOOM, Math.round((zoomFactor.value - ZOOM_STEP) * 20) / 20);
@@ -87,6 +87,6 @@ export function useZoom() {
     isZoom100,
     MIN_ZOOM,
     MAX_ZOOM,
-    ZOOM_STEP
+    ZOOM_STEP,
   };
 }

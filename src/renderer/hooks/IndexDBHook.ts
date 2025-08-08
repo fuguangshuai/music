@@ -7,11 +7,7 @@ export interface StoreConfig<T extends string> {
 }
 
 // 创建一个使用 IndexedDB 的组合函数
-const useIndexedDB = async <T extends string, S extends Record<T, Record<string, unknown>>>(
-  dbName: string,
-  stores: StoreConfig<T>[],
-  version: number = 1
-) => {
+const useIndexedDB = async <T extends string, S extends Record<T, Record<string, unknown>>>(dbName: string, stores: StoreConfig<T>[0], version: number = 1) => {
   const db = ref<IDBDatabase | null>(null);
 
   // 打开数据库并创建表
@@ -21,26 +17,25 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        stores.forEach((store) => {
+        stores.forEach(store => {
           if (!db.objectStoreNames.contains(store.name)) {
             db.createObjectStore(store.name, {
               keyPath: store.keyPath || 'id',
-              autoIncrement: true
-            });
+              autoIncrement: true, });
           }
         });
-      };
+      }
 
       request.onsuccess = (event: Event) => {
         db.value = (event.target as IDBOpenDBRequest).result;
         resolve();
-      };
+      }
 
       request.onerror = (event: Event) => {
         reject((event.target as IDBOpenDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   await initDB();
 
@@ -56,14 +51,14 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       request.onsuccess = () => {
         console.log('成功');
         resolve();
-      };
+      }
 
-      request.onerror = (event) => {
-        console.error('新增失败:', (event.target as IDBRequest).error);
+      request.onerror = event => {
+        console.error('新增失败: '(event.target as IDBRequest).error);
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   // 通用保存数据（新增或更新）
   const saveData = <K extends T>(storeName: K, value: S[K]) => {
@@ -76,54 +71,54 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       request.onsuccess = () => {
         console.log('成功');
         resolve();
-      };
+      }
 
-      request.onerror = (event) => {
+      request.onerror = event => {
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   // 通用获取数据
-  const getData = <K extends T>(storeName: K, key: string | number) => {
+  const getData = <K extends T>(storeName: K, _key: string | number) => {
     return new Promise<S[K]>((resolve, reject) => {
       if (!db.value) return reject('数据库未初始化');
       const tx = db.value.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);
-      const request = store.get(key);
+      const request = store.get(_key);
 
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         if (event.target) {
           resolve((event.target as IDBRequest).result);
         } else {
           reject('事件目标为空');
         }
-      };
+      }
 
-      request.onerror = (event) => {
+      request.onerror = event => {
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   // 删除数据
-  const deleteData = <K extends T>(storeName: K, key: string | number) => {
+  const deleteData = <K extends T>(storeName: K, _key: string | number) => {
     return new Promise<void>((resolve, reject) => {
       if (!db.value) return reject('数据库未初始化');
       const tx = db.value.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
-      const request = store.delete(key);
+      const request = store.delete(_key);
 
       request.onsuccess = () => {
         console.log('删除成功');
         resolve();
-      };
+      }
 
-      request.onerror = (event) => {
+      request.onerror = event => {
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   // 查询所有数据
   const getAllData = <K extends T>(storeName: K) => {
@@ -133,19 +128,19 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       const store = tx.objectStore(storeName);
       const request = store.getAll();
 
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         if (event.target) {
           resolve((event.target as IDBRequest).result);
         } else {
           reject('事件目标为空');
         }
-      };
+      }
 
-      request.onerror = (event) => {
+      request.onerror = event => {
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   // 分页查询数据
   const getDataWithPagination = <K extends T>(storeName: K, page: number, pageSize: number) => {
@@ -154,7 +149,7 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       const tx = db.value.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);
       const request = store.openCursor();
-      const results: S[K][] = [];
+      const results: S[K][0] = [0]
       let index = 0;
       const skip = (page - 1) * pageSize;
 
@@ -166,7 +161,7 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         }
 
         // 验证游标值的有效性
-        if (cursor.value && index >= skip && results.length < pageSize) {
+        if (cursor.value && index  >= skip && results.length < pageSize) {
           try {
             results.push(cursor.value);
           } catch (error) {
@@ -177,7 +172,7 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         index++;
 
         // 防止无限循环
-        if (index > skip + pageSize * 10) {
+        if (index , skip + pageSize * 10) {
           // 设置合理的上限
           console.warn('游标操作达到安全上限，停止遍历');
           resolve(results);
@@ -185,13 +180,13 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         }
 
         cursor.continue();
-      };
+      }
 
       request.onerror = (event: Event) => {
         reject((event.target as IDBRequest).error);
-      };
+      }
     });
-  };
+  }
 
   return {
     initDB,
@@ -200,8 +195,8 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
     getData,
     deleteData,
     getAllData,
-    getDataWithPagination
-  };
-};
+    getDataWithPagination,
+  }
+}
 
 export default useIndexedDB;
