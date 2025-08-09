@@ -36,7 +36,7 @@ export interface BaseApiResponse<T = unknown> {
 export type RecommendedApiResponse<T> = StandardApiResponse<T>;
 
 // 分页响应结构
-export interface PaginatedResponse<T> extends BaseApiResponse<T> {
+export interface PaginatedResponse<T> extends StandardApiResponse<T> {
   total?: number;
   hasMore?: boolean;
   offset?: number;
@@ -76,7 +76,7 @@ export interface UserProfile {
   backgroundImgIdStr: string;
 }
 
-export interface LoginResponse extends BaseApiResponse {
+export interface LoginResponse extends StandardApiResponse<any> {
   data: {
     code: number;
     account?: {
@@ -275,7 +275,7 @@ export interface SearchResult {
   };
 }
 
-export interface SearchResponse extends BaseApiResponse {
+export interface SearchResponse extends StandardApiResponse<any> {
   data: {
     result: SearchResult;
   };
@@ -341,7 +341,7 @@ export interface Lyric {
   lyric: string;
 }
 
-export interface LyricResponse extends BaseApiResponse {
+export interface LyricResponse extends StandardApiResponse<any> {
   data: {
     sgc: boolean;
     sfy: boolean;
@@ -355,7 +355,7 @@ export interface LyricResponse extends BaseApiResponse {
 }
 
 // 通用错误响应
-export interface ErrorResponse extends BaseApiResponse {
+export interface ErrorResponse extends StandardApiResponse<null> {
   code: number;
   message: string;
   data?: null;

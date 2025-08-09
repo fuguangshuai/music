@@ -1,7 +1,7 @@
 /**
  * 🔒 统一类型守卫工具库
  * 整合项目中所有重复的类型检查和验证函数
- * 
+ *
  * 功能特性：
  * - 基础类型检查（string, number, boolean等）
  * - 复合类型检查（object, array, function等）
@@ -9,18 +9,12 @@
  * - 音乐数据验证
  * - 配置数据验证
  * - 性能优化的缓存验证器
- * 
+ *
  * @author TypeScript重构项目组
  * @since v4.11.0
  */
 
-import type { 
-  ApiResponseData, 
-  ValidationInput, 
-  GenericObject, 
-  GenericArray,
-  ConfigData 
-} from '../types/consolidated-types';
+import type { GenericObject, ValidationInput } from '../types/consolidated-types';
 
 // ============================================================================
 // 基础类型守卫 - 替代项目中重复的基础类型检查
@@ -34,8 +28,7 @@ export const basicTypeGuards = {
   /**
    * 检查是否为字符串
    */
-  isString: (value: ValidationInput): value is string => 
-    typeof value === 'string',
+  isString: (value: ValidationInput): value is string => typeof value === 'string',
 
   /**
    * 检查是否为数字（排除NaN和Infinity）
@@ -58,20 +51,17 @@ export const basicTypeGuards = {
   /**
    * 检查是否为布尔值
    */
-  isBoolean: (value: ValidationInput): value is boolean => 
-    typeof value === 'boolean',
+  isBoolean: (value: ValidationInput): value is boolean => typeof value === 'boolean',
 
   /**
    * 检查是否为null
    */
-  isNull: (value: ValidationInput): value is null => 
-    value === null,
+  isNull: (value: ValidationInput): value is null => value === null,
 
   /**
    * 检查是否为undefined
    */
-  isUndefined: (value: ValidationInput): value is undefined => 
-    value === undefined,
+  isUndefined: (value: ValidationInput): value is undefined => value === undefined,
 
   /**
    * 检查是否为null或undefined
@@ -82,8 +72,7 @@ export const basicTypeGuards = {
   /**
    * 检查是否为函数
    */
-  isFunction: (value: ValidationInput): value is Function => 
-    typeof value === 'function',
+  isFunction: (value: ValidationInput): value is Function => typeof value === 'function'
 } as const;
 
 // ============================================================================
@@ -107,8 +96,7 @@ export const complexTypeGuards = {
   /**
    * 检查是否为数组
    */
-  isArray: <T = any>(value: ValidationInput): value is T[] => 
-    Array.isArray(value),
+  isArray: <T = any>(value: ValidationInput): value is T[] => Array.isArray(value),
 
   /**
    * 检查是否为非空数组
@@ -121,20 +109,20 @@ export const complexTypeGuards = {
    */
   isJsonValue: (value: ValidationInput): boolean => {
     if (value === null) return true;
-    
+
     const type = typeof value;
     if (type === 'string' || type === 'number' || type === 'boolean') {
       return true;
     }
-    
+
     if (Array.isArray(value)) {
       return value.every(complexTypeGuards.isJsonValue);
     }
-    
+
     if (complexTypeGuards.isObject(value)) {
       return Object.values(value).every(complexTypeGuards.isJsonValue);
     }
-    
+
     return false;
   },
 
@@ -147,8 +135,7 @@ export const complexTypeGuards = {
   /**
    * 检查是否为空数组
    */
-  isEmptyArray: (value: ValidationInput): boolean =>
-    Array.isArray(value) && value.length === 0,
+  isEmptyArray: (value: ValidationInput): boolean => Array.isArray(value) && value.length === 0
 } as const;
 
 // ============================================================================
@@ -164,29 +151,25 @@ export const apiTypeGuards = {
    * 检查是否为标准API响应格式
    */
   isStandardApiResponse: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isNumber((value as any).code),
+    complexTypeGuards.isObject(value) && basicTypeGuards.isNumber((value as any).code),
 
   /**
    * 检查是否为成功的API响应
    */
   isSuccessApiResponse: (value: ValidationInput): boolean =>
-    apiTypeGuards.isStandardApiResponse(value) &&
-    (value as any).code === 200,
+    apiTypeGuards.isStandardApiResponse(value) && (value as any).code === 200,
 
   /**
    * 检查是否为错误的API响应
    */
   isErrorApiResponse: (value: ValidationInput): boolean =>
-    apiTypeGuards.isStandardApiResponse(value) &&
-    (value as any).code !== 200,
+    apiTypeGuards.isStandardApiResponse(value) && (value as any).code !== 200,
 
   /**
    * 检查是否包含data字段
    */
   hasDataField: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) &&
-    'data' in value,
+    complexTypeGuards.isObject(value) && 'data' in value,
 
   /**
    * 检查是否为分页响应
@@ -194,7 +177,7 @@ export const apiTypeGuards = {
   isPaginatedResponse: (value: ValidationInput): boolean =>
     apiTypeGuards.hasDataField(value) &&
     complexTypeGuards.isObject((value as any).data) &&
-    basicTypeGuards.isNumber((value as any).data.total),
+    basicTypeGuards.isNumber((value as any).data.total)
 } as const;
 
 // ============================================================================
@@ -224,15 +207,13 @@ export const musicTypeGuards = {
    * 检查是否为有效的艺术家数据
    */
   isValidArtistData: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isString((value as any).name),
+    complexTypeGuards.isObject(value) && basicTypeGuards.isString((value as any).name),
 
   /**
    * 检查是否为有效的专辑数据
    */
   isValidAlbumData: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isString((value as any).name),
+    complexTypeGuards.isObject(value) && basicTypeGuards.isString((value as any).name),
 
   /**
    * 检查是否为有效的播放列表数据
@@ -249,7 +230,7 @@ export const musicTypeGuards = {
     if (!musicTypeGuards.isValidSongData(value)) return false;
     const fee = (value as any).fee;
     return fee !== 1 && fee !== 4;
-  },
+  }
 } as const;
 
 // ============================================================================
@@ -281,7 +262,8 @@ export const configTypeGuards = {
   isValidAudioConfig: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
     basicTypeGuards.isNumber((value as any).volume) &&
-    (value as any).volume >= 0 && (value as any).volume <= 1,
+    (value as any).volume >= 0 &&
+    (value as any).volume <= 1,
 
   /**
    * 检查是否为有效的主题配置
@@ -295,8 +277,7 @@ export const configTypeGuards = {
    * 检查是否为有效的语言配置
    */
   isValidLanguageConfig: (value: ValidationInput): boolean =>
-    basicTypeGuards.isString(value) &&
-    /^[a-z]{2}(-[A-Z]{2})?$/.test(value as string),
+    basicTypeGuards.isString(value) && /^[a-z]{2}(-[A-Z]{2})?$/.test(value as string)
 } as const;
 
 // ============================================================================
@@ -311,8 +292,7 @@ export const errorTypeGuards = {
   /**
    * 检查是否为Error实例
    */
-  isError: (value: ValidationInput): value is Error =>
-    value instanceof Error,
+  isError: (value: ValidationInput): value is Error => value instanceof Error,
 
   /**
    * 检查是否为网络错误
@@ -320,16 +300,15 @@ export const errorTypeGuards = {
   isNetworkError: (value: ValidationInput): boolean =>
     errorTypeGuards.isError(value) &&
     ((value as Error).message.includes('network') ||
-     (value as Error).message.includes('fetch') ||
-     (value as any).code === 'NETWORK_ERROR'),
+      (value as Error).message.includes('fetch') ||
+      (value as any).code === 'NETWORK_ERROR'),
 
   /**
    * 检查是否为音频错误
    */
   isAudioError: (value: ValidationInput): boolean =>
     errorTypeGuards.isError(value) &&
-    ((value as Error).message.includes('audio') ||
-     (value as any).code === 'AUDIO_ERROR'),
+    ((value as Error).message.includes('audio') || (value as any).code === 'AUDIO_ERROR'),
 
   /**
    * 检查是否为API错误
@@ -343,8 +322,7 @@ export const errorTypeGuards = {
    * 检查是否为可恢复的错误
    */
   isRecoverableError: (value: ValidationInput): boolean =>
-    errorTypeGuards.isNetworkError(value) ||
-    errorTypeGuards.isAudioError(value),
+    errorTypeGuards.isNetworkError(value) || errorTypeGuards.isAudioError(value)
 } as const;
 
 // ============================================================================
@@ -355,9 +333,7 @@ export const errorTypeGuards = {
  * 创建带缓存的类型验证器
  * 用于性能敏感的场景，避免重复验证相同对象
  */
-export const createCachedValidator = <T>(
-  validator: (value: ValidationInput) => value is T
-) => {
+export const createCachedValidator = <T>(validator: (value: ValidationInput) => value is T) => {
   const cache = new WeakMap<object, boolean>();
 
   return (value: ValidationInput): value is T => {
@@ -384,7 +360,7 @@ export const createCompositeValidator = <T>(
   validators: Array<(value: ValidationInput) => boolean>
 ) => {
   return (value: ValidationInput): value is T => {
-    return validators.every(validator => validator(value));
+    return validators.every((validator) => validator(value));
   };
 };
 
@@ -416,7 +392,7 @@ export const unifiedTypeGuards = {
   ...apiTypeGuards,
   ...musicTypeGuards,
   ...configTypeGuards,
-  ...errorTypeGuards,
+  ...errorTypeGuards
 } as const;
 
 /**
@@ -425,7 +401,7 @@ export const unifiedTypeGuards = {
 export const typeGuardUtils = {
   createCachedValidator,
   createCompositeValidator,
-  createConditionalValidator,
+  createConditionalValidator
 } as const;
 
 /**

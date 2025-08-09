@@ -140,7 +140,7 @@ export type UnifiedApiResponse<T> = StandardApiResponse<T>;
 /**
  * 分页响应结构
  */
-export interface PaginatedResponse<T = any> extends BaseResponse<T[]> {
+export interface PaginatedResponse<T = any> extends StandardApiResponse<T[]> {
   /** 总数 */
   total?: number;
   /** 当前页 */
