@@ -49,7 +49,7 @@ const props = withDefaults(
       name: string;
       desc: string;
       type: string;
-      [_key: string]: unknown;
+      [_key: string]: any;
     };
   }>(),
   {
@@ -76,9 +76,9 @@ const getCurrentMv = () => {
 const handleClick = async () => {
   listInfo.value = null;
   if (props.item.type === '专辑') {
-    const res = await getAlbum((props.item as any).id);
-    songList.value = res.data.songs.map((song: unknown) => {
-      (song as any).al.picUrl = (song as any).al.picUrl || (props.item as any).picUrl;
+    const res = await getAlbum(props.item.id);
+    songList.value = res.data.songs.map((song: Record<string, any>) => {
+      song.al.picUrl = song.al.picUrl || props.item.picUrl;
       return song;
     });
     listInfo.value = {
@@ -101,11 +101,11 @@ const handleClick = async () => {
     // 使用路由跳转
     router.push({
       name: 'musicList',
-      params: { id: (props.item as any).id },
+      params: { id: props.item.id },
       query: { type: 'album' }
     });
   } else if (props.item.type === 'playlist') {
-    const res = await getListDetail((props.item as any).id);
+    const res = await getListDetail(props.item.id);
     songList.value = res.data.playlist.tracks;
     listInfo.value = res.data.playlist;
 
@@ -120,7 +120,7 @@ const handleClick = async () => {
     // 使用路由跳转
     router.push({
       name: 'musicList',
-      params: { id: (props.item as any).id },
+      params: { id: props.item.id },
       query: { type: 'playlist' }
     });
   } else if (props.item.type === 'mv') {

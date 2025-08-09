@@ -60,7 +60,7 @@
               v-model:value="volumeSlider"
               :step="1"
               :tooltip="false"
-              @wheel.prevent="handleVolumeWheel"
+              @wheel.passive="handleVolumeWheel"
             ></n-slider>
           </div>
         </div>

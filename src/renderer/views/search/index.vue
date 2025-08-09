@@ -37,7 +37,7 @@
           @click="searchDetail = null"
         ></i>
         {{ hotKeyword }}
-        <div v-if="(searchDetail as any)?.songs?.length" class="title-play-all">
+        <div v-if="extractSearchSongs(searchDetail)?.length" class="title-play-all">
           <div class="play-all-btn" @click="handlePlayAll">
             <i class="ri-play-circle-fill"></i>
             <span>{{ t('search.button.playAll') }}</span>
@@ -48,7 +48,7 @@
         <template v-if="searchDetail">
           <!-- 音乐搜索结果 -->
           <div
-            v-for="(item, index) in (searchDetail as any)?.songs"
+            v-for="(item, index) in extractSearchSongs(searchDetail)"
             :key="item.id"
             :class="setAnimationClass('animate__bounceInRight')"
             :style="getSearchListAnimation(index)"
@@ -56,10 +56,10 @@
             <song-item :item="item" @play="handlePlay" :is-next="true" />
           </div>
           <template v-for="(list, key) in searchDetail">
-            <template v-if="(key as any).toString() !== 'songs'">
+            <template v-if="String(key) !== 'songs'">
               <div
                 v-for="(item, index) in list"
-                :key="(item as any).id"
+                :key="`${key}-${index}`"
                 class="mb-3"
                 :class="setAnimationClass('animate__bounceInRight')"
                 :style="getSearchListAnimation(index)"
@@ -128,6 +128,7 @@ import type { Album, Artist, MV, Playlist, Song } from '@/types/common';
 import type { SongResult } from '@/types/music';
 import type { IHotSearch } from '@/types/search';
 import { isMobile, setAnimationClass, setAnimationDelay } from '@/utils';
+import { extractSearchSongs } from '@/utils/typeSafeHelpers';
 
 defineOptions({
   name: 'Search'
@@ -244,9 +245,11 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
       offset: page.value * ITEMS_PER_PAGE
     });
 
-    const songs = (data as any).result.songs || [];
-    const albums = (data as any).result.albums || [];
-    const mvs = ((data as any).result.mvs || [0]).map(
+    // 使用类型安全的数据提取
+    const result = data?.result || {};
+    const songs = result.songs || [];
+    const albums = result.albums || [];
+    const mvs = (result.mvs || []).map(
       (item: MV): MV => ({
         ...item,
         picUrl: item.cover,
@@ -256,7 +259,7 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
       })
     );
 
-    const playlists = ((data as any).result.playlists || [0]).map(
+    const playlists = (result.playlists || []).map(
       (item: Playlist): Playlist => ({
         ...item,
         picUrl: item.coverImgUrl,
@@ -276,14 +279,12 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
     });
 
     if (isLoadMore && searchDetail.value) {
-      // 合并数据
-      (searchDetail.value as any).songs = [...(searchDetail.value as any).songs, ...songs];
-      (searchDetail.value as any).albums = [...(searchDetail.value as any).albums, ...albums];
-      (searchDetail.value as any).mvs = [...(searchDetail.value as any).mvs, ...mvs];
-      (searchDetail.value as any).playlists = [
-        ...(searchDetail.value as any).playlists,
-        ...playlists
-      ];
+      // 合并数据 - 使用类型安全的方式
+      const currentDetail = searchDetail.value as any;
+      currentDetail.songs = [...(currentDetail.songs || []), ...songs];
+      currentDetail.albums = [...(currentDetail.albums || []), ...albums];
+      currentDetail.mvs = [...(currentDetail.mvs || []), ...mvs];
+      currentDetail.playlists = [...(currentDetail.playlists || []), ...playlists];
     } else {
       searchDetail.value = {
         songs,
@@ -337,7 +338,7 @@ const dateFormat = (time: number | string | Date) => useDateFormat(time, 'YYYY.M
 // 添加滚动处理函数 (用于模板中的@scroll事件)
 // 用于模板中的@scroll事件
 const handleScroll = (e: Event) => {
-  const target = e.target as any;
+  const target = e.target as HTMLElement;
   const { scrollTop, scrollHeight, clientHeight } = target;
   // 距离底部100px时加载更多
   if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoadingMore.value && hasMore.value) {
@@ -388,16 +389,16 @@ const handleSearchHistory = (item: { keyword: string; type: number }) => {
 };
 
 // 播放全部搜索结果 (用于模板中的@click事件)
-// @ts-ignore - 用于模板中的@click事件
 const handlePlayAll = async () => {
-  if (!(searchDetail.value as any)?.songs?.length) return;
+  const songs = extractSearchSongs(searchDetail.value);
+  if (!songs.length) return;
 
   // 设置播放列表为搜索结果中的所有歌曲
-  playerStore.setPlayList((searchDetail.value as any).songs);
+  playerStore.setPlayList(songs);
 
   // 使用统一的播放控制服务开始播放第一首歌
-  if ((searchDetail.value as any).songs[0]) {
-    await playControl((searchDetail.value as any).songs[0], 'SearchPage-PlayAll');
+  if (songs[0]) {
+    await playControl(songs[0], 'SearchPage-PlayAll');
   }
 };
 </script>

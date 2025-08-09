@@ -37,7 +37,6 @@ export default {
     success: '재분석 성공',
     failed: '재분석 실패',
     warning: '음원을 선택해주세요',
-    bilibiliNotSupported: 'B站 비디오는 재분석을 지원하지 않습니다',
     processing: '분석 중...',
     clear: '사용자 정의 음원 지우기'
   },

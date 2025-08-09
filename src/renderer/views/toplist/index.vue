@@ -20,7 +20,7 @@
               preview-disabled
             />
             <div class="top">
-              <div class="play-count">{{ formatNumber(item.playCount) }}</div>
+              <div class="play-count">{{ formatNumber(item.playCount || 0) }}</div>
               <i class="iconfont icon-videofill"></i>
             </div>
           </div>
@@ -38,18 +38,44 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { getListDetail, getToplist } from '@/api/list';
 import { navigateToMusicList } from '@/components/common/MusicListNavigator';
 import type { IListDetail } from '@/types/listDetail';
 import { formatNumber, getImgUrl, setAnimationClass, setAnimationDelay } from '@/utils';
+import { typeGuards } from '@/utils/typeHelpers';
+
+// 定义榜单项的类型结构
+interface ToplistItem {
+  id?: number;
+  name?: string;
+  description?: string;
+  coverImgUrl?: string;
+  trackCount?: number;
+  playCount?: number;
+  updateFrequency?: string;
+}
+
+// 类型安全的榜单项提取器
+const extractToplistItem = (item: Record<string, any>): ToplistItem => {
+  return {
+    id: item.id || undefined,
+    name: item.name || undefined,
+    description: item.description || undefined,
+    coverImgUrl: item.coverImgUrl || undefined,
+    trackCount: item.trackCount || undefined,
+    playCount: item.playCount || undefined,
+    updateFrequency: item.updateFrequency || undefined
+  };
+};
 
 defineOptions({
   name: 'Toplist'
 });
 
-const topList = ref<any[]>([]);
+const topList = ref<ToplistItem[]>([]);
 
 // 计算每个项目的动画延迟
 const getItemAnimationDelay = (index: number) => {
@@ -61,18 +87,30 @@ const listLoading = ref(true);
 
 const router = useRouter();
 
-const openToplist = (item: unknown) => {
+const openToplist = (item: ToplistItem) => {
+  if (!item.id) {
+    console.warn('🎵 无效的榜单项，缺少ID', item);
+    return;
+  }
+
   listLoading.value = true;
 
-  getListDetail((item as any).id).then((res) => {
+  getListDetail(item.id).then((res) => {
     listDetail.value = res.data;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: (item as any).id,
+      id: item.id!,
       type: 'playlist',
-      name: (item as any).name,
-      songList: (res.data.playlist.tracks as any) || [],
+      name: item.name || '',
+      songList: (res.data.playlist.tracks || []).map((track: Record<string, any>) => ({
+        ...track,
+        id: track.id || 0,
+        name: track.name || '',
+        artist: track.ar?.[0]?.name || '',
+        album: track.al?.name || '',
+        duration: track.dt || 0
+      })),
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -83,10 +121,58 @@ const loading = ref(false);
 const loadToplist = async () => {
   loading.value = true;
   try {
-    const { data } = (await getToplist()) as any;
-    topList.value = data.list || [];
+    const response = await getToplist();
+    console.log('🎵 原始API响应:', response);
+
+    // 处理Axios响应对象
+    let data: any;
+    if (typeGuards.isObject(response)) {
+      // 检查是否是Axios响应对象
+      if ('data' in response && 'status' in response) {
+        // 这是Axios响应对象，提取data字段
+        const axiosData = (response as any).data;
+        console.log('🎵 Axios响应数据:', axiosData);
+
+        // 检查是否是标准API响应格式
+        if (typeGuards.isObject(axiosData) && 'code' in axiosData) {
+          if (axiosData.code === 200) {
+            data = axiosData.data || axiosData;
+          } else {
+            throw new Error(`API请求失败，状态码: ${axiosData.code}`);
+          }
+        } else {
+          // 直接使用Axios数据
+          data = axiosData;
+        }
+      } else if ('code' in response && 'data' in response) {
+        // 这是标准API响应格式
+        if ((response as any).code === 200) {
+          data = (response as any).data;
+        } else {
+          throw new Error(`API请求失败，状态码: ${(response as any).code}`);
+        }
+      } else {
+        // 直接使用响应数据
+        data = response;
+      }
+    } else {
+      throw new Error('API响应不是对象格式');
+    }
+
+    console.log('🎵 最终处理的数据:', data);
+
+    if (typeGuards.isObject(data) && typeGuards.isArray((data as Record<string, unknown>).list)) {
+      const rawList = (data as Record<string, unknown>).list as Record<string, any>[];
+      console.log('🎵 榜单列表数据:', rawList);
+      topList.value = rawList.map((item) => extractToplistItem(item));
+      console.log('🎵 转换后的榜单数据:', topList.value);
+    } else {
+      topList.value = [];
+      console.warn('🎵 榜单数据格式不正确，期望包含list数组', data);
+    }
   } catch (error) {
     console.error('加载榜单列表失败:', error);
+    topList.value = [];
   } finally {
     loading.value = false;
   }

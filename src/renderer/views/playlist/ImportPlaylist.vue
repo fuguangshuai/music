@@ -284,17 +284,17 @@ const handleImportByLink = async () => {
 
     const encodedLinks = JSON.stringify(links);
 
-    const params: unknown = {
+    const params: Record<string, any> = {
       link: encodedLinks
     };
 
     if (importToStarPlaylist.value) {
-      (params as any).importStarPlaylist = true;
+      params.importStarPlaylist = true;
     } else if (playlistName.value) {
-      (params as any).playlistName = playlistName.value;
+      params.playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params as any);
+    const res = await importPlaylist(params);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));
@@ -323,17 +323,17 @@ const handleImportByText = async () => {
 
     const encodedText = encodeURIComponent(textInput.value);
 
-    const params: unknown = {
+    const params: Record<string, any> = {
       text: encodedText
     };
 
     if (importToStarPlaylist.value) {
-      (params as any).importStarPlaylist = true;
+      params.importStarPlaylist = true;
     } else if (playlistName.value) {
-      (params as any).playlistName = playlistName.value;
+      params.playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params as any);
+    const res = await importPlaylist(params);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));
@@ -365,17 +365,17 @@ const handleImportByLocal = async () => {
 
     const encodedLocal = JSON.stringify(filteredData);
 
-    const params: unknown = {
+    const params: Record<string, any> = {
       local: encodedLocal
     };
 
     if (importToStarPlaylist.value) {
-      (params as any).importStarPlaylist = true;
+      params.importStarPlaylist = true;
     } else if (playlistName.value) {
-      (params as any).playlistName = playlistName.value;
+      params.playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params as any);
+    const res = await importPlaylist(params);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));

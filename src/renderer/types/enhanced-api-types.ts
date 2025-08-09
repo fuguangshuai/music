@@ -17,10 +17,31 @@ import type { JsonValue, ThirdPartyData, UnknownData } from '../utils/typeHelper
 /**
  * 标准API响应结构
  */
-export interface StandardApiResponse<T = unknown> {
+/**
+ * 标准API响应接口
+ *
+ * @template T 响应数据的类型
+ *
+ * @example
+ * ```typescript
+ * // 歌曲API响应
+ * type SongResponse = StandardApiResponse<EnhancedSong>;
+ *
+ * // 搜索API响应
+ * type SearchResponse = StandardApiResponse<EnhancedSearchResult>;
+ * ```
+ *
+ * @since v4.11.0
+ * @see {@link https://docs.example.com/api-response} API响应规范
+ */
+export interface StandardApiResponse<T> {
+  /** 响应状态码，200表示成功 */
   code: number;
+  /** 响应消息，通常在错误时提供详细信息 */
   message?: string;
+  /** 响应数据，具体类型由泛型T决定 */
   data?: T;
+  /** 响应时间戳，Unix时间戳格式 */
   timestamp?: number;
 }
 

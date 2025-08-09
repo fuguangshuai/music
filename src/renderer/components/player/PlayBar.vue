@@ -94,7 +94,7 @@
       </div>
     </div>
     <div class="audio-button">
-      <div class="audio-volume custom-slider" @wheel.prevent="handleVolumeWheel">
+      <div class="audio-volume custom-slider" @wheel.passive="handleVolumeWheel">
         <div class="volume-icon" @click="mute">
           <i class="iconfont" :class="getVolumeIcon"></i>
         </div>
@@ -542,6 +542,15 @@ const openPlayListDrawer = () => {
 }
 
 // 自定义滑块样式
+/* 阻断滚动链路并声明触控意图，减少触摸事件非被动监听的性能告警 */
+.custom-slider,
+.custom-slider :deep(.n-slider),
+.custom-slider :deep(.n-slider-rail),
+.custom-slider :deep(.n-slider-handle) {
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
 .custom-slider {
   :deep(.n-slider) {
     --n-rail-height: 4px;

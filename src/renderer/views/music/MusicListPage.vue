@@ -153,21 +153,21 @@
             object-fit="cover"
           />
         </div>
-        <div v-if="(listInfo as any)?.creator" class="creator-info">
+        <div v-if="extractPlaylistInfo(listInfo).creator" class="creator-info">
           <n-avatar
             round
             :size="24"
-            :src="getImgUrl((listInfo as any).creator.avatarUrl, '50y50')"
+            :src="getImgUrl(extractPlaylistInfo(listInfo).creator?.avatarUrl, '50y50')"
           />
-          <span class="creator-name">{{ (listInfo as any).creator.nickname }}</span>
+          <span class="creator-name">{{ extractPlaylistInfo(listInfo).creator?.nickname }}</span>
         </div>
         <div v-if="total" class="music-total">
           {{ t('player.songNum', { num: total }) }}
         </div>
 
         <n-scrollbar style="max-height: 200px">
-          <div v-if="(listInfo as any)?.description" class="music-desc">
-            {{ (listInfo as any).description }}
+          <div v-if="extractPlaylistInfo(listInfo).description" class="music-desc">
+            {{ extractPlaylistInfo(listInfo).description }}
           </div>
         </n-scrollbar>
       </div>
@@ -241,6 +241,41 @@ import { useMusicStore, usePlayerStore } from '@/store';
 import type { Artist, ErrorObject, Song } from '@/types/common';
 import { SongResult } from '@/types/music';
 import { getImgUrl, isElectron, isMobile, setAnimationClass } from '@/utils';
+import { typeGuards } from '@/utils/typeHelpers';
+
+// 定义播放列表信息的类型结构
+interface PlaylistInfo {
+  id?: number;
+  name?: string;
+  description?: string;
+  coverImgUrl?: string;
+  trackIds?: Array<{ id: number }>;
+  subscribed?: boolean;
+  creator?: {
+    nickname?: string;
+    avatarUrl?: string;
+  };
+}
+
+// 类型安全的播放列表信息提取器
+const extractPlaylistInfo = (data: unknown): PlaylistInfo => {
+  if (!typeGuards.isObject(data)) {
+    return {};
+  }
+
+  const obj = data as Record<string, unknown>;
+  return {
+    id: typeGuards.isNumber(obj.id) ? obj.id : undefined,
+    name: typeGuards.isString(obj.name) ? obj.name : undefined,
+    description: typeGuards.isString(obj.description) ? obj.description : undefined,
+    coverImgUrl: typeGuards.isString(obj.coverImgUrl) ? obj.coverImgUrl : undefined,
+    trackIds: typeGuards.isArray(obj.trackIds)
+      ? (obj.trackIds as Array<{ id: number }>)
+      : undefined,
+    subscribed: typeGuards.isBoolean(obj.subscribed) ? obj.subscribed : undefined,
+    creator: typeGuards.isObject(obj.creator) ? (obj.creator as PlaylistInfo['creator']) : undefined
+  };
+};
 
 const { t } = useI18n();
 const route = useRoute();
@@ -302,8 +337,9 @@ const handleSearchBlur = () => {
 
 // 计算总数
 const total = computed(() => {
-  if ((listInfo.value as any)?.trackIds) {
-    return (listInfo.value as any).trackIds.length;
+  const playlistInfo = extractPlaylistInfo(listInfo.value);
+  if (playlistInfo.trackIds) {
+    return playlistInfo.trackIds.length;
   }
   return songList.value.length;
 });
@@ -403,9 +439,9 @@ const loadDataByType = async (type: string, id: string) => {
 };
 
 const getCoverImgUrl = computed(() => {
-  const coverImgUrl = (listInfo.value as any)?.coverImgUrl;
-  if (coverImgUrl) {
-    return coverImgUrl;
+  const playlistInfo = extractPlaylistInfo(listInfo.value);
+  if (playlistInfo.coverImgUrl) {
+    return playlistInfo.coverImgUrl;
   }
 
   const song = songList.value[0];

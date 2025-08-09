@@ -1,29 +1,72 @@
 /**
  * 通用Vue组件引用工具
  * 统一处理Vue组件引用的类型问题
+ *
+ * 重构说明：消除 any 类型使用，提供类型安全的组件操作
  */
+
+import type { ComponentPublicInstance, Ref } from 'vue';
+
+// 定义Vue组件引用的可能类型
+type VueComponentRef =
+  | Ref<HTMLElement | null>
+  | Ref<ComponentPublicInstance | null>
+  | HTMLElement
+  | ComponentPublicInstance
+  | null
+  | undefined;
+
+// 定义组件实例的基本结构
+interface ComponentInstance {
+  $el?: HTMLElement;
+  value?: HTMLElement | ComponentInstance;
+}
+
+/**
+ * 类型守卫：检查是否为有效的组件实例
+ */
+const isComponentInstance = (value: unknown): value is ComponentInstance => {
+  return typeof value === 'object' && value !== null && '$el' in value;
+};
+
+/**
+ * 类型守卫：检查是否为Ref对象
+ */
+const isRefObject = (value: unknown): value is { value: unknown } => {
+  return typeof value === 'object' && value !== null && 'value' in value;
+};
 
 /**
  * 获取组件的DOM元素
  * @param ref Vue组件引用
  * @returns HTMLElement或null
  */
-export const getComponentElement = (ref: any): HTMLElement | null => {
+export const getComponentElement = (ref: VueComponentRef): HTMLElement | null => {
   if (!ref) return null;
 
-  // 如果是Vue组件实例，获取$el
-  if (ref.value?.$el) {
-    return ref.value.$el;
-  }
+  // 如果是Ref对象
+  if (isRefObject(ref)) {
+    const refValue = ref.value;
 
-  // 如果是直接的DOM元素
-  if (ref.value instanceof HTMLElement) {
-    return ref.value;
+    // 如果是Vue组件实例，获取$el
+    if (isComponentInstance(refValue) && refValue.$el instanceof HTMLElement) {
+      return refValue.$el;
+    }
+
+    // 如果是直接的DOM元素
+    if (refValue instanceof HTMLElement) {
+      return refValue;
+    }
   }
 
   // 如果ref本身就是DOM元素
   if (ref instanceof HTMLElement) {
     return ref;
+  }
+
+  // 如果ref本身就是组件实例
+  if (isComponentInstance(ref) && ref.$el instanceof HTMLElement) {
+    return ref.$el;
   }
 
   return null;
@@ -34,7 +77,7 @@ export const getComponentElement = (ref: any): HTMLElement | null => {
  * @param ref Vue组件引用
  * @param options 滚动选项
  */
-export const scrollToPosition = (ref: any, options: ScrollToOptions) => {
+export const scrollToPosition = (ref: VueComponentRef, options: ScrollToOptions): void => {
   const element = getComponentElement(ref);
 
   if (element && typeof element.scrollTo === 'function') {
@@ -47,7 +90,7 @@ export const scrollToPosition = (ref: any, options: ScrollToOptions) => {
  * @param ref Vue组件引用
  * @returns scrollTop值
  */
-export const getScrollTop = (ref: any): number => {
+export const getScrollTop = (ref: VueComponentRef): number => {
   const element = getComponentElement(ref);
   return element?.scrollTop || 0;
 };
@@ -57,7 +100,7 @@ export const getScrollTop = (ref: any): number => {
  * @param ref Vue组件引用
  * @param scrollTop 滚动位置
  */
-export const setScrollTop = (ref: any, scrollTop: number) => {
+export const setScrollTop = (ref: VueComponentRef, scrollTop: number): void => {
   const element = getComponentElement(ref);
   if (element) {
     element.scrollTop = scrollTop;
@@ -69,7 +112,7 @@ export const setScrollTop = (ref: any, scrollTop: number) => {
  * @param ref Vue组件引用
  * @returns 客户端高度
  */
-export const getClientHeight = (ref: any): number => {
+export const getClientHeight = (ref: VueComponentRef): number => {
   const element = getComponentElement(ref);
   return element?.clientHeight || 0;
 };
@@ -79,7 +122,7 @@ export const getClientHeight = (ref: any): number => {
  * @param ref Vue组件引用
  * @returns 滚动高度
  */
-export const getScrollHeight = (ref: any): number => {
+export const getScrollHeight = (ref: VueComponentRef): number => {
   const element = getComponentElement(ref);
   return element?.scrollHeight || 0;
 };
@@ -90,7 +133,7 @@ export const getScrollHeight = (ref: any): number => {
  * @param threshold 阈值（默认10px）
  * @returns 是否接近底部
  */
-export const isNearBottom = (ref: any, threshold = 10): boolean => {
+export const isNearBottom = (ref: VueComponentRef, threshold = 10): boolean => {
   const element = getComponentElement(ref);
   if (!element) return false;
 
@@ -105,14 +148,18 @@ export const isNearBottom = (ref: any, threshold = 10): boolean => {
  * @param args 参数
  * @returns 方法返回值
  */
-export const callComponentMethod = (ref: any, methodName: string, ...args: any[]): any => {
-  if (!ref?.value) return undefined;
+export const callComponentMethod = (
+  ref: VueComponentRef,
+  methodName: string,
+  ...args: unknown[]
+): unknown => {
+  if (!isRefObject(ref) || !ref.value) return undefined;
 
-  const component = ref.value;
+  const component = ref.value as unknown as Record<string, unknown>;
   const method = component[methodName];
 
   if (typeof method === 'function') {
-    return method.apply(component, args);
+    return (method as Function).apply(component, args);
   }
 
   return undefined;
@@ -124,10 +171,11 @@ export const callComponentMethod = (ref: any, methodName: string, ...args: any[]
  * @param propertyName 属性名
  * @returns 属性值
  */
-export const getComponentProperty = (ref: any, propertyName: string): any => {
-  if (!ref?.value) return undefined;
+export const getComponentProperty = (ref: VueComponentRef, propertyName: string): unknown => {
+  if (!isRefObject(ref) || !ref.value) return undefined;
 
-  return ref.value[propertyName];
+  const component = ref.value as unknown as Record<string, unknown>;
+  return component[propertyName];
 };
 
 /**
@@ -136,10 +184,15 @@ export const getComponentProperty = (ref: any, propertyName: string): any => {
  * @param propertyName 属性名
  * @param value 属性值
  */
-export const setComponentProperty = (ref: any, propertyName: string, value: any): void => {
-  if (!ref?.value) return;
+export const setComponentProperty = (
+  ref: VueComponentRef,
+  propertyName: string,
+  value: unknown
+): void => {
+  if (!isRefObject(ref) || !ref.value) return;
 
-  ref.value[propertyName] = value;
+  const component = ref.value as unknown as Record<string, unknown>;
+  component[propertyName] = value;
 };
 
 /**
@@ -148,8 +201,9 @@ export const setComponentProperty = (ref: any, propertyName: string, value: any)
  * @returns 滚动信息对象
  */
 export const getScrollInfo = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (!target) {
+  const target = event.target;
+
+  if (!target || !(target instanceof HTMLElement)) {
     return {
       scrollTop: 0,
       scrollHeight: 0,

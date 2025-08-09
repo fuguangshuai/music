@@ -60,7 +60,7 @@
           :show-arrow="false"
         >
           <template #trigger>
-            <div class="function-button" @click="mute" @wheel.prevent="handleVolumeWheel">
+            <div class="function-button" @click="mute" @wheel.passive="handleVolumeWheel">
               <i class="iconfont" :class="getVolumeIcon"></i>
             </div>
           </template>
@@ -70,7 +70,7 @@
               :step="0.01"
               :tooltip="false"
               vertical
-              @wheel.prevent="handleVolumeWheel"
+              @wheel.passive="handleVolumeWheel"
             ></n-slider>
           </div>
         </n-popover>
@@ -529,6 +529,17 @@ const setMusicFull = () => {
 }
 
 .volume-slider-wrapper {
+  /* 阻断滚动链路并声明触控意图，减少触摸事件非被动监听的性能告警 */
+  overscroll-behavior: contain;
+  touch-action: none;
+
+  :deep(.n-slider),
+  :deep(.n-slider-rail),
+  :deep(.n-slider-handle) {
+    overscroll-behavior: contain;
+    touch-action: none;
+  }
+
   @apply p-2 py-4 rounded-xl bg-white dark:bg-dark-100 shadow-lg bg-opacity-90 backdrop-blur;
   height: 160px;
 

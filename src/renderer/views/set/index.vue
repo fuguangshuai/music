@@ -758,7 +758,7 @@ const clearCache = async (selectedCacheTypes) => {
 
 const showShortcutModal = ref(false);
 
-const handleShortcutsChange = (shortcuts: unknown) => {
+const handleShortcutsChange = (shortcuts: Record<string, any>) => {
   console.log('快捷键已更新:', shortcuts);
 };
 
@@ -796,7 +796,7 @@ const handleTokenSave = async (token: string) => {
     localStorage.setItem('token', token);
 
     // 验证token有效性
-    const user = (await getUserDetail()) as any;
+    const user = (await getUserDetail()) as Record<string, any>;
     if (user.data && user.data.profile) {
       // token有效，更新用户信息
       userStore.setUser(user.data.profile);

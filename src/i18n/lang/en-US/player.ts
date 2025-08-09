@@ -37,7 +37,6 @@ export default {
     success: 'Reparse successful',
     failed: 'Reparse failed',
     warning: 'Please select a music source',
-
     processing: 'Processing...',
     clear: 'Clear Custom Source'
   },

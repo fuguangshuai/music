@@ -109,8 +109,11 @@ const getHistorySongs = async () => {
 };
 
 // 处理滚动事件
-const handleScroll = (e: unknown) => {
-  const { scrollTop, scrollHeight, offsetHeight } = (e as any).target;
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+
+  const { scrollTop, scrollHeight, offsetHeight } = target;
   const threshold = 100; // 距离底部多少像素时加载更多
 
   if (!loading.value && !noMore.value && scrollHeight - (scrollTop + offsetHeight) < threshold) {

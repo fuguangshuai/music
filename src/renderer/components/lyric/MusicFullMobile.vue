@@ -693,7 +693,7 @@ const handleMouseUp = (e: MouseEvent) => {
 
 // 处理滑块拖动
 const handleThumbTouchStart = (e: TouchEvent) => {
-  e.preventDefault(); // 阻止默认行为
+  // 注意：模板中使用了 .passive 修饰符，不能调用 preventDefault()
   e.stopPropagation(); // 阻止事件冒泡
   isThumbDragging.value = true;
 
@@ -709,7 +709,7 @@ const handleThumbTouchStart = (e: TouchEvent) => {
 const handleThumbTouchMove = (e: TouchEvent) => {
   if (!isThumbDragging.value || !sound.value) return;
 
-  e.preventDefault(); // 阻止默认行为
+  // 注意：模板中使用了 .passive 修饰符，不能调用 preventDefault()
 
   const touch = e.touches[0];
   const target = e.currentTarget as HTMLElement;
@@ -730,7 +730,7 @@ const handleThumbTouchMove = (e: TouchEvent) => {
 const handleThumbTouchEnd = (e: TouchEvent) => {
   if (!isThumbDragging.value || !sound.value) return;
 
-  e.preventDefault(); // 阻止默认行为
+  // 注意：模板中使用了 .passive 修饰符，不能调用 preventDefault()
   e.stopPropagation(); // 阻止事件冒泡
 
   // 拖动结束时执行seek操作

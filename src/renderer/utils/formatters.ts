@@ -140,7 +140,7 @@ export const formatPublishTime = (
  * @returns 格式化后的歌曲名称
  */
 export const formatSongName = (
-  songInfo: unknown,
+  songInfo: Record<string, any> | null | undefined,
   nameFormat: string = '{songName} - {artistName}'
 ): string => {
   if (!songInfo || typeof songInfo !== 'object') return '';

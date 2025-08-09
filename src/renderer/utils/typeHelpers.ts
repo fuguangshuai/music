@@ -3,12 +3,20 @@
  * 提供常用的类型工具函数，减少重复的类型定义工作
  */
 
+import type { StandardApiResponse } from '../types/enhanced-api-types';
+
 // 通用API响应包装器
-export type ApiResponse<T = unknown> = {
-  code: number;
-  message?: string;
-  data?: T;
-};
+/**
+ * @deprecated 使用 StandardApiResponse 替代
+ * @see StandardApiResponse in enhanced-api-types.ts
+ *
+ * 迁移指南：
+ * - 旧用法: ApiResponse<SomeType>
+ * - 新用法: StandardApiResponse<SomeType>
+ *
+ * 此类型别名将在下个版本中移除
+ */
+export type ApiResponse<T> = StandardApiResponse<T>;
 
 /**
  * 未知数据类型 - 替代any的类型安全方案

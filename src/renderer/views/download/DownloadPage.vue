@@ -55,7 +55,7 @@
               <div v-for="item in downloadList" :key="item.path" class="download-item">
                 <div class="item-left flex items-center gap-3">
                   <div class="item-cover">
-                    <img :src="getImgUrl((item as any).songInfo?.picUrl, '200y200')" alt="Cover" />
+                    <img :src="getImgUrl(item.songInfo?.picUrl, '200y200')" alt="Cover" />
                   </div>
                   <div class="item-info flex items-center gap-4 w-full">
                     <div
@@ -65,10 +65,7 @@
                       {{ item.filename }}
                     </div>
                     <div class="item-artist min-w-[120px] max-w-[120px] truncate">
-                      {{
-                        (item as any).songInfo?.ar?.map((a: any) => a.name).join(', ') ||
-                        t('download.artist.unknown')
-                      }}
+                      {{ getArtistNames(item.songInfo) }}
                     </div>
                     <div class="item-progress flex-1 min-w-0">
                       <div class="progress-bar">
@@ -445,7 +442,7 @@ interface DownloadItem {
   path: string;
   status: 'downloading' | 'completed' | 'error';
   error?: string;
-  songInfo?: unknown;
+  songInfo?: Record<string, any>;
 }
 
 interface DownloadedItem {
@@ -576,12 +573,29 @@ const handlePlayMusic = async (item: DownloadedItem) => {
         id: 0,
         picUrl: item.picUrl,
         pic: 0,
-        picId: 0
+        picId: 0,
+        type: '',
+        size: 0,
+        blurPicUrl: '',
+        companyId: 0,
+        publishTime: 0,
+        subType: '',
+        description: '',
+        tags: '',
+        company: '',
+        briefDesc: '',
+        artist: { name: '', id: 0 },
+        songs: [],
+        alias: [],
+        status: 0,
+        copyrightId: 0,
+        commentThreadId: '',
+        artists: []
       } as any,
       picUrl: item.picUrl,
       // 使用本地文件协议
       playMusicUrl: getLocalFilePath(item.path),
-      source: 'netease' as 'netease',
+      source: 'netease' as const,
       count: 0
     };
 
@@ -655,8 +669,16 @@ const clearDownloadRecords = async () => {
 // 添加加载状态
 const isLoadingDownloaded = ref(false);
 
+// 获取艺术家名称
+const getArtistNames = (songInfo: Record<string, any> | undefined) => {
+  if (!songInfo?.ar) return t('download.artist.unknown');
+  return (
+    songInfo.ar.map((a: Record<string, any>) => a.name).join(', ') || t('download.artist.unknown')
+  );
+};
+
 // 使用统一的歌曲名称格式化函数
-const formatSongNameLocal = (songInfo: unknown) => {
+const formatSongNameLocal = (songInfo: Record<string, any>) => {
   const nameFormat = downloadSettings.value.nameFormat || '{songName} - {artistName}';
   return formatSongName(songInfo, nameFormat);
 };

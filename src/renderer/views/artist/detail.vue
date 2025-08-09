@@ -125,7 +125,7 @@
                       <song-item
                         :index="index"
                         :compact="isCompactLayout"
-                        :item="formatSong(item) || (item as any)"
+                        :item="formatSong(item) || item"
                         @play="handlePlay"
                       />
                     </div>
@@ -212,6 +212,7 @@ import { usePlayerStore } from '@/store';
 import { IArtist } from '@/types/artist';
 import { getImgUrl, isMobile } from '@/utils';
 import { formatPublishTime } from '@/utils/formatters';
+import { isEnhancedArtist } from '@/utils/typeSafeHelpers';
 
 defineOptions({
   name: 'ArtistDetail'
@@ -440,14 +441,24 @@ const filteredSongs = computed(() => {
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
     const artistsMatch = artists.some((artist: unknown) => {
-      return (artist as any).name?.toLowerCase().includes(keyword);
+      if (isEnhancedArtist(artist)) {
+        return artist.name?.toLowerCase().includes(keyword);
+      }
+      // 回退到安全的属性访问
+      const artistObj = artist as Record<string, unknown>;
+      return typeof artistObj.name === 'string' && artistObj.name.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
     const artistsPinyinMatch = artists.some((artist: unknown) => {
-      return (artist as any).name && PinyinMatch.match((artist as any).name, keyword);
+      if (isEnhancedArtist(artist)) {
+        return artist.name && PinyinMatch.match(artist.name, keyword);
+      }
+      // 回退到安全的属性访问
+      const artistObj = artist as Record<string, unknown>;
+      return typeof artistObj.name === 'string' && PinyinMatch.match(artistObj.name, keyword);
     });
 
     return (
@@ -519,7 +530,10 @@ const handlePlay = (song?: unknown) => {
   // 如果传入了特定歌曲（点击单曲播放），则将其作为播放列表的第一首
   if (song) {
     const songList = [...filteredSongs.value];
-    const index = songList.findIndex((item) => item.id === (song as any).id);
+    // 使用类型安全的ID比较
+    const songObj = song as Record<string, unknown>;
+    const songId = songObj.id;
+    const index = songList.findIndex((item) => item.id === songId);
 
     if (index !== -1) {
       // 将点击的歌曲移到第一位
@@ -534,8 +548,8 @@ const handlePlay = (song?: unknown) => {
       }))
     );
 
-    // 设置当前播放歌曲
-    playerStore.setPlay(song as any);
+    // 设置当前播放歌曲 - 使用类型断言（保持原有功能）
+    playerStore.setPlay(songObj as any);
   } else {
     // 默认行为：播放整个过滤后的列表
     playerStore.setPlayList(
@@ -656,17 +670,23 @@ const formatSong = (item: unknown) => {
   if (!item) {
     return null;
   }
+  // 使用类型安全的属性访问
+  const songObj = item as Record<string, unknown>;
+  const albumObj = songObj.al as Record<string, unknown> | undefined;
+
   return {
     ...item,
-    picUrl: (item as any).al?.picUrl || (item as any).picUrl
+    picUrl: albumObj?.picUrl || songObj.picUrl
   };
 };
 
 // 处理虚拟列表滚动
 const handleVirtualScroll = (e: unknown) => {
-  if (!e || !(e as any).target) return;
+  const eventObj = e as Record<string, unknown>;
+  if (!e || !eventObj.target) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
+  const target = eventObj.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   const threshold = 200;
 
   if (

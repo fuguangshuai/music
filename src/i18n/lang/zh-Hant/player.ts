@@ -37,7 +37,6 @@ export default {
     success: '重新解析成功',
     failed: '重新解析失敗',
     warning: '請選擇一個音源',
-
     processing: '解析中...',
     clear: '清除自訂音源'
   },

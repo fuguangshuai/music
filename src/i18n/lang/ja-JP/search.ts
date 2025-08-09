@@ -21,7 +21,6 @@ export default {
     single: '楽曲',
     album: 'アルバム',
     playlist: 'プレイリスト',
-    mv: 'MV',
-    bilibili: 'Bilibili'
+    mv: 'MV'
   }
 };

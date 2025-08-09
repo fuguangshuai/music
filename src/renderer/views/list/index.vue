@@ -3,7 +3,7 @@
     <!-- 修改歌单分类部分 -->
     <div class="play-list-type">
       <n-scrollbar ref="scrollbarRef" x-scrollable>
-        <div class="categories-wrapper" @wheel.prevent="handleWheel">
+        <div class="categories-wrapper" @wheel.passive="handleWheel">
           <span
             v-for="(item, index) in playlistCategory?.sub"
             :key="item.name"
@@ -70,6 +70,32 @@ import type { IRecommendItem } from '@/types/list';
 import type { IListDetail } from '@/types/listDetail';
 import type { IPlayListSort } from '@/types/playlist';
 import { formatNumber, getImgUrl, setAnimationClass, setAnimationDelay } from '@/utils';
+import { typeGuards } from '@/utils/typeHelpers';
+
+// 定义播放列表项的类型结构
+interface PlaylistItem {
+  id?: number;
+  name?: string;
+  description?: string;
+  coverImgUrl?: string;
+  trackCount?: number;
+}
+
+// 类型安全的播放列表项提取器
+const extractPlaylistItem = (item: unknown): PlaylistItem => {
+  if (!typeGuards.isObject(item)) {
+    return {};
+  }
+
+  const obj = item as Record<string, unknown>;
+  return {
+    id: typeGuards.isNumber(obj.id) ? obj.id : undefined,
+    name: typeGuards.isString(obj.name) ? obj.name : undefined,
+    description: typeGuards.isString(obj.description) ? obj.description : undefined,
+    coverImgUrl: typeGuards.isString(obj.coverImgUrl) ? obj.coverImgUrl : undefined,
+    trackCount: typeGuards.isNumber(obj.trackCount) ? obj.trackCount : undefined
+  };
+};
 
 defineOptions({
   name: 'List'
@@ -99,25 +125,38 @@ const listLoading = ref(true);
 const router = useRouter();
 
 const openPlaylist = (item: unknown) => {
+  const playlistItem = extractPlaylistItem(item);
+
+  if (!playlistItem.id) {
+    console.warn('🎵 无效的播放列表项，缺少ID', item);
+    return;
+  }
+
   recommendItem.value = item as IRecommendItem;
   listLoading.value = true;
 
-  getListDetail((item as any).id).then((res) => {
+  getListDetail(playlistItem.id).then((res) => {
     listDetail.value = res.data;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: (item as any).id,
+      id: playlistItem.id!,
       type: 'playlist',
-      name: (item as any).name,
-      songList: (res.data.playlist.tracks || []).map((track: any) => ({
-        ...track,
-        id: track.id,
-        name: track.name,
-        artist: track.ar?.[0]?.name || '',
-        album: track.al?.name || '',
-        duration: track.dt || 0
-      })),
+      name: playlistItem.name || '',
+      songList: (res.data.playlist.tracks || []).map((track: unknown) => {
+        const trackObj = track as Record<string, unknown>;
+        const arArray = trackObj.ar as Array<Record<string, unknown>> | undefined;
+        const alObj = trackObj.al as Record<string, unknown> | undefined;
+
+        return {
+          ...trackObj,
+          id: (trackObj.id as string | number) || 0,
+          name: (trackObj.name as string) || '',
+          artist: (arArray?.[0]?.name as string) || '',
+          album: (alObj?.name as string) || '',
+          duration: (trackObj.dt as number) || 0
+        };
+      }),
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -161,8 +200,11 @@ const loadList = async (type: string, isLoadMore = false) => {
 };
 
 // 监听滚动事件
-const handleScroll = (e: unknown) => {
-  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = target;
   // 距离底部100px时加载更多
   if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoadingMore.value && hasMore.value) {
     loadList(currentType.value, true);

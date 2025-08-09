@@ -3,6 +3,8 @@
  * 替换项目中过于宽泛的unknown类型使用
  */
 
+import type { StandardApiResponse } from './enhanced-api-types';
+
 /**
  * 代理配置接口
  */
@@ -108,6 +110,16 @@ export type StorageKey =
  * API响应基础结构
  * 替换API响应中的 unknown 类型
  */
+/**
+ * @deprecated 使用 StandardApiResponse 替代
+ * @see StandardApiResponse in enhanced-api-types.ts
+ *
+ * 迁移指南：
+ * - 旧用法: BaseResponse<SomeType>
+ * - 新用法: StandardApiResponse<SomeType>
+ *
+ * 此接口将在下个版本中移除
+ */
 export interface BaseResponse<T = unknown> {
   /** 响应码 */
   code: number;
@@ -118,6 +130,12 @@ export interface BaseResponse<T = unknown> {
   /** 时间戳 */
   timestamp?: number;
 }
+
+/**
+ * 推荐的响应类型别名
+ * 使用StandardApiResponse替代BaseResponse
+ */
+export type UnifiedApiResponse<T> = StandardApiResponse<T>;
 
 /**
  * 分页响应结构

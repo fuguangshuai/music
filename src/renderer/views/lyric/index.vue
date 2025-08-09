@@ -125,7 +125,7 @@ import {
 defineOptions({
   name: 'Lyric'
 });
-const windowData = window as any;
+const windowData = window as Window & Record<string, any>;
 const containerRef = ref<HTMLElement | null>(null);
 const containerHeight = ref(0);
 const lineHeight = ref(60);
@@ -471,15 +471,15 @@ const watchStopFunctions: Array<() => void> = [];
 // 监听据更新
 const stopDynamicDataWatch = watch(
   () => dynamicData.value,
-  (newData: unknown) => {
+  (newData: Record<string, any>) => {
     // 更新最后更新时间
     lastUpdateTime.value = performance.now();
 
     // 更新实际时间，包含偏移量
-    actualTime.value = (newData as any).nowTime + TIME_OFFSET / 1000;
+    actualTime.value = newData.nowTime + TIME_OFFSET / 1000;
 
     // 如果正在播放且没有动画，启动动画
-    if ((newData as any).isPlay && !animationFrameId.value) {
+    if (newData.isPlay && !animationFrameId.value) {
       updateProgress();
     }
   },

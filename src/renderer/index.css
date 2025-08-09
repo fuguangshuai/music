@@ -1,13 +1,13 @@
 /* ./src/index.css */
 
+/* 导入统一的样式变量和工具类 - 必须在所有其他规则之前 */
+@import './assets/css/variables.scss';
+@import './assets/css/utilities.scss';
+
 /*! @import */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 导入统一的样式变量和工具类 */
-@import './assets/css/variables.scss';
-@import './assets/css/utilities.scss';
 
 .n-image img {
   background-color: #111111;
@@ -21,6 +21,33 @@
 
 .v-binder-follower-container:has(.n-slider-handle-indicator--top) {
   z-index: 999999999 !important;
+}
+/* 全局滑块触摸优化：阻断滚动链路并声明触控意图，减少触摸事件非被动监听的性能告警 */
+.n-slider,
+.n-slider-rail,
+.n-slider-handle,
+.n-slider-handle-indicator,
+.n-scrollbar,
+.n-virtual-list,
+.custom-slider {
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+/* 针对垂直滑块的特殊处理 */
+.n-slider--vertical {
+  touch-action: pan-y;
+}
+
+/* 针对水平滑块的特殊处理 */
+.n-slider--horizontal {
+  touch-action: pan-x;
+}
+
+/* 滚动容器优化 */
+.n-scrollbar-container,
+.n-scrollbar-content {
+  overscroll-behavior: contain;
 }
 
 .text-el {

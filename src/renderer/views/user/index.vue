@@ -9,7 +9,7 @@
       <div class="page">
         <div class="user-name">
           <span>{{ user.nickname }}</span>
-          <span class="login-type">{{ t('login.title.' + currentLoginType) }}</span>
+          <span class="login-type" v-if="currentLoginType">{{ t('login.title.' + currentLoginType) }}</span>
         </div>
         <div class="user-info">
           <n-avatar round :size="50" :src="getImgUrl((user as any)?.avatarUrl, '50y50')" />
@@ -193,8 +193,15 @@ const loadData = async () => {
 
     if (!user.value) {
       console.warn('用户数据不存在，尝试重新获取');
-      // 可以尝试重新获取用户数据
-      return;
+      // 尝试从本地登录状态恢复用户信息
+      const loginInfo = checkAuthStatus();
+      if (loginInfo && loginInfo.user) {
+        userStore.setUser(loginInfo.user);
+      } else {
+        // 未登录则跳转登录页（桌面端），移动端保留当前页
+        if (!isMobile.value) router.push('/login');
+        return;
+      }
     }
 
     // 使用 Promise.all 并行请求提高效率
@@ -208,14 +215,15 @@ const loadData = async () => {
 
     userDetail.value = (userDetailRes as any).data;
     playList.value = (playlistRes as any).data.playlist;
-    recordList.value = (recordRes as any).data.allData.map((item: unknown) => ({
-      ...(item as any),
-      ...(item as any).song,
-      picUrl: (item as any).song.al.picUrl
+    recordList.value = (recordRes as any).data.allData.map((item: Record<string, any>) => ({
+      ...item,
+      ...item.song,
+      picUrl: item.song?.al?.picUrl
     }));
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('加载用户页面失败:', error);
-    if ((error as any).response?.status === 401) {
+    const errorObj = error as Record<string, any>;
+    if (errorObj.response?.status === 401) {
       userStore.handleLogout();
       router.push('/login');
     } else {
@@ -235,7 +243,8 @@ watch(
   (newPath) => {
     console.log('newPath', newPath);
     if (newPath === '/user') {
-      checkLoginStatus();
+      // 仅在登录状态有效时加载数据，避免未登录时触发 loadData 导致 user 为空
+      if (!checkLoginStatus()) return;
       loadData();
     }
   }
@@ -259,18 +268,25 @@ onMounted(() => {
 });
 
 // 替换显示歌单的方法
-const openPlaylist = (item: unknown) => {
+const openPlaylist = (item: Record<string, any>) => {
   listLoading.value = true;
 
-  getListDetail((item as any).id).then((res) => {
+  getListDetail(item.id).then((res) => {
     list.value = res.data.playlist;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: (item as any).id,
+      id: item.id,
       type: 'playlist',
-      name: (item as any).name,
-      songList: (res.data.playlist.tracks as any) || [],
+      name: item.name,
+      songList: (res.data.playlist.tracks || []).map((track: any) => ({
+        ...track,
+        id: track.id,
+        name: track.name,
+        artist: track.ar?.[0]?.name || '',
+        album: track.al?.name || '',
+        duration: track.dt || 0
+      })),
       listInfo: res.data.playlist,
       canRemove: true // 保留可移除功能
     });

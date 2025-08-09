@@ -37,7 +37,6 @@ export default {
     success: '再解析成功',
     failed: '再解析失敗',
     warning: '音源を選択してください',
-    bilibiliNotSupported: 'Bilibili動画は再解析をサポートしていません',
     processing: '解析中...',
     clear: 'カスタム音源をクリア'
   },

@@ -10,12 +10,30 @@
  * 🔄 第三方库 - 使用any，避免过度工程化
  */
 
+import type { StandardApiResponse } from './enhanced-api-types';
+
 // 基础响应结构
+/**
+ * @deprecated 使用 StandardApiResponse 替代
+ * @see StandardApiResponse in enhanced-api-types.ts
+ *
+ * 迁移指南：
+ * - 旧用法: BaseApiResponse<SomeType>
+ * - 新用法: StandardApiResponse<SomeType>
+ *
+ * 此接口将在下个版本中移除
+ */
 export interface BaseApiResponse<T = unknown> {
   code: number;
   message?: string;
   data?: T;
 }
+
+/**
+ * 推荐的API响应类型别名
+ * 使用StandardApiResponse替代BaseApiResponse
+ */
+export type RecommendedApiResponse<T> = StandardApiResponse<T>;
 
 // 分页响应结构
 export interface PaginatedResponse<T> extends BaseApiResponse<T> {
