@@ -8,7 +8,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { type CacheStats, CacheType, smartCacheService } from '@/services/cacheService';
 import { CacheUtils } from '@/utils/cacheUtils';
 
-export function useSmartCache(): unknown {
+export function useSmartCache(): any {
   const cacheStats = ref<Map<string, CacheStats> | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -234,7 +234,7 @@ export function useSmartCache(): unknown {
 /**
  * 特定类型缓存的组合式函数
  */
-export function useImageCache(): unknown {
+export function useImageCache(): any {
   const { clearCache } = useSmartCache() as any;
 
   const cacheImage = async (url: string, imageData: string | Blob, ttl?: number) => {
@@ -256,13 +256,13 @@ export function useImageCache(): unknown {
   };
 }
 
-export function useApiCache(): unknown {
+export function useApiCache(): any {
   const { clearCache } = useSmartCache() as any;
 
   const cacheApiResponse = async (
     endpoint: string,
     params: Record<string, unknown>,
-    response: unknown,
+    response: any,
     ttl?: number
   ) => {
     return await CacheUtils.cacheApiResponse(endpoint, params, response, ttl);
@@ -283,7 +283,7 @@ export function useApiCache(): unknown {
   };
 }
 
-export function useUserDataCache(): unknown {
+export function useUserDataCache(): any {
   const { clearCache } = useSmartCache() as any;
 
   const cacheUserData = async (userId: string, data: Record<string, unknown>, ttl?: number) => {

@@ -25,14 +25,14 @@ interface ComponentInstance {
 /**
  * 类型守卫：检查是否为有效的组件实例
  */
-const isComponentInstance = (value: unknown): value is ComponentInstance => {
+const isComponentInstance = (value: any): value is ComponentInstance => {
   return typeof value === 'object' && value !== null && '$el' in value;
 };
 
 /**
  * 类型守卫：检查是否为Ref对象
  */
-const isRefObject = (value: unknown): value is { value: unknown } => {
+const isRefObject = (value: any): value is { value: any } => {
   return typeof value === 'object' && value !== null && 'value' in value;
 };
 
@@ -151,11 +151,11 @@ export const isNearBottom = (ref: VueComponentRef, threshold = 10): boolean => {
 export const callComponentMethod = (
   ref: VueComponentRef,
   methodName: string,
-  ...args: unknown[]
-): unknown => {
+  ...args: any[]
+): any => {
   if (!isRefObject(ref) || !ref.value) return undefined;
 
-  const component = ref.value as unknown as Record<string, unknown>;
+  const component = ref.value as any as Record<string, any>;
   const method = component[methodName];
 
   if (typeof method === 'function') {
@@ -171,10 +171,10 @@ export const callComponentMethod = (
  * @param propertyName 属性名
  * @returns 属性值
  */
-export const getComponentProperty = (ref: VueComponentRef, propertyName: string): unknown => {
+export const getComponentProperty = (ref: VueComponentRef, propertyName: string): any => {
   if (!isRefObject(ref) || !ref.value) return undefined;
 
-  const component = ref.value as unknown as Record<string, unknown>;
+  const component = ref.value as any as Record<string, any>;
   return component[propertyName];
 };
 
@@ -187,11 +187,11 @@ export const getComponentProperty = (ref: VueComponentRef, propertyName: string)
 export const setComponentProperty = (
   ref: VueComponentRef,
   propertyName: string,
-  value: unknown
+  value: any
 ): void => {
   if (!isRefObject(ref) || !ref.value) return;
 
-  const component = ref.value as unknown as Record<string, unknown>;
+  const component = ref.value as any as Record<string, any>;
   component[propertyName] = value;
 };
 

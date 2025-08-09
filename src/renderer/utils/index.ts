@@ -77,13 +77,13 @@ export const isMobile = computed(() => {
   return isMobileDevice;
 });
 
-export const isElectron = (window as { electron?: unknown }).electron !== undefined;
+export const isElectron = (window as { electron?: any }).electron !== undefined;
 
 export const isLyricWindow = computed(() => {
   return window.location.hash.includes('lyric');
 });
 
-export const getSetData = (): Record<string, unknown> | null => {
+export const getSetData = (): Record<string, any> | null => {
   let setData = null;
   if (window.electron) {
     setData = window.electron.ipcRenderer.sendSync('get-store-value', 'set');

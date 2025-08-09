@@ -237,7 +237,11 @@ const lrcScroll = (behavior: ScrollBehavior = 'smooth', forceTop: boolean = fals
   if (!isVisible.value || !lrcSider.value) return;
 
   if (forceTop) {
-    (lrcSider.value as any).scrollTo({
+    (
+      lrcSider.value as HTMLElement & {
+        scrollTo: (options: { top?: number; behavior?: string }) => void;
+      }
+    ).scrollTo({
       top: 0,
       behavior
     });
@@ -248,11 +252,15 @@ const lrcScroll = (behavior: ScrollBehavior = 'smooth', forceTop: boolean = fals
 
   const nowEl = document.querySelector(`#music-lrc-text-${nowIndex.value}`) as HTMLElement;
   if (nowEl) {
-    const containerHeight = (lrcSider.value as any).$el.clientHeight;
+    const containerHeight = (lrcSider.value as { $el: HTMLElement }).$el.clientHeight;
     const elementTop = nowEl.offsetTop;
     const scrollTop = elementTop - containerHeight / 2 + nowEl.clientHeight / 2;
 
-    (lrcSider.value as any).scrollTo({
+    (
+      lrcSider.value as HTMLElement & {
+        scrollTo: (options: { top?: number; behavior?: string }) => void;
+      }
+    ).scrollTo({
       top: scrollTop,
       behavior
     });

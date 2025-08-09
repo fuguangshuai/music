@@ -7,7 +7,7 @@ import { clearLoginStatus } from '@/utils/auth';
 
 interface UserData {
   userId: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 function getLocalStorageItem<T>(_key: string, defaultValue: T): T {

@@ -22,14 +22,14 @@ interface Privilege {
   cs: boolean;
   maxbr: number;
   fl: number;
-  pc?: unknown;
+  pc?: any;
   toast: boolean;
   flag: number;
   paidBigBang: boolean;
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: unknown;
+  rscl?: any;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }

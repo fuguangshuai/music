@@ -379,33 +379,22 @@ export const createAudioError = (
 };
 
 /**
- * 错误重试装饰器
+ * 错误重试装饰器 - 使用统一的重试逻辑
+ * @deprecated 请使用 unifiedRetry 替代
  */
 export const withRetry = async <T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
   _delay: number = 1000
 ): Promise<T> => {
-  let lastError: Error | null = null;
+  // 导入统一的重试函数
+  const { unifiedRetry } = await import('./unified-helpers');
 
-  for (let i = 0; i <= maxRetries; i++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-
-      if (i === maxRetries) {
-        throw lastError;
-      }
-
-      // 指数退避，但限制最大延迟
-      const currentDelay = Math.min(_delay * Math.pow(2, i), 10000);
-      await new Promise((resolve) => setTimeout(resolve, currentDelay));
-    }
-  }
-
-  // 这里理论上不会到达，但为了类型安全
-  throw lastError || new Error('重试失败，未知错误');
+  return unifiedRetry(fn, {
+    maxRetries,
+    delay: _delay,
+    backoff: 'exponential'
+  });
 };
 
 /**

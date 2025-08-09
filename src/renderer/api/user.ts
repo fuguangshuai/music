@@ -1,8 +1,9 @@
+import type { ApiResponse } from '@/types/consolidated-types';
 import type { IUserDetail, IUserFollow } from '@/types/user';
 import request from '@/utils/request';
 
 // /user/detail
-export function getUserDetail(uid: number): Promise<unknown> {
+export function getUserDetail(uid: number): Promise<ApiResponse> {
   return request.get('/user/detail', { params: { uid } });
 }
 
@@ -11,13 +12,13 @@ export function getUserPlaylist(
   uid: number,
   limit: number = 30,
   offset: number = 0
-): Promise<unknown> {
+): Promise<ApiResponse> {
   return request.get('/user/playlist', { params: { uid, limit, offset } });
 }
 
 // 播放历史
 // /user/record?uid=32953014&type=1
-export function getUserRecord(uid: number, type: number = 0): Promise<unknown> {
+export function getUserRecord(uid: number, type: number = 0): Promise<ApiResponse> {
   return request.get('/user/record', {
     params: { uid, type }
   });
@@ -29,7 +30,7 @@ export function getUserFollows(
   uid: number,
   limit: number = 30,
   offset: number = 0
-): Promise<unknown> {
+): Promise<ApiResponse> {
   return request.get('/user/follows', { params: { uid, limit, offset } });
 }
 
@@ -38,13 +39,13 @@ export function getUserFollowers(
   uid: number,
   limit: number = 30,
   offset: number = 0
-): Promise<unknown> {
+): Promise<ApiResponse> {
   return request.post('/user/followeds', { uid, limit, offset });
 }
 
 // 获取用户账号信息
-export const getUserAccount = (): Promise<unknown> => {
-  return request<unknown>({
+export const getUserAccount = (): Promise<any> => {
+  return request({
     url: '/user/account',
     method: 'get'
   });

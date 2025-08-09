@@ -158,9 +158,9 @@ export interface Song {
   rUrl?: string;
   mark: number;
   originCoverType: number;
-  originSongSimpleData?: unknown;
+  originSongSimpleData?: any;
   single: number;
-  noCopyrightRcmd?: unknown;
+  noCopyrightRcmd?: any;
   rtUrls: string[];
   mst: number;
   cp: number;
@@ -209,7 +209,7 @@ export interface Playlist {
   playCount: number;
   bookCount: number;
   specialType: number;
-  officialPlaylistType?: unknown;
+  officialPlaylistType?: any;
   anonimous: boolean;
   createTime: number;
   updateTime: number;
@@ -231,26 +231,26 @@ export interface Playlist {
     alg?: string;
     uid: number;
     rcmdReason: string;
-    sc?: unknown;
-    f?: unknown;
-    sr?: unknown;
+    sc?: any;
+    f?: any;
+    sr?: any;
   }>;
   shareCount: number;
   commentCount: number;
-  remixVideo?: unknown;
-  sharedUsers?: unknown;
-  historySharedUsers?: unknown;
+  remixVideo?: any;
+  sharedUsers?: any;
+  historySharedUsers?: any;
   gradeStatus: string;
-  score?: unknown;
-  algTags?: unknown;
+  score?: any;
+  algTags?: any;
   trialMode: number;
-  displayTags?: unknown;
+  displayTags?: any;
   playlistType: string;
-  bizExtInfo?: unknown;
-  distributeTags: unknown[];
-  relateResType?: unknown;
-  relateResId?: unknown;
-  logInfo?: unknown;
+  bizExtInfo?: any;
+  distributeTags: any[];
+  relateResType?: any;
+  relateResId?: any;
+  logInfo?: any;
   description?: string;
   tags: string[];
 }
@@ -294,20 +294,20 @@ export interface SongUrl {
   gain: number;
   peak: number;
   fee: number;
-  uf?: unknown;
+  uf?: any;
   payed: number;
   flag: number;
   canExtend: boolean;
-  freeTrialInfo?: unknown;
+  freeTrialInfo?: any;
   level: string;
   encodeType: string;
   freeTrialPrivilege: {
     resConsumable: boolean;
     userConsumable: boolean;
-    listenType?: unknown;
-    cannotListenReason?: unknown;
-    playMaxTimeSec?: unknown;
-    freeTrialType?: unknown;
+    listenType?: any;
+    cannotListenReason?: any;
+    playMaxTimeSec?: any;
+    freeTrialType?: any;
   };
   freeTimeTrialPrivilege: {
     resConsumable: boolean;
@@ -317,8 +317,8 @@ export interface SongUrl {
   };
   urlSource: number;
   rightSource: number;
-  podcastCtrp?: unknown;
-  effectTypes?: unknown;
+  podcastCtrp?: any;
+  effectTypes?: any;
   time: number;
 }
 
@@ -359,4 +359,40 @@ export interface ErrorResponse extends BaseApiResponse {
   code: number;
   message: string;
   data?: null;
+}
+
+// 音乐 API 专用响应类型 - 用于批量修复 unknown 类型
+export interface MusicApiResponse {
+  data: {
+    data?: {
+      source?: string;
+      [key: string]: any;
+    };
+    size?: number;
+    br?: number;
+    url?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+// 用户 API 响应类型
+export interface UserApiResponse {
+  data: {
+    playlist?: any[];
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+// 播放列表 API 响应类型
+export interface PlaylistApiResponse {
+  data: {
+    playlist?: {
+      tracks?: any[];
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  [key: string]: any;
 }

@@ -9,7 +9,7 @@ import { smartLoadingManager } from '@/directive/loading';
 import { a11y, type AccessibilityConfig, accessibilityManager } from '@/utils/accessibility';
 import { AppError, globalErrorHandler } from '@/utils/errorHandler';
 
-export function useUXEnhancer(): unknown {
+export function useUXEnhancer(): any {
   const isLoading = ref(false);
   const loadingMessage = ref('加载中...');
   const error = ref<AppError | null>(null);
@@ -320,7 +320,17 @@ export function useUXEnhancer(): unknown {
 /**
  * 骨架屏增强组合式函数
  */
-export function useSkeletonLoader(): unknown {
+export function useSkeletonLoader(): {
+  showSkeleton: Ref<boolean>;
+  skeletonType: Ref<'song-list' | 'card-grid' | 'user-profile' | 'lyrics' | 'player' | 'text'>;
+  skeletonCount: Ref<number>;
+  startSkeleton: (
+    type?: 'song-list' | 'card-grid' | 'user-profile' | 'lyrics' | 'player' | 'text',
+    count?: number,
+    minDuration?: number
+  ) => void;
+  stopSkeleton: () => Promise<void>;
+} {
   const showSkeleton = ref(false);
   const skeletonType = ref<
     'song-list' | 'card-grid' | 'user-profile' | 'lyrics' | 'player' | 'text'

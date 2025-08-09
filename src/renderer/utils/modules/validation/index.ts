@@ -301,39 +301,61 @@ export const musicRules = {
 
 /**
  * 🔧 通用验证函数
+ * @deprecated 请使用 unified-validation-factory 中的 validate 函数替代
+ * 此模块将在下个版本中移除，请迁移到统一的验证工厂
  */
 export const validate = {
   /**
    * 验证字符串
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
-  string: (value: string) => createValidator(value),
+  string: (value: string) => {
+    console.warn('validate.string 已废弃，请使用 unified-validation-factory 中的 validate.string');
+    return createValidator(value);
+  },
 
   /**
    * 验证数字
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
-  number: (value: number) => createValidator(value),
+  number: (value: number) => {
+    console.warn('validate.number 已废弃，请使用 unified-validation-factory 中的 validate.number');
+    return createValidator(value);
+  },
 
   /**
    * 验证数组
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
-  array: (value: unknown[]) => createValidator(value),
+  array: (value: any[]) => {
+    console.warn('validate.array 已废弃，请使用 unified-validation-factory 中的 validate.array');
+    return createValidator(value);
+  },
 
   /**
    * 验证对象
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
-  object: (value: object) => createValidator(value),
+  object: (value: object) => {
+    console.warn('validate.object 已废弃，请使用 unified-validation-factory 中的 validate.object');
+    return createValidator(value);
+  },
 
   /**
    * 验证邮箱
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
   email: (email: string): boolean => {
+    console.warn('validate.email 已废弃，请使用 unified-validation-factory 中的 validate.email');
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   },
 
   /**
    * 验证URL
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
   url: (url: string): boolean => {
+    console.warn('validate.url 已废弃，请使用 unified-validation-factory 中的 validate.url');
     try {
       new URL(url);
       return true;
@@ -344,15 +366,19 @@ export const validate = {
 
   /**
    * 验证手机号
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
   phone: (phone: string): boolean => {
+    console.warn('validate.phone 已废弃，请使用 unified-validation-factory 中的 validate.phone');
     return /^1[3-9]\d{9}$/.test(phone);
   },
 
   /**
    * 验证身份证号
+   * @deprecated 使用 import { validate } from '../unified-validation-factory'
    */
-  _idCard: (idCard: string): boolean => {
+  idCard: (idCard: string): boolean => {
+    console.warn('validate.idCard 已废弃，请使用 unified-validation-factory 中的验证函数');
     return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
       idCard
     );

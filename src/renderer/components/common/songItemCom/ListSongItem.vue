@@ -49,8 +49,8 @@
             <template v-for="(artist, index) in artists" :key="index">
               <span
                 class="cursor-pointer hover:text-green-500"
-                @click.stop="onArtistClick((artist as any).id)"
-                >{{ (artist as any).name }}</span
+                @click.stop="onArtistClick(typeof artist === 'object' ? artist.id : artist)"
+                >{{ typeof artist === 'object' ? artist.name : artist }}</span
               >
               <span v-if="index < artists.length - 1"> / </span>
             </template>

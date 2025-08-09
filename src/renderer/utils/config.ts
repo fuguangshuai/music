@@ -357,7 +357,7 @@ export const userPreferences = createConfig<UserPreferences>({
  */
 export interface PlayerState extends Record<string, unknown> {
   currentSong: Record<string, unknown> | null;
-  playList: unknown[];
+  playList: any[];
   playListIndex: number;
   isPlaying: boolean;
   currentTime: number;

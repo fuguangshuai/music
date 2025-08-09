@@ -3,6 +3,7 @@
  * 提供常用的类型工具函数，减少重复的类型定义工作
  */
 
+import type { ApiResponseData, GenericObject, ValidationInput } from '../types/consolidated-types';
 import type { StandardApiResponse } from '../types/enhanced-api-types';
 
 // 通用API响应包装器
@@ -22,8 +23,9 @@ export type ApiResponse<T> = StandardApiResponse<T>;
  * 未知数据类型 - 替代any的类型安全方案
  * @description 用于处理动态或未知结构的数据，提供基本的类型安全保证
  * @since TypeScript 5.0+
+ * @deprecated 使用 ApiResponseData 或 ValidationInput 替代
  */
-export type UnknownData = unknown;
+export type UnknownData = ApiResponseData;
 
 /**
  * JSON兼容的值类型 - 确保数据可序列化
@@ -112,7 +114,7 @@ export const typeHelpers = {
    * @param data 未知结构的API数据
    * @returns 类型安全的临时数据
    */
-  processTempApiData: (data: unknown): TempApiData => {
+  processTempApiData: (data: ApiResponseData): TempApiData => {
     if (data === null || data === undefined) {
       return null;
     }
@@ -134,7 +136,7 @@ export const typeHelpers = {
    * @param libraryName 库名称，用于日志记录
    * @returns 类型安全的第三方数据
    */
-  processThirdPartyData: (data: unknown, libraryName = 'unknown'): ThirdPartyData => {
+  processThirdPartyData: (data: ApiResponseData, libraryName = 'unknown'): ThirdPartyData => {
     console.info(`🔌 处理第三方库数据: ${libraryName}`);
 
     if (data === null || data === undefined) {
@@ -196,40 +198,42 @@ export const typeHelpers = {
  */
 export const typeGuards = {
   // 基础类型守卫 - 严格验证
-  isString: (value: unknown): value is string => typeof value === 'string',
+  isString: (value: ValidationInput): value is string => typeof value === 'string',
 
-  isNumber: (value: unknown): value is number =>
+  isNumber: (value: ValidationInput): value is number =>
     typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value),
 
-  isInteger: (value: unknown): value is number =>
+  isInteger: (value: ValidationInput): value is number =>
     typeGuards.isNumber(value) && Number.isInteger(value),
 
-  isPositiveNumber: (value: unknown): value is number => typeGuards.isNumber(value) && value > 0,
+  isPositiveNumber: (value: ValidationInput): value is number =>
+    typeGuards.isNumber(value) && value > 0,
 
-  isBoolean: (value: unknown): value is boolean => typeof value === 'boolean',
+  isBoolean: (value: ValidationInput): value is boolean => typeof value === 'boolean',
 
-  isNull: (value: unknown): value is null => value === null,
+  isNull: (value: ValidationInput): value is null => value === null,
 
-  isUndefined: (value: unknown): value is undefined => value === undefined,
+  isUndefined: (value: ValidationInput): value is undefined => value === undefined,
 
-  isNullish: (value: unknown): value is null | undefined => value === null || value === undefined,
+  isNullish: (value: ValidationInput): value is null | undefined =>
+    value === null || value === undefined,
 
   // 复合类型守卫 - 增强验证
-  isObject: (value: unknown): value is Record<string, unknown> =>
+  isObject: (value: ValidationInput): value is GenericObject =>
     typeof value === 'object' &&
     value !== null &&
     !Array.isArray(value) &&
     Object.prototype.toString.call(value) === '[object Object]',
 
-  isArray: <T = unknown>(value: unknown): value is T[] => Array.isArray(value),
+  isArray: <T = any>(value: ValidationInput): value is T[] => Array.isArray(value),
 
-  isNonEmptyArray: <T = unknown>(value: unknown): value is [T, ...T[]] =>
+  isNonEmptyArray: <T = any>(value: ValidationInput): value is [T, ...T[]] =>
     Array.isArray(value) && value.length > 0,
 
-  isFunction: (value: unknown): value is Function => typeof value === 'function',
+  isFunction: (value: ValidationInput): value is Function => typeof value === 'function',
 
   // JSON类型守卫
-  isJsonValue: (value: unknown): value is JsonValue => {
+  isJsonValue: (value: ValidationInput): value is JsonValue => {
     if (value === null) return true;
 
     const type = typeof value;
@@ -249,7 +253,7 @@ export const typeGuards = {
   },
 
   // API响应类型守卫 - 增强版本
-  isApiResponse: <T = unknown>(value: unknown): value is ApiResponse<T> => {
+  isApiResponse: <T = any>(value: ValidationInput): value is ApiResponse<T> => {
     if (!typeGuards.isObject(value)) return false;
 
     const obj = value as Record<string, unknown>;

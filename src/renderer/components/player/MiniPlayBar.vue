@@ -216,7 +216,7 @@ const toggleFavorite = async (e: Event) => {
 };
 
 // 播放列表相关
-const palyListRef = useTemplateRef('palyListRef') as any;
+const palyListRef = useTemplateRef('palyListRef');
 const isPlaylistOpen = ref(false);
 
 // 提供 openPlaylistDrawer 给子组件

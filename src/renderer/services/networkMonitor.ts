@@ -276,7 +276,7 @@ export function useNetworkMonitor() {
 /**
  * 网络错误类型守卫
  */
-export function isNetworkError(error: unknown): error is Error {
+export function isNetworkError(error: any): error is Error {
   if (!(error instanceof Error)) return false;
 
   const networkErrorPatterns = [

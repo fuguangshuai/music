@@ -107,6 +107,6 @@ export interface IMvUrlData {
   fee: number;
   mvFee: number;
   st: number;
-  promotionVo: unknown;
+  promotionVo: any;
   msg: string;
 }

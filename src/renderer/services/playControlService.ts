@@ -17,8 +17,8 @@ class PlayControlService {
   /**
    * 条件性日志输出，只在开发环境输出
    */
-  private log(level: 'info' | 'warn' | 'error', _message: string, ...args: unknown[]) {
-    if ((globalThis as any).process.env.NODE_ENV === 'development') {
+  private log(level: 'info' | 'warn' | 'error', _message: string, ...args: any[]) {
+    if (import.meta.env.DEV) {
       console[level](_message, ...args);
     }
   }

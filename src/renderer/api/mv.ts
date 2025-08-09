@@ -17,13 +17,10 @@ export const getTopMv = (params: MvParams) => {
   });
 };
 
-// 获取所有mv
+// 获取所有mv - 注意：此函数与 getTopMv 功能重复，建议使用 getTopMv
 export const getAllMv = (params: MvParams) => {
-  return request({
-    url: '/mv/all',
-    method: 'get',
-    params
-  });
+  console.warn('getAllMv 函数与 getTopMv 功能重复，建议使用 getTopMv');
+  return getTopMv(params);
 };
 
 // 获取 mv 数据

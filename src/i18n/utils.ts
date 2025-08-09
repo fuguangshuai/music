@@ -16,7 +16,7 @@ export const buildLanguageMessages = () => {
         if (!messages[langCode]) {
           messages[langCode] = {};
         }
-        messages[langCode][moduleName] = (module as any).default;
+        messages[langCode][moduleName] = (module as { default: any }).default;
       }
     }
   });

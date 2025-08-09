@@ -4,7 +4,7 @@ import { ref } from 'vue';
  * 页面缩放功能的组合式API
  * 提供页面缩放相关的状态和方法
  */
-export function useZoom(): unknown {
+export function useZoom(): any {
   // 缩放相关常量
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 1.5;

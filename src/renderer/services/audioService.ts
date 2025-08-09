@@ -168,7 +168,7 @@ class AudioService {
   // 事件处理相关
   private callbacks: { [key: string]: Function[] } = {};
 
-  private emit(event: string, ...args: unknown[]) {
+  private emit(event: string, ...args: any[]) {
     const eventCallbacks = this.callbacks[event];
     if (eventCallbacks) {
       eventCallbacks.forEach((callback) => callback(...args));
@@ -906,9 +906,9 @@ class AudioService {
     this.currentSound.rate(rate);
 
     // 取出底层 HTMLAudioElement，改原生 playbackRate
-    const sounds = (this.currentSound as { _sounds?: unknown[] })._sounds || [];
+    const sounds = (this.currentSound as { _sounds?: any[] })._sounds || [];
     sounds.forEach((sound) => {
-      const _node = (sound as { _node?: unknown })._node;
+      const _node = (sound as { _node?: any })._node;
       if (_node instanceof HTMLAudioElement) {
         _node.playbackRate = rate;
       }
@@ -957,7 +957,7 @@ class AudioService {
 
     // 检查Howl对象的内部状态
     // 如果状态为1表示已经加载但未完成，状态为2表示正在加载
-    const state = (this.currentSound as { _state?: unknown })._state;
+    const state = (this.currentSound as { _state?: any })._state;
     // 如果操作锁激活也认为是加载状态
     return this.operationLock || state === 'loading' || state === 1;
   }

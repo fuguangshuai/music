@@ -43,65 +43,28 @@ export interface QueueTask<T = unknown> {
 
 /**
  * 🔄 智能重试函数
+ * @deprecated 请使用 unified-helpers 中的 unifiedRetry 函数替代
+ * 此函数将在下个版本中移除，请迁移到统一的重试工厂
  */
 export const retry = async <T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> => {
-  const {
-    maxRetries = 3,
-    delay = 1000,
-    backoff = 'exponential',
-    maxDelay = 30000,
-    retryCondition = () => true,
-    onRetry
-  } = options;
+  console.warn('async/retry 已废弃，请使用 unified-helpers 中的 unifiedRetry');
 
-  let lastError: unknown;
+  // 导入统一的重试函数
+  const { unifiedRetry } = await import('../../unified-helpers');
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-
-      // 最后一次尝试失败
-      if (attempt === maxRetries) {
-        throw error;
-      }
-
-      // 检查是否应该重试
-      if (!retryCondition(error, attempt + 1)) {
-        throw error;
-      }
-
-      // 计算延迟时间
-      let currentDelay = delay;
-      switch (backoff) {
-        case 'exponential':
-          currentDelay = Math.min(delay * Math.pow(2, attempt), maxDelay);
-          break;
-        case 'linear':
-          currentDelay = Math.min(delay * (attempt + 1), maxDelay);
-          break;
-        case 'fixed':
-        default:
-          currentDelay = delay;
-          break;
-      }
-
-      // 调用重试回调
-      if (onRetry) {
-        onRetry(error, attempt + 1);
-      }
-
-      // 等待后重试
-      await sleep(currentDelay);
-    }
-  }
-
-  throw lastError;
+  return unifiedRetry(fn, {
+    maxRetries: options.maxRetries,
+    delay: options.delay,
+    backoff: options.backoff === 'fixed' ? 'linear' : options.backoff,
+    maxDelay: options.maxDelay,
+    shouldRetry: options.retryCondition,
+    onRetry: options.onRetry
+  });
 };
 
 /**
  * 🛡️ 网络请求重试（专门针对网络错误）
+ * @deprecated 请使用 unified-helpers 中的 unifiedRetry 函数替代
  */
 export const retryNetwork = <T>(
   fn: () => Promise<T>,

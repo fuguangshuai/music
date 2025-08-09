@@ -258,7 +258,7 @@ interface PlaylistInfo {
 }
 
 // 类型安全的播放列表信息提取器
-const extractPlaylistInfo = (data: unknown): PlaylistInfo => {
+const extractPlaylistInfo = (data: any): PlaylistInfo => {
   if (!typeGuards.isObject(data)) {
     return {};
   }
@@ -503,7 +503,7 @@ const filteredSongs = computed(() => {
 });
 
 // 格式化歌曲数据 - 灵活版本，接受任何歌曲类型
-const formatSong = (item: unknown): SongResult => {
+const formatSong = (item: any): SongResult => {
   if (!item) {
     return {
       id: 0,
@@ -602,7 +602,7 @@ const loadFullPlaylist = async () => {
     }
 
     // 获取所有trackIds
-    const allIds = (listInfo.value as any).trackIds.map((item: unknown) => (item as any).id);
+    const allIds = (listInfo.value as any).trackIds.map((item: any) => (item as any).id);
     console.log(`歌单共有歌曲ID: ${allIds.length}首`);
 
     // 重置completePlaylist和当前显示歌曲ID集合，保证不会重复添加歌曲
@@ -623,7 +623,7 @@ const loadFullPlaylist = async () => {
     );
 
     // 过滤出尚未加载的歌曲ID
-    const unloadedIds = allIds.filter((id: unknown) => !loadedSongIds.has(id as number));
+    const unloadedIds = allIds.filter((id: any) => !loadedSongIds.has(id as number));
     console.log(`还需要加载的歌曲ID数量: ${unloadedIds.length}`);
 
     if (unloadedIds.length === 0) {
@@ -648,11 +648,11 @@ const loadFullPlaylist = async () => {
       if (loadedBatch.length > 0) {
         // 过滤掉已有的歌曲，确保不会重复添加
         const newSongs = loadedBatch.filter(
-          (song: unknown) => !loadedSongIds.has((song as any).id as number)
+          (song: any) => !loadedSongIds.has((song as any).id as number)
         );
 
         // 更新已加载ID集合
-        newSongs.forEach((song: unknown) => {
+        newSongs.forEach((song: any) => {
           loadedSongIds.add((song as any).id as number);
         });
 
@@ -705,7 +705,7 @@ const loadFullPlaylist = async () => {
       // 如果数量不符，可能是API未返回所有歌曲，打印缺失的歌曲ID
       if (displayedSongs.value.length < allIds.length) {
         const loadedIds = new Set(displayedSongs.value.map((song) => song.id));
-        const missingIds = allIds.filter((id: unknown) => !loadedIds.has(id as string | number));
+        const missingIds = allIds.filter((id: any) => !loadedIds.has(id as string | number));
         console.warn(`缺失的歌曲ID: ${missingIds.join(', ')}`);
       }
     }
@@ -776,7 +776,7 @@ const handleRemoveSong = async (songId: number) => {
     } else {
       throw new Error(res.data?.msg || t('user._message.deleteFailed'));
     }
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('删除歌曲失败:', error);
     const errorObj = error as ErrorObject;
     message.error(errorObj.message || t('user.message.deleteFailed'));
@@ -808,8 +808,8 @@ const loadMoreSongs = async () => {
     if ((listInfo.value as any)?.trackIds) {
       const trackIdsToLoad = (listInfo.value as any).trackIds
         .slice(start, end)
-        .map((item: unknown) => (item as any).id)
-        .filter((id: unknown) => !loadedIds.value.has(id as number));
+        .map((item: any) => (item as any).id)
+        .filter((id: any) => !loadedIds.value.has(id as number));
 
       if (trackIdsToLoad.length > 0) {
         await loadSongs(trackIdsToLoad, true, false);

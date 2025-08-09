@@ -269,7 +269,7 @@ class SmartCacheService {
   /**
    * 🎵 歌词缓存方法（保持向后兼容）
    */
-  async cacheLyric(id: number, data: unknown): Promise<boolean> {
+  async cacheLyric(id: number, data: any): Promise<boolean> {
     return await this.cacheData(CacheType.LYRIC, id.toString(), data);
   }
 

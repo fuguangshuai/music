@@ -34,6 +34,7 @@ import { getNewAlbum } from '@/api/home';
 import { getAlbum } from '@/api/list';
 import { navigateToMusicList } from '@/components/common/MusicListNavigator';
 import type { IAlbumNew } from '@/types/album';
+import type { MusicApiResponse } from '@/types/api-responses';
 import { getImgUrl, setAnimationClass, setAnimationDelay } from '@/utils';
 
 const { t } = useI18n();
@@ -45,27 +46,31 @@ const loadAlbumList = async () => {
 
 const router = useRouter();
 
-const handleClick = async (item: unknown) => {
+const handleClick = async (item: any) => {
   openAlbum(item);
 };
 
-const openAlbum = async (album: unknown) => {
+const openAlbum = async (album: any) => {
   if (!album) return;
 
   try {
-    const res = await getAlbum((album as any).id);
+    const res = await getAlbum((album as MusicApiResponse).id);
     const { songs, album: albumInfo } = res.data;
 
-    const formattedSongs = songs.map((song: unknown) => {
-      (song as any).al.picUrl = (song as any).al.picUrl || albumInfo.picUrl;
-      (song as any).picUrl = (song as any).al.picUrl || albumInfo.picUrl || (song as any).picUrl;
+    const formattedSongs = songs.map((song: any) => {
+      (song as MusicApiResponse).al.picUrl =
+        (song as MusicApiResponse).al.picUrl || albumInfo.picUrl;
+      (song as MusicApiResponse).picUrl =
+        (song as MusicApiResponse).al.picUrl ||
+        albumInfo.picUrl ||
+        (song as MusicApiResponse).picUrl;
       return song;
     });
 
     navigateToMusicList(router, {
-      id: (album as any).id,
+      id: (album as MusicApiResponse).id,
       type: 'album',
-      name: (album as any).name,
+      name: (album as MusicApiResponse).name,
       songList: formattedSongs,
       listInfo: {
         ...albumInfo,

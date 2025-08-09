@@ -9,7 +9,9 @@
       <div class="page">
         <div class="user-name">
           <span>{{ user.nickname }}</span>
-          <span class="login-type" v-if="currentLoginType">{{ t('login.title.' + currentLoginType) }}</span>
+          <span class="login-type" v-if="currentLoginType">{{
+            t('login.title.' + currentLoginType)
+          }}</span>
         </div>
         <div class="user-info">
           <n-avatar round :size="50" :src="getImgUrl((user as any)?.avatarUrl, '50y50')" />
@@ -118,6 +120,7 @@ import PlayBottom from '@/components/common/PlayBottom.vue';
 import SongItem from '@/components/common/SongItem.vue';
 import { usePlayerStore } from '@/store/modules/player';
 import { useUserStore } from '@/store/modules/user';
+import type { ErrorType, SongRecord } from '@/types/consolidated-types';
 import type { Playlist } from '@/types/listDetail';
 import type { IUserDetail } from '@/types/user';
 import { getImgUrl, isElectron, isMobile, setAnimationClass, setAnimationDelay } from '@/utils';
@@ -204,23 +207,30 @@ const loadData = async () => {
       }
     }
 
+    // 确保用户数据存在后再进行API调用
+    const currentUser = user.value;
+    if (!currentUser) {
+      console.error('用户数据仍然不存在，无法加载用户信息');
+      return;
+    }
+
     // 使用 Promise.all 并行请求提高效率
     const [userDetailRes, playlistRes, recordRes] = await Promise.all([
-      getUserDetail(user.value.userId),
-      getUserPlaylist(user.value.userId),
-      getUserRecord(user.value.userId)
+      getUserDetail(currentUser.userId),
+      getUserPlaylist(currentUser.userId),
+      getUserRecord(currentUser.userId)
     ]);
 
     if (!mounted.value) return;
 
     userDetail.value = (userDetailRes as any).data;
     playList.value = (playlistRes as any).data.playlist;
-    recordList.value = (recordRes as any).data.allData.map((item: Record<string, any>) => ({
+    recordList.value = (recordRes as any).data.allData.map((item: SongRecord) => ({
       ...item,
       ...item.song,
       picUrl: item.song?.al?.picUrl
     }));
-  } catch (error) {
+  } catch (error: ErrorType) {
     console.error('加载用户页面失败:', error);
     const errorObj = error as Record<string, any>;
     if (errorObj.response?.status === 401) {

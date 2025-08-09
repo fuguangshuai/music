@@ -22,7 +22,7 @@ export const getSongUrl = async (
 
   const { data } = await getMusicUrl(id, !unlimitedDownload);
   let url = '';
-  let songDetail: unknown = null;
+  let songDetail: any = null;
 
   try {
     if (data.data[0].freeTrialInfo || !data.data[0].url) {
@@ -63,7 +63,7 @@ interface PlayerState {
   play: boolean;
   playList: SongResult[];
   playListIndex: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 export const useMusicListHook = () => {

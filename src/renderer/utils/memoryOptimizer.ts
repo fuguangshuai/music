@@ -56,9 +56,10 @@ class MemoryOptimizer {
     });
 
     // 强制垃圾回收（如果支持）
-    if ('gc' in window && typeof (window as any).gc === 'function') {
+    const windowWithGC = window as Window & { gc?: () => void };
+    if ('gc' in window && typeof windowWithGC.gc === 'function') {
       try {
-        (window as any).gc();
+        windowWithGC.gc();
       } catch (error) {
         console.warn('Manual garbage collection failed:', error);
       }

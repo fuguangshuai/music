@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { getSongUrl } from '@/store/modules/player';
+import type { MusicApiResponse } from '@/types/api-responses';
 import type { SongResult } from '@/types/music';
 import { isElectron } from '@/utils';
 
@@ -21,8 +22,8 @@ const createDownloadManager = () => {
   let isInitialized = false;
 
   // 监听器引用（用于清理）
-  let completeListener: ((event: Electron.IpcRendererEvent, data: unknown) => void) | null = null;
-  let errorListener: ((event: Electron.IpcRendererEvent, data: unknown) => void) | null = null;
+  let completeListener: ((event: Electron.IpcRendererEvent, data: any) => void) | null = null;
+  let errorListener: ((event: Electron.IpcRendererEvent, data: any) => void) | null = null;
 
   return {
     // 添加下载
@@ -72,35 +73,43 @@ const createDownloadManager = () => {
       }
 
       // 创建新的监听器
-      completeListener = (_event, data: unknown) => {
-        if (!(data as any).filename || !activeDownloads.has((data as any).filename)) return;
+      completeListener = (_event, data: any) => {
+        if (
+          !(data as MusicApiResponse).filename ||
+          !activeDownloads.has((data as MusicApiResponse).filename)
+        )
+          return;
 
         // 如果该文件已经通知过，则跳过
-        if (notifiedDownloads.has((data as any).filename)) return;
+        if (notifiedDownloads.has((data as MusicApiResponse).filename)) return;
 
         // 标记为已通知
-        notifiedDownloads.add((data as any).filename);
+        notifiedDownloads.add((data as MusicApiResponse).filename);
 
         // 从活动下载移除
-        activeDownloads.delete((data as any).filename);
+        activeDownloads.delete((data as MusicApiResponse).filename);
       };
 
-      errorListener = (_event, data: unknown) => {
-        if (!(data as any).filename || !activeDownloads.has((data as any).filename)) return;
+      errorListener = (_event, data: any) => {
+        if (
+          !(data as MusicApiResponse).filename ||
+          !activeDownloads.has((data as MusicApiResponse).filename)
+        )
+          return;
 
         // 如果该文件已经通知过，则跳过
-        if (notifiedDownloads.has((data as any).filename)) return;
+        if (notifiedDownloads.has((data as MusicApiResponse).filename)) return;
 
         // 标记为已通知
-        notifiedDownloads.add((data as any).filename);
+        notifiedDownloads.add((data as MusicApiResponse).filename);
 
         // 显示失败通知
         (_message as any).error(
-          `${t('(songItem instanceof Error ? songItem.message : String(songItem)).downloadFailed')}: ${(data as any).filename} - ${(data as any).error || '未知错误'}`
+          `${t('(songItem instanceof Error ? songItem.message : String(songItem)).downloadFailed')}: ${(data as MusicApiResponse).filename} - ${(data as MusicApiResponse).error || '未知错误'}`
         );
 
         // 从活动下载移除
-        activeDownloads.delete((data as any).filename);
+        activeDownloads.delete((data as MusicApiResponse).filename);
       };
 
       // 添加监听器
@@ -174,8 +183,8 @@ export const useDownload = () => {
       }
 
       // 构建文件名
-      const artistNames = (song.ar || (song.song as any)?.artists)
-        ?.map((a: unknown) => (a as any).name)
+      const artistNames = (song.ar || (song.song as MusicApiResponse)?.artists)
+        ?.map((a: any) => a.name)
         .join(', ');
       const filename = `${song.name} - ${artistNames}`;
 
@@ -193,13 +202,13 @@ export const useDownload = () => {
 
       // 发送下载请求
       ipcRenderer?.send('download-music', {
-        url: typeof musicUrl === 'string' ? musicUrl : (musicUrl as any)?.url || '',
+        url: typeof musicUrl === 'string' ? musicUrl : (musicUrl as MusicApiResponse)?.url || '',
         filename,
         songInfo: {
           ...songData,
           downloadTime: Date.now()
         },
-        type: typeof musicUrl === 'string' ? 'mp3' : (musicUrl as any)?.type || 'mp3'
+        type: typeof musicUrl === 'string' ? 'mp3' : (musicUrl as MusicApiResponse)?.type || 'mp3'
       });
 
       message.success(
@@ -210,7 +219,7 @@ export const useDownload = () => {
       setTimeout(() => {
         isDownloading.value = false;
       }, 2000);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Download error:', error);
       isDownloading.value = false;
       message.error(
@@ -260,7 +269,11 @@ export const useDownload = () => {
             if (typeof data === 'string') {
               return { song, url: data, type: 'mp3' };
             } else {
-              return { song, url: (data as any)?.url || null, type: (data as any)?.type || 'mp3' };
+              return {
+                song,
+                url: (data as MusicApiResponse)?.url || null,
+                type: (data as MusicApiResponse)?.type || 'mp3'
+              };
             }
           } catch (error) {
             console.error(`获取歌曲 ${song.name} 下载链接失败:`, error);

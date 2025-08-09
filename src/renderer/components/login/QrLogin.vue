@@ -37,8 +37,8 @@ const loadLogin = async () => {
       timerRef.value = null;
     }
 
-    const qrKey = (await getQrKey()) as any;
-    const key = qrKey.data.data.unikey;
+    const qrKey = await getQrKey();
+    const key = (qrKey as any).data.data.unikey;
     const { data } = await createQr(key);
     qrUrl.value = data.data.qrimg;
     qrStatus.value = 'active';
@@ -87,10 +87,10 @@ const timerIsQr = (key: string) => {
       if (data.code === 803) {
         qrStatus.value = 'confirmed';
         localStorage.setItem('token', data.cookie);
-        const user = (await getUserDetail()) as any;
+        const user = await getUserDetail();
         const successMsg = t('login.message.loginSuccess');
         message.success(successMsg);
-        emit('loginSuccess', user.data.profile, 'qr');
+        emit('loginSuccess', (user as any).data.profile, 'qr');
 
         clearInterval(timer);
         timerRef.value = null;

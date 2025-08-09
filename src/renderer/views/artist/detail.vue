@@ -440,7 +440,7 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: unknown) => {
+    const artistsMatch = artists.some((artist: any) => {
       if (isEnhancedArtist(artist)) {
         return artist.name?.toLowerCase().includes(keyword);
       }
@@ -452,7 +452,7 @@ const filteredSongs = computed(() => {
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: unknown) => {
+    const artistsPinyinMatch = artists.some((artist: any) => {
       if (isEnhancedArtist(artist)) {
         return artist.name && PinyinMatch.match(artist.name, keyword);
       }
@@ -526,7 +526,7 @@ const addToPlaylist = () => {
   message.success(t('comp.musicList.addToPlaylistSuccess', { count: newSongs.length }));
 };
 
-const handlePlay = (song?: unknown) => {
+const handlePlay = (song?: any) => {
   // 如果传入了特定歌曲（点击单曲播放），则将其作为播放列表的第一首
   if (song) {
     const songList = [...filteredSongs.value];
@@ -666,7 +666,7 @@ onUnmounted(() => {
 const songListRef = ref(null);
 
 // 格式化歌曲（使用在虚拟列表中）
-const formatSong = (item: unknown) => {
+const formatSong = (item: any) => {
   if (!item) {
     return null;
   }
@@ -681,7 +681,7 @@ const formatSong = (item: unknown) => {
 };
 
 // 处理虚拟列表滚动
-const handleVirtualScroll = (e: unknown) => {
+const handleVirtualScroll = (e: any) => {
   const eventObj = e as Record<string, unknown>;
   if (!e || !eventObj.target) return;
 

@@ -49,7 +49,7 @@ interface RawPlaylistData {
 /**
  * 类型守卫：检查是否为有效的歌曲数据
  */
-const isValidSongData = (item: unknown): item is RawSongData => {
+const isValidSongData = (item: any): item is RawSongData => {
   return (
     typeGuards.isObject(item) &&
     (typeGuards.isNumber((item as RawSongData).id) ||
@@ -62,7 +62,7 @@ const isValidSongData = (item: unknown): item is RawSongData => {
  * @param item 原始歌曲数据
  * @returns 标准化的歌曲数据
  */
-export const formatSongData = (item: unknown): SongResult => {
+export const formatSongData = (item: any): SongResult => {
   if (!isValidSongData(item)) {
     console.warn('🎵 无效的歌曲数据，使用默认值', item);
     return {
@@ -92,7 +92,7 @@ export const formatSongData = (item: unknown): SongResult => {
  * @param items 原始歌曲数据数组
  * @returns 标准化的歌曲数据数组
  */
-export const formatSongList = (items: unknown): SongResult[] => {
+export const formatSongList = (items: any): SongResult[] => {
   if (!typeGuards.isArray(items)) {
     console.warn('🎵 输入不是数组，返回空列表', items);
     return [];
@@ -104,7 +104,7 @@ export const formatSongList = (items: unknown): SongResult[] => {
 /**
  * 类型守卫：检查是否为有效的艺术家数据
  */
-const isValidArtistData = (item: unknown): item is RawArtistData => {
+const isValidArtistData = (item: any): item is RawArtistData => {
   return typeGuards.isObject(item) && typeGuards.isString((item as RawArtistData).name);
 };
 
@@ -113,12 +113,12 @@ const isValidArtistData = (item: unknown): item is RawArtistData => {
  * @param artists 原始艺术家数据
  * @returns 格式化的艺术家字符串
  */
-export const formatArtists = (artists: unknown): string => {
+export const formatArtists = (artists: any): string => {
   if (!artists) return '';
 
   const artistArray = typeGuards.isArray(artists) ? artists : [artists];
   return artistArray
-    .map((artist: unknown) => {
+    .map((artist: any) => {
       if (isValidArtistData(artist)) {
         return artist.name;
       }
@@ -134,7 +134,7 @@ export const formatArtists = (artists: unknown): string => {
 /**
  * 类型守卫：检查是否为有效的专辑数据
  */
-const isValidAlbumData = (item: unknown): item is RawAlbumData => {
+const isValidAlbumData = (item: any): item is RawAlbumData => {
   return typeGuards.isObject(item) && typeGuards.isString((item as RawAlbumData).name);
 };
 
@@ -143,7 +143,7 @@ const isValidAlbumData = (item: unknown): item is RawAlbumData => {
  * @param album 原始专辑数据
  * @returns 格式化的专辑名称
  */
-export const formatAlbum = (album: unknown): string => {
+export const formatAlbum = (album: any): string => {
   if (!album) return '';
 
   if (isValidAlbumData(album)) {
@@ -163,7 +163,7 @@ export const formatAlbum = (album: unknown): string => {
  * @param size 图片尺寸
  * @returns 格式化的图片URL
  */
-export const formatPicUrl = (picUrl: unknown, size = '200y200'): string => {
+export const formatPicUrl = (picUrl: any, size = '200y200'): string => {
   if (!picUrl || !typeGuards.isString(picUrl)) return '';
 
   if (picUrl.includes('?')) {
@@ -177,7 +177,7 @@ export const formatPicUrl = (picUrl: unknown, size = '200y200'): string => {
  * @param duration 时长（毫秒或秒）
  * @returns 格式化的时长字符串
  */
-export const formatDuration = (duration: unknown): string => {
+export const formatDuration = (duration: any): string => {
   if (!typeGuards.isNumber(duration) && !typeGuards.isString(duration)) {
     return '00:00';
   }
@@ -195,7 +195,7 @@ export const formatDuration = (duration: unknown): string => {
  * @param song 歌曲数据
  * @returns 是否可播放
  */
-export const isSongPlayable = (song: unknown): boolean => {
+export const isSongPlayable = (song: any): boolean => {
   if (!isValidSongData(song)) {
     return false;
   }
@@ -207,7 +207,7 @@ export const isSongPlayable = (song: unknown): boolean => {
 /**
  * 类型守卫：检查是否为有效的播放列表数据
  */
-const isValidPlaylistData = (item: unknown): item is RawPlaylistData => {
+const isValidPlaylistData = (item: any): item is RawPlaylistData => {
   return (
     typeGuards.isObject(item) &&
     (typeGuards.isNumber((item as RawPlaylistData).id) ||
@@ -220,7 +220,7 @@ const isValidPlaylistData = (item: unknown): item is RawPlaylistData => {
  * @param playlist 原始播放列表数据
  * @returns 格式化的播放列表信息
  */
-export const formatPlaylistInfo = (playlist: unknown) => {
+export const formatPlaylistInfo = (playlist: any) => {
   if (!isValidPlaylistData(playlist)) {
     console.warn('🎵 无效的播放列表数据，使用默认值', playlist);
     return {

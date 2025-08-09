@@ -11,7 +11,7 @@ interface SearchKeywordData {
   action: number;
   alg: string;
   gap: number;
-  source?: unknown;
+  source?: any;
   bizQueryInfo: string;
 }
 
@@ -47,7 +47,7 @@ interface Result {
   video: Video2;
   sim_query: Simquery2;
   djRadio: DjRadio2;
-  rec_type?: unknown;
+  rec_type?: any;
   talk: Talk2;
   rec_query: null[];
   user: User2;
@@ -82,13 +82,13 @@ interface User {
   backgroundUrl: string;
   authority: number;
   mutual: boolean;
-  expertTags?: unknown;
-  experts?: unknown;
+  expertTags?: any;
+  experts?: any;
   djStatus: number;
   vipType: number;
   remarkName?: string | null;
   authenticationTypes: number;
-  avatarDetail?: unknown;
+  avatarDetail?: any;
   anchor: boolean;
   avatarImgIdStr: string;
   backgroundImgIdStr: string;
@@ -617,7 +617,7 @@ interface Privilege {
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: unknown;
+  rscl?: any;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }

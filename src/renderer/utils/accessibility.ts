@@ -376,7 +376,7 @@ export const a11y = {
   manageFocus: (element: HTMLElement, _options?: { preventScroll?: boolean }) =>
     accessibilityManager.manageFocus(element, _options),
 
-  _setupKeyboardNavigation: (container: HTMLElement, _options?: unknown) =>
+  _setupKeyboardNavigation: (container: HTMLElement, _options?: any) =>
     accessibilityManager.setupKeyboardNavigation(container, _options as any),
 
   _announce: (_message: string, priority?: 'polite' | 'assertive') =>

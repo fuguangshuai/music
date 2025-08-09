@@ -51,6 +51,7 @@ const defaultShouldRetry = (error: Error, _attempt: number): boolean => {
 
 /**
  * 统一的重试函数
+ * @deprecated 请使用 unifiedRetry 替代，此函数将在下个版本中移除
  * @param fn 要执行的异步函数
  * @param options 重试选项
  * @returns 执行结果
@@ -59,6 +60,9 @@ export const withRetry = async <T>(
   fn: () => Promise<T>,
   options: RetryOptions = {}
 ): Promise<T> => {
+  // 导入统一的重试函数
+  const { unifiedRetry } = await import('./unified-helpers');
+
   const {
     maxRetries = 3,
     delay = 1000,
@@ -68,50 +72,19 @@ export const withRetry = async <T>(
     onRetry
   } = options;
 
-  let lastError: Error | null = null;
-  let attempts = 0;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    attempts = attempt + 1;
-
-    try {
-      const result = await fn();
-
-      // 如果成功，返回结果
-      return result;
-    } catch (error) {
-      lastError = error as Error;
-
-      // 如果是最后一次尝试，直接抛出错误
-      if (attempt === maxRetries) {
-        break;
-      }
-
-      // 检查是否应该重试
-      if (!shouldRetry(lastError, attempt)) {
-        break;
-      }
-
-      // 调用重试回调
-      if (onRetry) {
-        onRetry(lastError, attempt);
-      }
-
-      // 计算延迟时间
-      const currentDelay =
-        backoff === 'exponential' ? Math.min(delay * Math.pow(2, attempt), maxDelay) : delay;
-
-      // 等待延迟
-      await new Promise((resolve) => setTimeout(resolve, currentDelay));
-    }
-  }
-
-  // 所有重试都失败，抛出最后的错误
-  throw new Error(`操作失败，已重试 ${attempts} 次: ${lastError?.message || '未知错误'}`);
+  return unifiedRetry(fn, {
+    maxRetries,
+    delay,
+    backoff,
+    maxDelay,
+    shouldRetry,
+    onRetry
+  });
 };
 
 /**
  * 带有详细结果的重试函数
+ * @deprecated 请使用 unifiedRetry 替代，此函数将在下个版本中移除
  * @param fn 要执行的异步函数
  * @param options 重试选项
  * @returns 包含详细信息的执行结果
@@ -140,6 +113,7 @@ export const withRetryDetailed = async <T>(
 
 /**
  * 为特定错误类型创建重试函数
+ * @deprecated 请使用 unifiedRetry 替代，此函数将在下个版本中移除
  * @param errorTypes 可重试的错误类型
  * @returns 重试函数
  */
@@ -156,6 +130,7 @@ export const createRetryForErrors = (errorTypes: string[]) => {
 
 /**
  * 网络请求专用重试函数
+ * @deprecated 请使用 unifiedRetry 替代，此函数将在下个版本中移除
  */
 export const withNetworkRetry = createRetryForErrors([
   'NETWORK_ERROR',
@@ -168,6 +143,7 @@ export const withNetworkRetry = createRetryForErrors([
 
 /**
  * 音频操作专用重试函数
+ * @deprecated 请使用 unifiedRetry 替代，此函数将在下个版本中移除
  */
 export const withAudioRetry = createRetryForErrors([
   'AUDIO_ERROR',

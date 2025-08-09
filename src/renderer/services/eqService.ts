@@ -17,9 +17,9 @@ export interface EQSettings {
 export class EQService {
   private context: AudioContext | null = null;
 
-  private tuna: unknown = null;
+  private tuna: any = null;
 
-  private equalizer: unknown = null;
+  private equalizer: any = null;
 
   private source: MediaElementAudioSourceNode | null = null;
 
@@ -70,7 +70,7 @@ export class EQService {
         await this.context.resume();
       }
 
-      const sound = ((this as any).howl as unknown as HowlSound)._sounds[0];
+      const sound = ((this as any).howl as any as HowlSound)._sounds[0];
       if (!sound?._node) throw new Error('无法获取音频节点');
 
       // 清理现有资源

@@ -115,7 +115,7 @@ export const parseFromGDMusic = async (
       })(),
       timeoutPromise
     ]);
-  } catch (error: unknown) {
+  } catch (error: Error | any) {
     if ((error as Error).message === 'GD音乐台解析超时') {
       console.error('GD音乐台解析超时(15秒):', error);
     } else {

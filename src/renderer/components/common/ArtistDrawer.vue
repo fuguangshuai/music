@@ -253,15 +253,19 @@ const loadAlbums = async () => {
 };
 
 // 处理滚动加载
-const handleSongScroll = (e: { target: unknown }) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target as any;
+const handleSongScroll = (e: Event) => {
+  if (!e.target) return;
+  const target = e.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   if (scrollHeight - scrollTop - clientHeight < 50) {
     loadSongs();
   }
 };
 
-const handleAlbumScroll = (e: { target: unknown }) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target as any;
+const handleAlbumScroll = (e: Event) => {
+  if (!e.target) return;
+  const target = e.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   if (scrollHeight - scrollTop - clientHeight < 50) {
     loadAlbums();
   }

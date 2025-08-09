@@ -77,7 +77,7 @@ export const getSongUrl = async (
     // 正常获取URL流程
     const { data } = await getMusicUrl(numericId, _isDownloaded);
     let url = '';
-    let songDetail: unknown = null;
+    let songDetail: any = null;
     try {
       if (data.data[0].freeTrialInfo || !data.data[0].url) {
         const res = await getParsingMusicUrl(numericId, cloneDeep(songData));

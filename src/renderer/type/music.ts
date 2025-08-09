@@ -21,7 +21,7 @@ export interface SongResult {
   copywriter?: string;
   type?: number;
   canDislike?: boolean;
-  program?: unknown;
+  program?: any;
   alg?: string;
   ar: Artist[];
   artists?: Artist[];
@@ -65,8 +65,8 @@ export interface Song {
   dayPlays: number;
   hearTime: number;
   ringtone: string;
-  crbt?: unknown;
-  audition?: unknown;
+  crbt?: any;
+  audition?: any;
   copyFrom: string;
   commentThreadId: string;
   rtUrl?: string | null;
@@ -77,9 +77,9 @@ export interface Song {
   sign?: string | null;
   mark: number;
   originCoverType: number;
-  originSongSimpleData?: unknown;
+  originSongSimpleData?: any;
   single: number;
-  noCopyrightRcmd?: unknown;
+  noCopyrightRcmd?: any;
   rtype: number;
   rurl?: string | null;
   mvid: number;
@@ -114,7 +114,7 @@ interface Privilege {
   preSell: boolean;
   playMaxbr: number;
   downloadMaxbr: number;
-  rscl?: unknown;
+  rscl?: any;
   freeTrialPrivilege: FreeTrialPrivilege;
   chargeInfoList: ChargeInfoList[];
 }
@@ -203,11 +203,11 @@ interface Datum {
   type: string;
   gain: number;
   fee: number;
-  uf?: unknown;
+  uf?: any;
   payed: number;
   flag: number;
   canExtend: boolean;
-  freeTrialInfo?: unknown;
+  freeTrialInfo?: any;
   level: string;
   encodeType: string;
   freeTrialPrivilege: FreeTrialPrivilege;

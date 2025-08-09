@@ -161,8 +161,8 @@ const loadToplist = async () => {
 
     console.log('🎵 最终处理的数据:', data);
 
-    if (typeGuards.isObject(data) && typeGuards.isArray((data as Record<string, unknown>).list)) {
-      const rawList = (data as Record<string, unknown>).list as Record<string, any>[];
+    if (typeGuards.isObject(data) && typeGuards.isArray((data as Record<string, any>).list)) {
+      const rawList = (data as Record<string, any>).list as Record<string, any>[];
       console.log('🎵 榜单列表数据:', rawList);
       topList.value = rawList.map((item) => extractToplistItem(item));
       console.log('🎵 转换后的榜单数据:', topList.value);

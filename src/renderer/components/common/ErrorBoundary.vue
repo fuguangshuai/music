@@ -123,7 +123,7 @@ const maxRetries = 3;
 
 // 工具
 const message = useMessage();
-const isDev = (globalThis as any).process.env.NODE_ENV === 'development';
+const isDev = import.meta.env.DEV;
 
 // 计算属性
 const errorTitle = computed(() => {

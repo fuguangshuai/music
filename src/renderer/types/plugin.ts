@@ -58,7 +58,7 @@ export type PluginEventType =
 export interface PluginEventData {
   type: PluginEventType;
   plugin?: Plugin;
-  data?: unknown; // 简化类型
+  data?: any; // 简化类型
   timestamp: number;
 }
 
@@ -69,11 +69,11 @@ export interface PluginConfigItem {
   key: string;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'select' | 'textarea';
-  defaultValue?: unknown;
-  options?: Array<{ label: string; value: unknown }>;
+  defaultValue?: any;
+  options?: Array<{ label: string; value: any }>;
   description?: string;
   required?: boolean;
-  validation?: (value: unknown) => boolean | string;
+  validation?: (value: any) => boolean | string;
 }
 
 /**
@@ -254,7 +254,7 @@ export interface PluginDevTools {
  * 简化的插件构建器
  */
 export class PluginBuilder {
-  private plugin: unknown = {};
+  private plugin: any = {};
 
   id(id: string): this {
     (this.plugin as any).id = id;
@@ -281,7 +281,7 @@ export class PluginBuilder {
     return this;
   }
 
-  onInstall(handler: (app: unknown) => void | Promise<void>): this {
+  onInstall(handler: (app: any) => void | Promise<void>): this {
     (this.plugin as any).install = handler;
     return this;
   }

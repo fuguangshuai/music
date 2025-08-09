@@ -55,7 +55,7 @@ export interface AppConfig {
   /** 是否启用无损音质 */
   enableFlac?: boolean;
   /** 其他扩展配置 */
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 /**
@@ -89,9 +89,9 @@ export interface StorageValue {
   /** 布尔值 */
   boolean?: boolean;
   /** 对象值 */
-  object?: Record<string, unknown>;
+  object?: Record<string, any>;
   /** 数组值 */
-  array?: unknown[];
+  array?: any[];
 }
 
 /**
@@ -120,7 +120,7 @@ export type StorageKey =
  *
  * 此接口将在下个版本中移除
  */
-export interface BaseResponse<T = unknown> {
+export interface BaseResponse<T = any> {
   /** 响应码 */
   code: number;
   /** 响应消息 */
@@ -140,7 +140,7 @@ export type UnifiedApiResponse<T> = StandardApiResponse<T>;
 /**
  * 分页响应结构
  */
-export interface PaginatedResponse<T = unknown> extends BaseResponse<T[]> {
+export interface PaginatedResponse<T = any> extends BaseResponse<T[]> {
   /** 总数 */
   total?: number;
   /** 当前页 */
@@ -184,7 +184,7 @@ export interface EventData {
   /** 事件源 */
   source?: string;
   /** 事件数据 */
-  payload?: Record<string, unknown>;
+  payload?: Record<string, any>;
   /** 时间戳 */
   timestamp?: number;
 }
@@ -400,29 +400,29 @@ export interface Playlist {
 /**
  * 类型守卫函数
  */
-export const isAppConfig = (value: unknown): value is AppConfig => {
+export const isAppConfig = (value: any): value is AppConfig => {
   return typeof value === 'object' && value !== null;
 };
 
-export const isMessageOptions = (value: unknown): value is MessageOptions => {
+export const isMessageOptions = (value: any): value is MessageOptions => {
   return typeof value === 'object' && value !== null;
 };
 
-export const isErrorDetails = (value: unknown): value is ErrorDetails => {
+export const isErrorDetails = (value: any): value is ErrorDetails => {
   return typeof value === 'object' && value !== null;
 };
 
 /**
  * 类型断言辅助函数
  */
-export const assertAppConfig = (value: unknown): AppConfig => {
+export const assertAppConfig = (value: any): AppConfig => {
   if (!isAppConfig(value)) {
     throw new Error('Invalid, AppConfig');
   }
   return value;
 };
 
-export const assertMessageOptions = (value: unknown): MessageOptions => {
+export const assertMessageOptions = (value: any): MessageOptions => {
   if (!isMessageOptions(value)) {
     throw new Error('Invalid, MessageOptions');
   }

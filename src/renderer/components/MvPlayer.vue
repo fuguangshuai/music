@@ -384,28 +384,100 @@ const isFullscreen = ref(false);
 
 // 检查是否支持全屏API
 const checkFullscreenAPI = () => {
-  const doc = document as any;
+  const doc = document;
   return {
     requestFullscreen:
       videoContainerRef.value?.requestFullscreen ||
-      (videoContainerRef.value as any)?.webkitRequestFullscreen ||
-      (videoContainerRef.value as any)?.mozRequestFullScreen ||
-      (videoContainerRef.value as any)?.msRequestFullscreen,
+      (
+        videoContainerRef.value as HTMLElement & {
+          webkitRequestFullscreen?: () => void;
+          mozRequestFullScreen?: () => void;
+          msRequestFullscreen?: () => void;
+        }
+      )?.webkitRequestFullscreen ||
+      (
+        videoContainerRef.value as HTMLElement & {
+          webkitRequestFullscreen?: () => void;
+          mozRequestFullScreen?: () => void;
+          msRequestFullscreen?: () => void;
+        }
+      )?.mozRequestFullScreen ||
+      (
+        videoContainerRef.value as HTMLElement & {
+          webkitRequestFullscreen?: () => void;
+          mozRequestFullScreen?: () => void;
+          msRequestFullscreen?: () => void;
+        }
+      )?.msRequestFullscreen,
     exitFullscreen:
       doc.exitFullscreen ||
-      doc.webkitExitFullscreen ||
-      doc.mozCancelFullScreen ||
-      doc.msExitFullscreen,
+      (
+        doc as Document & {
+          webkitExitFullscreen?: () => void;
+          mozCancelFullScreen?: () => void;
+          msExitFullscreen?: () => void;
+        }
+      ).webkitExitFullscreen ||
+      (
+        doc as Document & {
+          webkitExitFullscreen?: () => void;
+          mozCancelFullScreen?: () => void;
+          msExitFullscreen?: () => void;
+        }
+      ).mozCancelFullScreen ||
+      (
+        doc as Document & {
+          webkitExitFullscreen?: () => void;
+          mozCancelFullScreen?: () => void;
+          msExitFullscreen?: () => void;
+        }
+      ).msExitFullscreen,
     fullscreenElement:
       doc.fullscreenElement ||
-      doc.webkitFullscreenElement ||
-      doc.mozFullScreenElement ||
-      doc.msFullscreenElement,
+      (
+        doc as Document & {
+          webkitFullscreenElement?: Element | null;
+          mozFullScreenElement?: Element | null;
+          msFullscreenElement?: Element | null;
+        }
+      ).webkitFullscreenElement ||
+      (
+        doc as Document & {
+          webkitFullscreenElement?: Element | null;
+          mozFullScreenElement?: Element | null;
+          msFullscreenElement?: Element | null;
+        }
+      ).mozFullScreenElement ||
+      (
+        doc as Document & {
+          webkitFullscreenElement?: Element | null;
+          mozFullScreenElement?: Element | null;
+          msFullscreenElement?: Element | null;
+        }
+      ).msFullscreenElement,
     fullscreenEnabled:
       doc.fullscreenEnabled ||
-      doc.webkitFullscreenEnabled ||
-      doc.mozFullScreenEnabled ||
-      doc.msFullscreenEnabled
+      (
+        doc as Document & {
+          webkitFullscreenEnabled?: boolean;
+          mozFullScreenEnabled?: boolean;
+          msFullscreenEnabled?: boolean;
+        }
+      ).webkitFullscreenEnabled ||
+      (
+        doc as Document & {
+          webkitFullscreenEnabled?: boolean;
+          mozFullScreenEnabled?: boolean;
+          msFullscreenEnabled?: boolean;
+        }
+      ).mozFullScreenEnabled ||
+      (
+        doc as Document & {
+          webkitFullscreenEnabled?: boolean;
+          mozFullScreenEnabled?: boolean;
+          msFullscreenEnabled?: boolean;
+        }
+      ).msFullscreenEnabled
   };
 };
 

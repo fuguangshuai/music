@@ -82,12 +82,12 @@ interface PlaylistItem {
 }
 
 // 类型安全的播放列表项提取器
-const extractPlaylistItem = (item: unknown): PlaylistItem => {
+const extractPlaylistItem = (item: any): PlaylistItem => {
   if (!typeGuards.isObject(item)) {
     return {};
   }
 
-  const obj = item as Record<string, unknown>;
+  const obj = item as Record<string, any>;
   return {
     id: typeGuards.isNumber(obj.id) ? obj.id : undefined,
     name: typeGuards.isString(obj.name) ? obj.name : undefined,
@@ -124,7 +124,7 @@ const listLoading = ref(true);
 
 const router = useRouter();
 
-const openPlaylist = (item: unknown) => {
+const openPlaylist = (item: any) => {
   const playlistItem = extractPlaylistItem(item);
 
   if (!playlistItem.id) {
@@ -143,10 +143,10 @@ const openPlaylist = (item: unknown) => {
       id: playlistItem.id!,
       type: 'playlist',
       name: playlistItem.name || '',
-      songList: (res.data.playlist.tracks || []).map((track: unknown) => {
-        const trackObj = track as Record<string, unknown>;
-        const arArray = trackObj.ar as Array<Record<string, unknown>> | undefined;
-        const alObj = trackObj.al as Record<string, unknown> | undefined;
+      songList: (res.data.playlist.tracks || []).map((track: any) => {
+        const trackObj = track as Record<string, any>;
+        const arArray = trackObj.ar as Array<Record<string, any>> | undefined;
+        const alObj = trackObj.al as Record<string, any> | undefined;
 
         return {
           ...trackObj,

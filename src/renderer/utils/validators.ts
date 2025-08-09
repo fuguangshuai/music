@@ -102,7 +102,7 @@ export const isValidColor = (color: string): boolean => {
  * @returns 是否为有效数字
  */
 export const isValidNumber = (
-  value: unknown,
+  value: any,
   _options: {
     min?: number;
     max?: number;

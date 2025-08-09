@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import { musicDB } from '@/hooks/MusicHook';
 import { isNetworkError } from '@/services/networkMonitor';
 import { useSettingsStore, useUserStore } from '@/store';
+import type { MusicApiResponse } from '@/types/api-responses';
 import type { ILyric } from '@/types/lyric';
 import type { SongResult } from '@/types/music';
 import { isElectron } from '@/utils';
@@ -189,24 +190,24 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
         apiIndex === 0
           ? await requestMusic(apiIndex).get<unknown>(`?songs=${encodeURIComponent(songId)}`)
           : await requestMusic(apiIndex).get<unknown>('/music', { params: { id } });
-      if (apiIndex === 0 && (result.data as any).解锁成功 > 0) {
+      if (apiIndex === 0 && (result.data as MusicApiResponse).解锁成功 > 0) {
         result.data = {
           params: {},
           data: {
-            size: (result.data as any).成功列表.文件大小 || 0,
-            br: (result.data as any).成功列表.音质 || 320000,
-            url: (result.data as any).成功列表.播放链接 || '',
+            size: (result.data as MusicApiResponse).成功列表.文件大小 || 0,
+            br: (result.data as MusicApiResponse).成功列表.音质 || 320000,
+            url: (result.data as MusicApiResponse).成功列表.播放链接 || '',
             md5: '',
             source:
-              (result.data as any).成功列表.音源ID ||
-              (result.data as any).成功列表.音源名称 ||
+              (result.data as MusicApiResponse).成功列表.音源ID ||
+              (result.data as MusicApiResponse).成功列表.音源名称 ||
               apiName
           }
         };
       }
       if (result?.data) {
         console.log(
-          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${(data as any).name || '未知'}, 音源: ${(result as any).data.data?.source || apiName}`
+          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${(data as any).name || '未知'}, 音源: ${(result as any).data?.data?.source || apiName}`
         );
         return result;
       } else {
@@ -216,7 +217,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
       // 根据错误类型提供不同的处理
       if (isNetworkError(error)) {
         console.warn(`🌐 ${apiName}网络连接失败:`, error);
-      } else if ((error as any)?.response?.status === 410) {
+      } else if ((error as MusicApiResponse)?.response?.status === 410) {
         console.warn(`⏰ ${apiName}资源已过期:`, error);
       } else {
         console.error(`❌ ${apiName}音乐解析失败:`, error);

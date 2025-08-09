@@ -161,10 +161,8 @@ const fetchUserPlaylists = async () => {
     }
 
     const res = await getUserPlaylist(user.userId, 999);
-    if ((res as any).data?.playlist) {
-      playlists.value = (res as any).data.playlist.filter(
-        (item: any) => item.userId === user.userId
-      );
+    if (res.data?.playlist) {
+      playlists.value = res.data.playlist.filter((item: any) => item.userId === user.userId);
     }
   } catch (error) {
     console.error('获取歌单失败:', error);
@@ -173,12 +171,12 @@ const fetchUserPlaylists = async () => {
 };
 
 // 添加到歌单
-const handleAddToPlaylist = async (playlist: unknown) => {
+const handleAddToPlaylist = async (playlist: { id: number; name: string }) => {
   if (!props.songId) return;
   try {
     const res = await updatePlaylistTracks({
       op: 'add',
-      pid: (playlist as any).id,
+      pid: playlist.id,
       tracks: props.songId.toString()
     });
     console.log('res.data', res.data);
@@ -189,9 +187,11 @@ const handleAddToPlaylist = async (playlist: unknown) => {
     } else {
       throw new Error(res.data?.msg || t('comp.playlistDrawer.addFailed'));
     }
-  } catch (error: unknown) {
+  } catch (error: Error | any) {
     console.error('添加到歌单失败:', error);
-    message.error((error as any).message || t('comp.playlistDrawer.addFailed'));
+    message.error(
+      error instanceof Error ? error.message : String(error) || t('comp.playlistDrawer.addFailed')
+    );
   }
 };
 

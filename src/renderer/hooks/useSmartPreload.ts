@@ -12,7 +12,7 @@ import {
 } from '@/services/audioPreloadService';
 import type { SongResult } from '@/types/music';
 
-export function useSmartPreload(): unknown {
+export function useSmartPreload(): any {
   const isEnabled = ref(true);
   const networkCondition = ref<NetworkCondition | null>(null);
   const userBehavior = ref<UserBehaviorPattern | null>(null);
@@ -228,7 +228,7 @@ export function useSmartPreload(): unknown {
 /**
  * 智能预加载监控组合式函数
  */
-export function useSmartPreloadMonitor(): unknown {
+export function useSmartPreloadMonitor(): any {
   const { getSmartStatus } = useSmartPreload() as any;
   const monitorData = ref<unknown>(null);
   const monitorInterval = ref<number | null>(null);

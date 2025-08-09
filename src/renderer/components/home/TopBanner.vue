@@ -240,7 +240,7 @@ const loadDayRecommendData = async () => {
     dayRecommendData.value = {
       ...dayRecommendSource,
       dailySongs: dayRecommendSource.dailySongs.filter(
-        (song: unknown) => !playerStore.dislikeList.includes((song as any).id)
+        (song: any) => !playerStore.dislikeList.includes(song.id)
       )
     };
   } catch (error) {
@@ -268,7 +268,7 @@ const loadNonUserData = async () => {
 const loadUserData = async () => {
   try {
     if (userStore.user) {
-      const { data: playlistData } = (await getUserPlaylist(userStore.user?.userId)) as any;
+      const { data: playlistData } = await getUserPlaylist(userStore.user?.userId);
       // 确保最多只显示4个歌单，并按播放次数排序
       userPlaylist.value = (playlistData.playlist as Playlist[])
         .sort((a, b) => b.playCount - a.playCount)
@@ -297,13 +297,13 @@ const showDayRecommend = () => {
   navigateToMusicList(router, {
     type: 'dailyRecommend',
     name: t('comp.recommendSinger.songlist'),
-    songList: getDisplayDaySongs.value as any,
+    songList: getDisplayDaySongs.value,
     canRemove: false
   });
 };
 
-const openPlaylist = (item: unknown) => {
-  playlistItem.value = item as any;
+const openPlaylist = (item: any) => {
+  playlistItem.value = item;
   playlistLoading.value = true;
 
   getListDetail((item as any).id).then((res) => {

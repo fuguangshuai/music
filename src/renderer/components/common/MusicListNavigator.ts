@@ -19,9 +19,9 @@ export function navigateToMusicList(
       artist?: string;
       album?: string;
       duration?: number;
-      [key: string]: unknown;
+      [key: string]: any;
     }>;
-    listInfo?: unknown;
+    listInfo?: any;
     canRemove?: boolean;
   }
 ) {

@@ -63,7 +63,7 @@
               </div>
               <div class="stat-item">
                 <span class="label">命中率:</span>
-                <span class="value">{{ (stat as any).hitRate.toFixed(1) }}%</span>
+                <span class="value">{{ (stat as any).hitRate?.toFixed(1) }}%</span>
               </div>
               <div class="stat-item">
                 <span class="label">大小:</span>
@@ -138,7 +138,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { memoryOptimizer, type MemoryStats } from '@/utils/memoryOptimizer';
 
 // 开发环境检测
-const isDev = (globalThis as any).process.env.NODE_ENV === 'development';
+const isDev = import.meta.env.DEV;
 
 // 面板状态
 const collapsed = ref(true);

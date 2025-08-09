@@ -1,28 +1,18 @@
 /**
  * 统一的格式化工具函数
  * 提供一致的数据格式化功能，消除项目中的重复实现
+ *
+ * @deprecated 此文件已被 unified-helpers.ts 替代，请使用统一的格式化函数
  */
+
+import { unifiedFormatTime } from './unified-helpers';
 
 /**
  * 时间格式化函数
- * 将秒数转换为时间字符串格式
- * @param time 时间（秒）
- * @param format 格式类型
- * @returns 格式化后的时间字符串
+ * @deprecated 请使用 unifiedFormatTime 替代
  */
 export const formatTime = (time: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss'): string => {
-  if (!time || time < 0) {
-    return format === 'hh:mm:ss' ? '00:00:00' : '00:00';
-  }
-
-  const hours = Math.floor(time / 3600);
-  const minutes = Math.floor((time % 3600) / 60);
-  const seconds = Math.floor(time % 60);
-
-  if (format === 'hh:mm:ss' && hours > 0) {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  return unifiedFormatTime(time, { format });
 };
 
 /**
@@ -149,10 +139,10 @@ export const formatSongName = (
 
   // 准备替换变量
   const artistName = Array.isArray(song.ar)
-    ? song.ar.map((a: Record<string, unknown>) => a.name).join('/') || '未知艺术家'
+    ? song.ar.map((a: Record<string, any>) => a.name).join('/') || '未知艺术家'
     : '未知艺术家';
   const songName = (song.name as string) || (song.filename as string) || '未知歌曲';
-  const albumName = ((song.al as Record<string, unknown>)?.name as string) || '未知专辑';
+  const albumName = ((song.al as Record<string, any>)?.name as string) || '未知专辑';
 
   // 应用自定义格式
   return nameFormat

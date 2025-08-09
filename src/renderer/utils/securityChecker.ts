@@ -80,7 +80,7 @@ class SecurityChecker {
       enableStorageSecurityCheck: true,
       enableTransportSecurityCheck: true,
       autoMitigation: true,
-      reportingEnabled: (globalThis as any).process.env.NODE_ENV === 'development',
+      reportingEnabled: import.meta.env.DEV,
       ...config
     };
 
@@ -314,7 +314,7 @@ class SecurityChecker {
 
     // 检查混合内容
     const insecureResources = document.querySelectorAll(
-      'img[src^="http: "] > script[src^="http:"], link[href^="http:"]'
+      'img[src^="http:"], script[src^="http:"], link[href^="http:"]'
     );
     if (insecureResources.length > 0) {
       threats.push({
@@ -406,17 +406,17 @@ class SecurityChecker {
     const threats: SecurityThreat[] = [];
 
     // 检查弱密码策略（如果有密码输入框）
-    const passwordInputs = document.querySelectorAll('input[type="_password"]');
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
     passwordInputs.forEach((input, index) => {
       const passwordInput = input as HTMLInputElement;
       if (passwordInput.value && passwordInput.value.length < 8) {
         threats.push({
-          id: `weak-_password-${index}`,
+          id: `weak-password-${index}`,
           type: SecurityThreatType.WEAK_AUTHENTICATION,
           level: SecurityThreatLevel.MEDIUM,
           title: '弱密码',
           description: '检测到可能的弱密码',
-          location: `_password input ${index}`,
+          location: `password input ${index}`,
           mitigation: '实施强密码策略，要求至少8位字符',
           timestamp: Date.now(),
           resolved: false

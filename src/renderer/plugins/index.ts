@@ -12,8 +12,8 @@ import { registerExamplePlugins, testExamplePlugins } from '../../../plugins/exa
  */
 const PLUGIN_CONFIG = {
   autoLoad: true,
-  enableDevMode: (globalThis as any).process.env.NODE_ENV === 'development',
-  enableTesting: (globalThis as any).process.env.NODE_ENV === 'development'
+  enableDevMode: import.meta.env.DEV,
+  enableTesting: import.meta.env.DEV
 };
 
 /**
@@ -69,7 +69,7 @@ export async function destroyPluginSystem(): Promise<void> {
 /**
  * 获取插件管理器实例
  */
-export function getPluginManager(): unknown {
+export function getPluginManager(): any {
   return pluginManager;
 }
 
@@ -269,15 +269,15 @@ export function setupPluginSystemListeners(): void {
   // 监听插件系统事件
   const pluginApp = pluginManager; // pluginManager本身就是PluginApp
   if (pluginApp) {
-    pluginApp.events.on('plugin: error', (error: unknown) => {
+    pluginApp.events.on('plugin: error', (error: any) => {
       console.error('插件系统错误:', error);
     });
 
-    pluginApp.events.on('plugin: activated', (plugin: unknown) => {
+    pluginApp.events.on('plugin: activated', (plugin: any) => {
       console.log(`插件 ${(plugin as any).name}, 已激活`);
     });
 
-    pluginApp.events.on('plugin: deactivated', (plugin: unknown) => {
+    pluginApp.events.on('plugin: deactivated', (plugin: any) => {
       console.log(`插件 ${(plugin as any).name}, 已停用`);
     });
   }
@@ -326,7 +326,7 @@ export const devTools = {
   /**
    * 模拟插件事件
    */
-  emitEvent(event: string, data?: unknown) {
+  emitEvent(event: string, data?: any) {
     const pluginApp = pluginManager; // pluginManager本身就是PluginApp
     if (pluginApp) {
       pluginApp.events.emit(event, data);

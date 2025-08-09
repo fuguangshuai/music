@@ -4,6 +4,11 @@
  * 集成类型安全验证机制，支持运行时类型检查
  */
 
+/**
+ * @deprecated 使用 StandardApiResponse 替代
+ * 此接口定义已移除，请使用 enhanced-api-types.ts 中的 StandardApiResponse
+ */
+import type { ApiResponseData, ValidationInput } from '../types/consolidated-types';
 import type { StandardApiResponse } from '../types/enhanced-api-types';
 import {
   createCachedValidator,
@@ -13,13 +18,8 @@ import {
   isStandardApiResponse
 } from './typeSafeHelpers';
 
-/**
- * @deprecated 使用 StandardApiResponse 替代
- * 此接口定义已移除，请使用 enhanced-api-types.ts 中的 StandardApiResponse
- */
-
 // 类型守卫函数类型定义
-type TypeGuard<T> = (value: unknown) => value is T;
+type TypeGuard<T> = (value: ValidationInput) => value is T;
 
 /**
  * 处理API响应，提取data字段
@@ -27,7 +27,7 @@ type TypeGuard<T> = (value: unknown) => value is T;
  * @param validator 可选的类型验证器
  * @returns 提取的data数据
  */
-export const handleApiResponse = <T>(response: unknown, validator?: TypeGuard<T>): T => {
+export const handleApiResponse = <T>(response: ApiResponseData, validator?: TypeGuard<T>): T => {
   // 验证响应格式
   if (!isStandardApiResponse(response)) {
     throw new Error('API响应格式不正确');
@@ -81,7 +81,7 @@ export const safeApiCall = async <T>(
  * @param responses API响应数组
  * @returns 处理后的数据数组
  */
-export const handleBatchApiResponse = <T>(responses: unknown[]): T[] => {
+export const handleBatchApiResponse = <T>(responses: ApiResponseData[]): T[] => {
   return responses.map((response) => handleApiResponse<T>(response));
 };
 
@@ -90,7 +90,7 @@ export const handleBatchApiResponse = <T>(responses: unknown[]): T[] => {
  * @param response API响应对象
  * @returns 是否成功
  */
-export const isApiSuccess = (response: unknown): boolean => {
+export const isApiSuccess = (response: ApiResponseData): boolean => {
   const apiResponse = response as StandardApiResponse<unknown>;
   return apiResponse.code === 200;
 };
@@ -100,7 +100,7 @@ export const isApiSuccess = (response: unknown): boolean => {
  * @param response API响应对象
  * @returns 错误信息
  */
-export const getApiErrorMessage = (response: unknown): string => {
+export const getApiErrorMessage = (response: ApiResponseData): string => {
   const apiResponse = response as StandardApiResponse<unknown>;
   return apiResponse.message || '未知错误';
 };

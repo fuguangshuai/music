@@ -7,7 +7,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 
 import { performanceMonitor, type PerformanceReport } from '@/services/performanceMonitor';
 
-export function usePerformanceMonitor(): unknown {
+export function usePerformanceMonitor(): any {
   const isActive = ref(false);
   const currentReport = ref<PerformanceReport | null>(null);
   const reportInterval = ref<number | null>(null);
@@ -115,7 +115,7 @@ export function usePerformanceMonitor(): unknown {
 /**
  * 路由性能监控组合式函数
  */
-export function useRoutePerformanceMonitor(): unknown {
+export function useRoutePerformanceMonitor(): any {
   const { trackRouteChange } = usePerformanceMonitor() as any;
 
   /**
@@ -138,7 +138,7 @@ export function useRoutePerformanceMonitor(): unknown {
 /**
  * 音频性能监控组合式函数
  */
-export function useAudioPerformanceMonitor(): unknown {
+export function useAudioPerformanceMonitor(): any {
   const { trackAudioLoad } = usePerformanceMonitor() as any;
 
   /**

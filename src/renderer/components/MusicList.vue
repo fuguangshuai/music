@@ -55,9 +55,9 @@
             <n-avatar
               round
               :size="24"
-              :src="getImgUrl((listInfo.creator as any)?.avatarUrl, '50y50')"
+              :src="getImgUrl((listInfo.creator as MusicApiResponse)?.avatarUrl, '50y50')"
             />
-            <span class="creator-name">{{ (listInfo.creator as any)?.nickname }}</span>
+            <span class="creator-name">{{ (listInfo.creator as MusicApiResponse)?.nickname }}</span>
           </div>
           <div v-if="total" class="music-total">
             {{ t('player.songNum', { num: total }) }}
@@ -116,6 +116,7 @@ import PinyinMatch from 'pinyin-match';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import type { MusicApiResponse } from '@/types/api-responses';
 import { formatSongData } from '@/utils/musicDataFormatter';
 
 const emit = defineEmits<{
@@ -142,7 +143,7 @@ const props = withDefaults(
     loading?: boolean;
     listInfo?: {
       trackIds: { id: number }[];
-      [_key: string]: unknown;
+      [_key: string]: any;
     };
     cover?: boolean;
     canRemove?: boolean;
@@ -184,11 +185,11 @@ const getCoverImgUrl = computed(() => {
   if (song?.picUrl) {
     return song.picUrl;
   }
-  if ((song as any)?.al?.picUrl) {
-    return (song as any).al.picUrl;
+  if ((song as MusicApiResponse)?.al?.picUrl) {
+    return (song as MusicApiResponse).al.picUrl;
   }
-  if ((song as any)?.album?.picUrl) {
-    return (song as any).album.picUrl;
+  if ((song as MusicApiResponse)?.album?.picUrl) {
+    return (song as MusicApiResponse).album.picUrl;
   }
   return '';
 });
@@ -208,15 +209,18 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: unknown) => {
-      return (artist as any).name?.toLowerCase().includes(keyword);
+    const artistsMatch = artists.some((artist: any) => {
+      return (artist as MusicApiResponse).name?.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: unknown) => {
-      return (artist as any).name && PinyinMatch.match((artist as any).name, keyword);
+    const artistsPinyinMatch = artists.some((artist: any) => {
+      return (
+        (artist as MusicApiResponse).name &&
+        PinyinMatch.match((artist as MusicApiResponse).name, keyword)
+      );
     });
 
     return (
@@ -231,7 +235,7 @@ const filteredSongs = computed(() => {
 });
 
 // 格式化歌曲数据
-const formatSong = (item: unknown) => {
+const formatSong = (item: any) => {
   if (!item) {
     return null;
   }
@@ -262,13 +266,13 @@ const loadSongs = async (ids: number[], appendToList = true, updateComplete = fa
       let newSongs = songs;
       if (!updateComplete) {
         // 在普通加载模式下继续过滤已加载的歌曲，避免重复
-        newSongs = songs.filter((song: unknown) => !loadedIds.value.has((song as any).id));
+        newSongs = songs.filter((song: any) => !loadedIds.value.has(song.id));
         console.log(`过滤已加载ID后剩余歌曲数量: ${newSongs.length}`);
       }
 
       // 更新已加载ID集合
-      songs.forEach((song: unknown) => {
-        loadedIds.value.add((song as any).id);
+      songs.forEach((song: any) => {
+        loadedIds.value.add((song as MusicApiResponse).id);
       });
 
       // 追加到显示列表 - 仅当appendToList=true时添加到displayedSongs
@@ -491,9 +495,9 @@ const loadMoreSongs = async () => {
       }
     } else if (start < props.songList.length) {
       const newSongs = props.songList.slice(start, end);
-      newSongs.forEach((song: unknown) => {
-        if (!loadedIds.value.has((song as any).id as number)) {
-          loadedIds.value.add((song as any).id as number);
+      newSongs.forEach((song: any) => {
+        if (!loadedIds.value.has((song as MusicApiResponse).id as number)) {
+          loadedIds.value.add((song as MusicApiResponse).id as number);
           displayedSongs.value.push(song as any);
         }
       });
@@ -509,10 +513,11 @@ const loadMoreSongs = async () => {
 };
 
 // 处理虚拟列表滚动事件
-const handleVirtualScroll = (e: unknown) => {
-  if (!e || !(e as any).target) return;
+const handleVirtualScroll = (e: Event) => {
+  if (!e || !e.target) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
+  const target = e.target as HTMLElement;
+  const { scrollTop, scrollHeight, clientHeight } = target;
   const threshold = 200;
 
   if (
@@ -538,10 +543,10 @@ const resetListState = () => {
 };
 
 // 初始化歌曲列表
-const initSongList = (songs: unknown[]) => {
+const initSongList = (songs: any[]) => {
   if (songs.length > 0) {
     displayedSongs.value = [...songs] as SongResult[];
-    songs.forEach((song) => loadedIds.value.add((song as any).id));
+    songs.forEach((song) => loadedIds.value.add((song as MusicApiResponse).id));
     page.value = Math.ceil(songs.length / pageSize);
   }
 

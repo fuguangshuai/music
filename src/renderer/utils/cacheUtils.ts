@@ -105,7 +105,7 @@ export class CacheUtils {
   static async cacheApiResponse(
     endpoint: string,
     params: Record<string, unknown>,
-    response: unknown,
+    response: any,
     ttl?: number
   ): Promise<boolean> {
     const _key = this.generateApiKey(endpoint, params);
