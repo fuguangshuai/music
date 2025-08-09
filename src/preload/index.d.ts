@@ -4,7 +4,7 @@ interface API {
   minimize: () => void;
   maximize: () => void;
   close: () => void;
-  dragStart: (data: unknown) => void;
+  dragStart: (data: any) => void;
   miniTray: () => void;
   miniWindow: () => void;
   restore: () => void;
@@ -12,23 +12,23 @@ interface API {
   resizeWindow: (width: number, height: number) => void;
   resizeMiniWindow: (showPlaylist: boolean) => void;
   openLyric: () => void;
-  sendLyric: (data: unknown) => void;
-  sendSong: (data: unknown) => void;
-  unblockMusic: (id: number, data: unknown, enabledSources?: string[]) => Promise<any>;
+  sendLyric: (data: any) => void;
+  sendSong: (data: any) => void;
+  unblockMusic: (id: number, data: any, enabledSources?: string[]) => Promise<any>;
   onLyricWindowClosed: (callback: () => void) => void;
   startDownload: (url: string) => void;
   onDownloadProgress: (callback: (progress: number, status: string) => void) => void;
   onDownloadComplete: (callback: (success: boolean, filePath: string) => void) => void;
   onLanguageChanged: (callback: (locale: string) => void) => void;
   removeDownloadListeners: () => void;
-  invoke: (channel: string, ...args: unknown[]) => Promise<any>;
+  invoke: (channel: string, ...args: any[]) => Promise<any>;
 }
 
 // 🔒 安全IPC渲染进程通信接口 - 仅允许白名单通道
 interface SecureIpcRenderer {
-  send: (channel: string, ...args: unknown[]) => void;
-  invoke: (channel: string, ...args: unknown[]) => Promise<any>;
-  on: (channel: string, listener: (...args: unknown[]) => void) => () => void;
+  send: (channel: string, ...args: any[]) => void;
+  invoke: (channel: string, ...args: any[]) => Promise<any>;
+  on: (channel: string, listener: (...args: any[]) => void) => () => void;
   cleanup: () => void;
 }
 

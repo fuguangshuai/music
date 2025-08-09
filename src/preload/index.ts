@@ -6,17 +6,17 @@ const api = {
   minimize: () => ipcRenderer.send('minimize-window'),
   maximize: () => ipcRenderer.send('maximize-window'),
   close: () => ipcRenderer.send('close-window'),
-  dragStart: (data: unknown) => ipcRenderer.send('drag-start', data),
+  dragStart: (data) => ipcRenderer.send('drag-start', data),
   miniTray: () => ipcRenderer.send('mini-tray'),
   miniWindow: () => ipcRenderer.send('mini-window'),
   restore: () => ipcRenderer.send('restore-window'),
   restart: () => ipcRenderer.send('restart'),
-  resizeWindow: (width: number, height: number) => ipcRenderer.send('resize-window', width, height),
-  resizeMiniWindow: (showPlaylist: boolean) => ipcRenderer.send('resize-mini-window', showPlaylist),
+  resizeWindow: (width, height) => ipcRenderer.send('resize-window', width, height),
+  resizeMiniWindow: (showPlaylist) => ipcRenderer.send('resize-mini-window', showPlaylist),
   openLyric: () => ipcRenderer.send('open-lyric'),
-  sendLyric: (data: unknown) => ipcRenderer.send('send-lyric', data),
-  sendSong: (data: unknown) => ipcRenderer.send('update-current-song', data),
-  unblockMusic: (id: unknown, data: unknown, enabledSources: unknown) =>
+  sendLyric: (data) => ipcRenderer.send('send-lyric', data),
+  sendSong: (data) => ipcRenderer.send('update-current-song', data),
+  unblockMusic: (id, data, enabledSources) =>
     ipcRenderer.invoke('unblock-music', id, data, enabledSources),
   // 歌词窗口关闭事件
   onLyricWindowClosed: (callback: () => void) => {
@@ -41,7 +41,7 @@ const api = {
     ipcRenderer.removeAllListeners('download-complete');
   },
   // 歌词缓存相关
-  invoke: (channel: string, ...args: unknown[]) => {
+  invoke: (channel: string, ...args: any[]) => {
     const validChannels = [
       'get-lyrics',
       'clear-lyrics-cache',
@@ -60,7 +60,7 @@ const api = {
 // 跟踪活跃的监听器
 const activeListeners = new Map<
   string,
-  Set<(event: Electron.IpcRendererEvent, ...args: unknown[]) => void>
+  Set<(event: Electron.IpcRendererEvent, ...args: any[]) => void>
 >();
 
 // 🔒 安全重构: 创建专用的安全API，替代通用IPC暴露
@@ -110,7 +110,7 @@ const isChannelAllowed = (channel: string): boolean => {
 // 创建安全的IPC接口
 const secureIPC = {
   // 🔒 安全的发送方法 - 仅允许白名单通道
-  send: (channel: string, ...args: unknown[]) => {
+  send: (channel: string, ...args: any[]) => {
     if (!isChannelAllowed(channel)) {
       console.error(`🚫 IPC通道未授权: ${channel}`);
       throw new Error(`未授权的IPC通道: ${channel}`);
@@ -119,7 +119,7 @@ const secureIPC = {
   },
 
   // 🔒 安全的调用方法 - 仅允许白名单通道
-  invoke: (channel: string, ...args: unknown[]) => {
+  invoke: (channel: string, ...args: any[]) => {
     if (!isChannelAllowed(channel)) {
       console.error(`🚫 IPC通道未授权: ${channel}`);
       return Promise.reject(new Error(`未授权的IPC通道: ${channel}`));
@@ -128,7 +128,7 @@ const secureIPC = {
   },
 
   // 🔒 安全的监听方法 - 仅允许特定通道
-  on: (channel: string, listener: (...args: unknown[]) => void) => {
+  on: (channel: string, listener: (...args: any[]) => void) => {
     // 允许监听的通道（主要是从主进程发送到渲染进程的消息）
     const allowedListenChannels = [
       'language-changed',
@@ -144,7 +144,7 @@ const secureIPC = {
       throw new Error(`未授权的IPC监听通道: ${channel}`);
     }
 
-    const wrappedListener = (_: unknown, ...args: unknown[]) => listener(...args);
+    const wrappedListener = (_: any, ...args: any[]) => listener(...args);
     ipcRenderer.on(channel, wrappedListener);
 
     // 跟踪活跃的监听器
