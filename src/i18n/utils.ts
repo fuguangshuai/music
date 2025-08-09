@@ -2,8 +2,8 @@
 const allLangModules = import.meta.glob('./lang/**/*.ts', { eager: true });
 
 // 构建语言消息对象
-export const buildLanguageMessages = (): Record<string, Record<string, unknown>> => {
-  const messages: Record<string, Record<string, unknown>> = {};
+export const buildLanguageMessages = () => {
+  const messages: Record<string, Record<string, any>> = {};
 
   Object.entries(allLangModules).forEach(([path, module]) => {
     // 解析路径，例如 './lang/zh-CN/common.ts' -> { lang: 'zh-CN', module: 'common' }
@@ -16,7 +16,7 @@ export const buildLanguageMessages = (): Record<string, Record<string, unknown>>
         if (!messages[langCode]) {
           messages[langCode] = {};
         }
-        messages[langCode][moduleName] = (module as { default: unknown }).default;
+        messages[langCode][moduleName] = (module as any).default;
       }
     }
   });

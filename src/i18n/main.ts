@@ -16,21 +16,15 @@ const mainI18n = {
     set locale(value: Language) {
       this.currentLocale = value;
     },
-    t(_key: string) {
-      const keys = _key.split('.');
-      let current: Record<string, unknown> = messages[this.currentLocale];
+    t(key: string) {
+      const keys = key.split('.');
+      let current: any = messages[this.currentLocale];
       for (const k of keys) {
         if (current[k] === undefined) {
           // 如果找不到翻译，返回键名
-          return _key;
+          return key;
         }
-        const next = current[k];
-        if (typeof next === 'object' && next !== null) {
-          current = next as Record<string, unknown>;
-        } else {
-          // 如果不是对象，说明已经到了最终值
-          return next as string;
-        }
+        current = current[k];
       }
       return current;
     },
