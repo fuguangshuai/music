@@ -6,20 +6,20 @@ import type { MusicSourceType } from '@/types/music';
  * GD音乐台解析服务
  */
 export interface GDMusicResponse {
-  url: string;
-  br: number;
-  size: number;
-  md5: string;
-  platform: string;
-  gain: number;
+  readonly url: string;
+  readonly br: number;
+  readonly size: number;
+  readonly md5?: string;
+  readonly platform: string;
+  readonly gain?: number;
 }
 
 export interface ParsedMusicResult {
-  data: {
-    data: GDMusicResponse;
-    params: {
-      id: number;
-      type: string;
+  readonly data: {
+    readonly data: GDMusicResponse;
+    readonly params: {
+      readonly id: number;
+      readonly type: string;
     };
   };
 }

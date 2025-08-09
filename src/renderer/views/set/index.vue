@@ -464,7 +464,7 @@ import ProxySettings from '@/components/settings/ProxySettings.vue';
 import ShortcutSettings from '@/components/settings/ShortcutSettings.vue';
 import { useSettingsStore } from '@/store/modules/settings';
 import { useUserStore } from '@/store/modules/user';
-import { Platform } from '@/types/music';
+import { type Platform } from '@/types/music';
 import { isElectron, isMobile } from '@/utils';
 import { openDirectory, selectDirectory } from '@/utils/fileOperation';
 
