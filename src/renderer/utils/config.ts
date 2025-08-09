@@ -4,7 +4,9 @@
  */
 
 import type { AppConfig } from '@/types/common';
-import { isElectron } from '@/utils';
+
+// 直接检查是否在Electron环境中，避免循环依赖
+const isElectron = typeof window !== 'undefined' && window.electron;
 
 /**
  * 配置选项接口

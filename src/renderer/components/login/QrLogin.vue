@@ -33,12 +33,20 @@ const loadLogin = async () => {
       timerRef.value = null;
     }
 
-    const qrKey = await getQrKey();
-    const key = (qrKey as any).data.data.unikey;
+    // 获取QR密钥
+    const qrKeyResult = await getQrKey();
+    const key = (qrKeyResult as any)?.data?.data?.unikey;
+
+    if (!key) {
+      throw new Error('获取QR密钥失败');
+    }
+
+    // 创建QR码
     const { data } = await createQr(key);
     qrUrl.value = data.data.qrimg;
     qrStatus.value = 'active';
 
+    // 开始检查QR码状态
     const timer = timerIsQr(key);
     timerRef.value = timer as any;
   } catch (error) {

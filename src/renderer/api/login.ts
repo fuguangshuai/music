@@ -3,7 +3,7 @@ import request from '@/utils/request';
 // 创建二维码key
 //  /login/qr/key
 export function getQrKey(): Promise<unknown> {
-  return request.get('/login/qr/_key');
+  return request.get('/login/qr/key');
 }
 
 // 创建二维码

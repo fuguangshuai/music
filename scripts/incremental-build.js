@@ -9,6 +9,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const crypto = require('crypto');
+const { errorHandler } = require('./utils');
 
 console.log('🔨 启动增量构建系统...\n');
 
@@ -76,32 +77,43 @@ function getAllFiles(dir, fileList = []) {
  * 加载文件哈希缓存
  */
 function loadHashCache() {
-  try {
-    if (fs.existsSync(buildConfig.hashFile)) {
-      const content = fs.readFileSync(buildConfig.hashFile, 'utf8');
-      return JSON.parse(content);
-    }
-  } catch (_error) {
-    console.warn('⚠️  无法加载哈希缓存:', _error.message);
-  }
-  return {};
+  return (
+    errorHandler.safeExecute(
+      () => {
+        if (fs.existsSync(buildConfig.hashFile)) {
+          const content = fs.readFileSync(buildConfig.hashFile, 'utf8');
+          return JSON.parse(content);
+        }
+        return {};
+      },
+      {
+        context: '哈希缓存加载',
+        exitOnError: false,
+        fallback: () => ({})
+      }
+    ) || {}
+  );
 }
 
 /**
  * 保存文件哈希缓存
  */
 function saveHashCache(hashes) {
-  try {
-    // 确保缓存目录存在
-    if (!fs.existsSync(buildConfig.cacheDir)) {
-      fs.mkdirSync(buildConfig.cacheDir, { recursive: true });
-    }
+  errorHandler.safeExecute(
+    () => {
+      // 确保缓存目录存在
+      if (!fs.existsSync(buildConfig.cacheDir)) {
+        fs.mkdirSync(buildConfig.cacheDir, { recursive: true });
+      }
 
-    fs.writeFileSync(buildConfig.hashFile, JSON.stringify(hashes, null, 2));
-    console.log('💾 文件哈希缓存已保存');
-  } catch (_error) {
-    console._error('❌ 保存哈希缓存失败:', _error.message);
-  }
+      fs.writeFileSync(buildConfig.hashFile, JSON.stringify(hashes, null, 2));
+      console.log('💾 文件哈希缓存已保存');
+    },
+    {
+      context: '哈希缓存保存',
+      exitOnError: false
+    }
+  );
 }
 
 /**
@@ -232,16 +244,20 @@ function watchFiles() {
 function cleanCache() {
   console.log('🧹 清理构建缓存...');
 
-  try {
-    if (fs.existsSync(buildConfig.cacheDir)) {
-      fs.rmSync(buildConfig.cacheDir, { recursive: true, force: true });
-      console.log('✅ 构建缓存已清理');
-    } else {
-      console.log('ℹ️  没有找到构建缓存');
+  errorHandler.safeExecute(
+    () => {
+      if (fs.existsSync(buildConfig.cacheDir)) {
+        fs.rmSync(buildConfig.cacheDir, { recursive: true, force: true });
+        console.log('✅ 构建缓存已清理');
+      } else {
+        console.log('ℹ️  没有找到构建缓存');
+      }
+    },
+    {
+      context: '构建缓存清理',
+      exitOnError: false
     }
-  } catch (_error) {
-    console._error('❌ 清理缓存失败:', _error.message);
-  }
+  );
 }
 
 /**

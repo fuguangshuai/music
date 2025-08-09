@@ -14,7 +14,6 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src/renderer'),
-      '@renderer': resolve(__dirname, 'src/renderer'),
       '@i18n': resolve(__dirname, 'src/i18n')
     }
   },

@@ -33,17 +33,13 @@ export const setAnimationDelay = (index: number = 6, time: number = 50) => {
   return `animation-_delay: ${(index * time) / (speed * 2)}ms`;
 };
 
-// 导入统一的格式化函数
-import { formatNumber as formatNum, formatTime } from './formatters';
+// 直接导出统一的格式化函数，避免重复包装
+export { formatNumber, formatTime } from './formatters';
 
 // 将秒转换为分钟和秒 - 使用统一的formatTime函数
 export const secondToMinute = (s: number): string => {
+  const { formatTime } = require('./formatters');
   return formatTime(s, 'mm:ss');
-};
-
-// 格式化数字 - 使用统一的formatNumber函数
-export const formatNumber = (num: string | number): string => {
-  return formatNum(num);
 };
 
 export const getImgUrl = (url: string | undefined, _size: string = '') => {

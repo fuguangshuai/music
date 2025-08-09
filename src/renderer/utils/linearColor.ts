@@ -1,5 +1,20 @@
+/**
+ * 🎨 线性颜色处理工具 (重构版)
+ *
+ * ⚠️ 此文件已重构为模块化结构
+ * 新的模块位于 src/renderer/utils/color/ 目录下
+ *
+ * 建议使用：
+ * import { ... } from '@/utils/color'
+ *
+ * 此文件保留用于向后兼容，将逐步迁移
+ */
+
 import { useDebounceFn } from '@vueuse/core';
 import tinycolor from 'tinycolor2';
+
+// 重新导出新的模块化功能
+export * from './color';
 
 interface IColor {
   backgroundColor: string;

@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 
 import { musicDB } from '@/hooks/MusicHook';
+import { isNetworkError } from '@/services/networkMonitor';
 import { useSettingsStore, useUserStore } from '@/store';
 import type { ILyric } from '@/type/lyric';
 import type { SongResult } from '@/type/music';
@@ -212,7 +213,14 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
         console.log(`❌ ${apiName}音乐解析失败 - 无有效数据`);
       }
     } catch (error) {
-      console.log(`❌ ${apiName}音乐解析失败:`, error);
+      // 根据错误类型提供不同的处理
+      if (isNetworkError(error)) {
+        console.warn(`🌐 ${apiName}网络连接失败:`, error);
+      } else if ((error as any)?.response?.status === 410) {
+        console.warn(`⏰ ${apiName}资源已过期:`, error);
+      } else {
+        console.error(`❌ ${apiName}音乐解析失败:`, error);
+      }
     }
     return null;
   }

@@ -100,16 +100,44 @@ const unblockMusic = async (
     : ALL_PLATFORMS;
 
   // 处理歌曲数据，确保数据结构完整
-  const processedSongData = ensureDataStructure(songData as unknown as Record<string, unknown>);
+  const processedSongDataRaw = ensureDataStructure(songData as unknown as Record<string, unknown>);
+
+  // 确保数据符合MusicInfo接口要求
+  const processedSongData = {
+    name: (processedSongDataRaw.name as string) || '',
+    artists:
+      (processedSongDataRaw.artists as Array<{ name: string }>) ||
+      (processedSongDataRaw.ar as Array<{ name: string }>),
+    album:
+      (processedSongDataRaw.album as { name: string }) ||
+      (processedSongDataRaw.al as { name: string }),
+    ar: processedSongDataRaw.ar as Array<{ name: string }>,
+    al: processedSongDataRaw.al as { name: string }
+  };
 
   // ✅ 使用统一的重试函数
   const executeWithRetry = async (): Promise<UnblockResult> => {
     return withRetry(
       async () => {
-        const data = await match(parseInt(String(id), 10), filteredPlatforms, processedSongData);
+        const matchResult = await match(
+          parseInt(String(id), 10),
+          filteredPlatforms,
+          processedSongData
+        );
+
+        // 确保返回的数据符合ResponseData接口要求
+        const responseData: ResponseData = {
+          url: matchResult.url || '', // 提供默认值
+          br: matchResult.br || 0,
+          size: matchResult.size || 0,
+          md5: matchResult.md5,
+          platform: matchResult.platform,
+          gain: matchResult.gain
+        };
+
         const result: UnblockResult = {
           data: {
-            data,
+            data: responseData,
             params: {
               id: parseInt(String(id), 10),
               type: 'song'

@@ -21,6 +21,25 @@ interface QualityMetrics {
   technicalDebt: string;
 }
 
+// 额外的类型定义
+interface ESLintResult {
+  errorCount: number;
+  warningCount: number;
+}
+
+interface TestResult {
+  status: string;
+}
+
+interface SecurityResults {
+  testResults?: TestResult[];
+}
+
+interface ExecError extends Error {
+  stdout?: string;
+  stderr?: string;
+}
+
 interface QualityReport {
   timestamp: string;
   overallScore: number;
@@ -107,7 +126,8 @@ class QualityChecker {
       });
       console.log('✅ Web 端类型检查通过');
     } catch (error: unknown) {
-      const output = error.stdout || error.stderr || '';
+      const execError = error as ExecError;
+      const output = execError.stdout || execError.stderr || '';
       const errorMatches = output.match(/error > TS\d+:/g);
       this.report.metrics.typeErrors = errorMatches ? errorMatches.length : 0;
 
@@ -138,7 +158,7 @@ class QualityChecker {
     console.log('🔍 > 检查代码规范...');
 
     try {
-      const _result = execSync('npx eslint src/renderer/**/*.{ts,vue} --format json', {
+      const result = execSync('npx eslint src/renderer/**/*.{ts,vue} --format json', {
         encoding: 'utf-8',
         stdio: 'pipe'
       });
@@ -148,8 +168,9 @@ class QualityChecker {
       let totalWarnings = 0;
 
       lintResults.forEach((file: unknown) => {
-        totalErrors += file.errorCount;
-        totalWarnings += file.warningCount;
+        const eslintFile = file as ESLintResult;
+        totalErrors += eslintFile.errorCount;
+        totalWarnings += eslintFile.warningCount;
       });
 
       this.report.metrics.lintErrors = totalErrors;
@@ -182,9 +203,10 @@ class QualityChecker {
         }
       );
 
-      const securityResults = JSON.parse(securityTestResult);
+      const securityResults = JSON.parse(securityTestResult) as SecurityResults;
       const securityPassing =
-        securityResults.testResults?.filter((t: unknown) => t.status === 'passed').length || 0;
+        securityResults.testResults?.filter((t: unknown) => (t as TestResult).status === 'passed')
+          .length || 0;
       const securityTotal = securityResults.testResults?.length || 0;
 
       // 运行国际化系统测试
@@ -196,9 +218,10 @@ class QualityChecker {
         }
       );
 
-      const i18nResults = JSON.parse(i18nTestResult);
+      const i18nResults = JSON.parse(i18nTestResult) as SecurityResults;
       const i18nPassing =
-        i18nResults.testResults?.filter((t: unknown) => t.status === 'passed').length || 0;
+        i18nResults.testResults?.filter((t: unknown) => (t as TestResult).status === 'passed')
+          .length || 0;
       const i18nTotal = i18nResults.testResults?.length || 0;
 
       this.report.metrics.testsPassing = securityPassing + i18nPassing;
@@ -374,10 +397,10 @@ class QualityChecker {
     let score = 100;
 
     // TypeScript 错误扣分
-    score -= Math.min(this.report.metrics.typeErrors * 0.5 > 30);
+    score -= Math.min(this.report.metrics.typeErrors * 0.5, 30);
 
     // ESLint 错误扣分
-    score -= Math.min(this.report.metrics.lintErrors * 0.3 > 20);
+    score -= Math.min(this.report.metrics.lintErrors * 0.3, 20);
 
     // 测试覆盖率扣分
     if (this.report.metrics.testCoverage < 80) {
@@ -391,7 +414,7 @@ class QualityChecker {
     score -= Math.min(this.report.metrics.codeSmells * 1, 15);
     score -= Math.min(this.report.metrics.duplicateCode * 0.5, 10);
 
-    this.report.overallScore = Math.max(score > 0);
+    this.report.overallScore = Math.max(score, 0);
   }
 
   /**

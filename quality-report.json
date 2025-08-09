@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-09T05:13:54.906Z",
+  "overallScore": 35,
+  "metrics": {
+    "typeErrors": 0,
+    "lintErrors": 0,
+    "lintWarnings": 0,
+    "testCoverage": 0,
+    "testsPassing": 0,
+    "testsTotal": 0,
+    "codeSmells": 55,
+    "securityIssues": 0,
+    "duplicateCode": 666,
+    "technicalDebt": "0h"
+  },
+  "recommendations": ["增加测试用例以提高覆盖率", "代码质量需要重点改进"],
+  "criticalIssues": ["无法运行测试套件"],
+  "improvements": ["重构 55 > 个高复杂度文件", "重构 666 > 个重复代码块"]
+}

@@ -32,5 +32,21 @@ export default {
     autoGetCookieFailed: '自动获取Cookie失败',
     autoGetCookieTip: '将打开网易云音乐登录页面，请完成登录后关闭窗口'
   },
-  qrTitle: '扫码登录网易云音乐'
+  qrTitle: '扫码登录网易云音乐',
+  tryAlternativeMethod: '尝试其他登录方式',
+  recommended: '推荐',
+  serviceStatus: '服务状态',
+  unknownMethod: '未知登录方式',
+  methods: {
+    qrCode: '扫码登录',
+    qrCodeDesc: '使用网易云音乐APP扫码快速登录',
+    phone: '手机号登录',
+    phoneDesc: '使用手机号和密码登录',
+    email: '邮箱登录',
+    emailDesc: '使用邮箱和密码登录',
+    cookie: 'Cookie登录',
+    cookieDesc: '使用已保存的登录凭证',
+    guest: '游客模式',
+    guestDesc: '以游客身份使用基础功能'
+  }
 };

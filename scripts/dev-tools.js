@@ -1,127 +1,31 @@
 #!/usr/bin/env node
-const path = require('path');
-
 /**
- * 开发工具链集成脚本
- * 简化版本，统一管理所有开发工具
+ * 🛠️ 开发工具链管理器
+ * 提供开发过程中常用的工具和检查功能
+ * 重构后使用共享工具函数，避免重复代码
  */
 
-const { execSync, spawn } = require('child_process');
-const fs = require('fs');
+const { executeCommand, spawnCommand, checkProjectHealth, errorHandler } = require('./utils');
 
-console.log('🛠️  开发工具链管理器\n');
-
-/**
- * 执行命令
- */
-function executeCommand(command, options = {}) {
-  try {
-    const result = execSync(command, {
-      encoding: 'utf8',
-      stdio: options.silent ? 'pipe' : 'inherit',
-      ...options
-    });
-    return { success: true, output: result };
-  } catch (_error) {
-    return { success: false, _error: _error.message, output: _error.stdout };
-  }
-}
+console.log('🛠️ 开发工具链管理器启动...\n');
 
 /**
- * 异步执行命令
- */
-function spawnCommand(command, args = [], options = {}) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      stdio: 'inherit',
-      shell: true,
-      ...options
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve({ success: true, code });
-      } else {
-        reject({ success: false, code });
-      }
-    });
-
-    child.on('error', (error) => {
-      reject({ success: false, error: error.message });
-    });
-  });
-}
-
-/**
- * 检查项目状态
- */
-function checkProjectStatus() {
-  console.log('📊 检查项目状态...\n');
-
-  const checks = [
-    {
-      name: '依赖安装',
-      check: () => fs.existsSync('node_modules'),
-      fix: 'npm install'
-    },
-    {
-      name: 'TypeScript配置',
-      check: () => fs.existsSync('tsconfig.json'),
-      fix: '请检查tsconfig.json文件'
-    },
-    {
-      name: 'Vite配置',
-      check: () => fs.existsSync('vite.config.ts'),
-      fix: '请检查vite.config.ts文件'
-    },
-    {
-      name: '测试配置',
-      check: () => fs.existsSync('vitest.config.ts'),
-      fix: '请检查vitest.config.ts文件'
-    }
-  ];
-
-  let allPassed = true;
-
-  checks.forEach(({ name, check, fix }) => {
-    const passed = check();
-    const status = passed ? '✅' : '❌';
-    console.log(`${status} ${name}`);
-
-    if (!passed) {
-      console.log(`   修复建议: ${fix}`);
-      allPassed = false;
-    }
-  });
-
-  console.log('');
-  return allPassed;
-}
-
-/**
- * 运行代码质量检查
+ * 运行代码质量检查 - 调用专门的质量检查工具
  */
 async function runQualityCheck() {
   console.log('🔍 运行代码质量检查...\n');
 
-  const tasks = [
-    { name: 'ESLint检查', command: 'npm run lint' },
-    { name: 'TypeScript检查', command: 'npm run typecheck' },
-    { name: '单元测试', command: 'npm run test' }
-  ];
+  // 调用专门的质量检查工具，避免重复实现
+  const result = executeCommand('npx tsx scripts/quality-check.ts');
 
-  for (const task of tasks) {
-    console.log(`📋 ${task.name}...`);
-    const result = executeCommand(task.command, { silent: true });
-
-    if (result.success) {
-      console.log(`✅ ${task.name} 通过\n`);
-    } else {
-      console.log(`❌ ${task.name} 失败`);
-      console.log(result.output || result._error);
-      console.log('');
-    }
+  if (result.success) {
+    console.log('✅ 质量检查完成\n');
+  } else {
+    console.log('❌ 质量检查失败\n');
+    console.log(result.output || result.error);
   }
+
+  return result.success;
 }
 
 /**
@@ -186,11 +90,10 @@ async function buildProject(incremental = false) {
 async function developmentMode() {
   console.log('🚀 启动开发模式...\n');
 
-  try {
-    await spawnCommand('npm', ['run', 'dev']);
-  } catch (_error) {
-    console._error('❌ 开发服务器启动失败:', _error._error || _error);
-  }
+  await errorHandler.safeExecute(() => spawnCommand('npm', ['run', 'dev']), {
+    context: '开发服务器启动',
+    exitOnError: false
+  });
 }
 
 /**
@@ -199,11 +102,10 @@ async function developmentMode() {
 async function watchMode() {
   console.log('👀 启动监听模式...\n');
 
-  try {
-    await spawnCommand('npm', ['run', 'build:watch']);
-  } catch (_error) {
-    console._error('❌ 监听模式启动失败:', _error._error || _error);
-  }
+  await errorHandler.safeExecute(() => spawnCommand('npm', ['run', 'build:watch']), {
+    context: '监听模式启动',
+    exitOnError: false
+  });
 }
 
 /**
@@ -271,7 +173,7 @@ async function runAll() {
   const startTime = Date.now();
 
   // 1. 检查项目状态
-  const statusOk = checkProjectStatus();
+  const statusOk = checkProjectHealth();
   if (!statusOk) {
     console.log('❌ 项目状态检查失败，请先修复问题');
     return;
@@ -309,50 +211,50 @@ async function runAll() {
 async function main() {
   const command = process.argv[2] || 'help';
 
-  try {
-    switch (command) {
-      case 'status':
-        checkProjectStatus();
-        break;
-      case 'quality':
-        await runQualityCheck();
-        break;
-      case 'perf':
-        await runPerformanceTest();
-        break;
-      case 'e2e':
-        await runE2ETest();
-        break;
-      case 'build':
-        await buildProject(false);
-        break;
-      case 'build:inc':
-        await buildProject(true);
-        break;
-      case 'dev':
-        await developmentMode();
-        break;
-      case 'watch':
-        await watchMode();
-        break;
-      case 'clean':
-        cleanProject();
-        break;
-      case 'all':
-        await runAll();
-        break;
-      case 'help':
-        showHelp();
-        break;
-      default:
-        console.error(`❌ 未知命令: ${command}`);
-        showHelp();
-        process.exit(1);
-    }
-  } catch (_error) {
-    console._error('❌ 执行失败:', _error.message || _error);
-    process.exit(1);
-  }
+  await errorHandler.safeExecute(
+    async () => {
+      switch (command) {
+        case 'status':
+          checkProjectHealth();
+          break;
+        case 'quality':
+          await runQualityCheck();
+          break;
+        case 'perf':
+          await runPerformanceTest();
+          break;
+        case 'e2e':
+          await runE2ETest();
+          break;
+        case 'build':
+          await buildProject(false);
+          break;
+        case 'build:inc':
+          await buildProject(true);
+          break;
+        case 'dev':
+          await developmentMode();
+          break;
+        case 'watch':
+          await watchMode();
+          break;
+        case 'clean':
+          cleanProject();
+          break;
+        case 'all':
+          await runAll();
+          break;
+        case 'help':
+          showHelp();
+          break;
+        default:
+          console.error(`❌ 未知命令: ${command}`);
+          showHelp();
+          process.exit(1);
+      }
+    },
+    { context: '开发工具执行', exitOnError: true }
+  );
 }
 
 // 运行主函数

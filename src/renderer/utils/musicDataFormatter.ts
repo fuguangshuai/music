@@ -3,7 +3,7 @@
  * 统一处理音乐数据的格式化和标准化
  */
 
-import type { SongResult } from '@/types';
+import type { SongResult } from '@/type/music';
 
 /**
  * 格式化单个歌曲数据
@@ -20,15 +20,7 @@ export const formatSongData = (item: unknown): SongResult => {
     ar: song.ar || song.artists || [],
     al: song.al || song.album || { name: '', id: 0 },
     dt: song.dt || song.duration || 0,
-    mv: song.mv || 0,
-    fee: song.fee || 0,
-    // pop: song.pop || 0, // 移除不存在的属性
-    count: song.count || 0,
-    // playCount: song.playCount || 0, // 移除不存在的属性
-    song: {
-      artists: song.ar || song.artists || [],
-      album: song.al || song.album || { name: '', id: 0 }
-    }
+    count: song.count || 0
   };
 };
 

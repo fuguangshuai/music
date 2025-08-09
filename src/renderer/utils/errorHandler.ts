@@ -11,7 +11,14 @@ export const ErrorTypes = {
   AUDIO_ERROR: 'AUDIO_ERROR',
   PERMISSION_ERROR: 'PERMISSION_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  TIMEOUT_ERROR: 'TIMEOUT_ERROR',
+  AUTH_ERROR: 'AUTH_ERROR',
+  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+  API_ERROR: 'API_ERROR',
+  LOGIN_ERROR: 'LOGIN_ERROR',
+  QR_CODE_ERROR: 'QR_CODE_ERROR'
 } as const;
 
 export type ErrorType = (typeof ErrorTypes)[keyof typeof ErrorTypes];
@@ -400,3 +407,41 @@ export const withRetry = async <T>(
   // 这里理论上不会到达，但为了类型安全
   throw lastError || new Error('重试失败，未知错误');
 };
+
+/**
+ * 创建用户友好的错误消息
+ */
+export function createUserFriendlyMessage(error: AppError): string {
+  const errorMessages: Record<ErrorType, string> = {
+    [ErrorTypes.NETWORK_ERROR]: '网络连接失败，请检查网络设置',
+    [ErrorTypes.AUDIO_ERROR]: '音频播放出现问题，请稍后重试',
+    [ErrorTypes.PERMISSION_ERROR]: '权限不足，请检查相关设置',
+    [ErrorTypes.VALIDATION_ERROR]: '输入信息有误，请检查后重试',
+    [ErrorTypes.UNKNOWN_ERROR]: '发生未知错误，请稍后重试',
+    [ErrorTypes.SERVICE_UNAVAILABLE]: '服务暂时不可用，请稍后重试',
+    [ErrorTypes.TIMEOUT_ERROR]: '请求超时，请检查网络连接',
+    [ErrorTypes.AUTH_ERROR]: '身份验证失败，请重新登录',
+    [ErrorTypes.RESOURCE_NOT_FOUND]: '请求的资源不存在',
+    [ErrorTypes.API_ERROR]: 'API服务异常，请稍后重试',
+    [ErrorTypes.LOGIN_ERROR]: '登录失败，请检查账号信息',
+    [ErrorTypes.QR_CODE_ERROR]: '二维码获取失败，请稍后重试'
+  };
+
+  return errorMessages[error.type] || error.message;
+}
+
+/**
+ * 创建登录错误的用户建议
+ */
+export function createLoginErrorSuggestion(error: AppError): string[] {
+  const suggestions: Partial<Record<ErrorType, string[]>> = {
+    [ErrorTypes.NETWORK_ERROR]: ['检查网络连接是否正常', '尝试切换网络环境', '稍后重试'],
+    [ErrorTypes.QR_CODE_ERROR]: ['刷新二维码重试', '尝试使用手机号登录', '检查网络连接'],
+    [ErrorTypes.API_ERROR]: ['服务可能暂时不可用', '尝试其他登录方式', '稍后重试'],
+    [ErrorTypes.SERVICE_UNAVAILABLE]: ['登录服务暂时不可用', '尝试使用Cookie登录', '等待服务恢复'],
+    [ErrorTypes.TIMEOUT_ERROR]: ['网络响应较慢', '检查网络连接', '重新尝试'],
+    [ErrorTypes.LOGIN_ERROR]: ['检查账号密码是否正确', '尝试其他登录方式', '重置密码']
+  };
+
+  return suggestions[error.type] || ['请稍后重试', '如问题持续存在，请联系技术支持'];
+}

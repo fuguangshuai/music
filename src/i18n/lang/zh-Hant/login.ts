@@ -32,5 +32,21 @@ export default {
     autoGetCookieFailed: '自動取得Cookie失敗',
     autoGetCookieTip: '將開啟網易雲音樂登入頁面，請完成登入後關閉視窗'
   },
-  qrTitle: '掃碼登入網易雲音樂'
+  qrTitle: '掃碼登入網易雲音樂',
+  tryAlternativeMethod: '嘗試其他登入方式',
+  recommended: '推薦',
+  serviceStatus: '服務狀態',
+  unknownMethod: '未知登入方式',
+  methods: {
+    qrCode: '掃碼登入',
+    qrCodeDesc: '使用網易雲音樂APP掃碼快速登入',
+    phone: '手機號登入',
+    phoneDesc: '使用手機號和密碼登入',
+    email: '郵箱登入',
+    emailDesc: '使用郵箱和密碼登入',
+    cookie: 'Cookie登入',
+    cookieDesc: '使用已儲存的登入憑證',
+    guest: '訪客模式',
+    guestDesc: '以訪客身份使用基礎功能'
+  }
 };

@@ -36,6 +36,14 @@ export default {
     selectRequired: '请选择一个选项',
     numberRange: '请输入 {min} 到 {max} 之间的数字'
   },
+  network: {
+    online: '网络已连接',
+    offline: '网络连接断开',
+    slow: '网络连接缓慢',
+    onlineDescription: '网络连接正常',
+    offlineDescription: '请检查网络设置',
+    slowDescription: '网络响应较慢，可能影响使用体验'
+  },
   viewMore: '查看更多',
   noMore: '没有更多了',
   selectAll: '全选',

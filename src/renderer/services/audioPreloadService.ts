@@ -153,7 +153,7 @@ class AudioPreloadService {
 
         // 监听加载错误事件
         sound.on('loaderror', (_id, error) => {
-          console.error('❌ 音频预加载失败: ', url, error);
+          console.warn('⚠️ 音频预加载失败: ', url, error);
           this.removePreloadedAudio(url);
           resolve(null);
         });

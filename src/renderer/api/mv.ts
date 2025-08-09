@@ -1,5 +1,5 @@
-import { IData } from '@/type';
 import { IMvUrlData } from '@/type/mv';
+import { IData } from '@/types';
 import request from '@/utils/request';
 
 interface MvParams {
@@ -36,7 +36,7 @@ export const getMvDetail = (mvid: string) => {
 };
 
 // 获取 mv 地址
-export const getMvUrl = (id: Number) => {
+export const getMvUrl = (id: number) => {
   return request.get<IData<IMvUrlData>>('/mv/url', {
     params: {
       id

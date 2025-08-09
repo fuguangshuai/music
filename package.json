@@ -12,7 +12,7 @@
     "lint:fix": "eslint . --fix",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
-    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "check": "npm run format &&npm run lint && npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "dev:web": "vite dev",
@@ -22,7 +22,6 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
-    "quality-check": "node scripts/quality-check.js",
     "build:verify": "node scripts/build-verify.js",
     "perf:enable": "node scripts/performance-monitor.js enable",
     "perf:benchmark": "node scripts/performance-monitor.js benchmark",
@@ -32,12 +31,7 @@
     "build:incremental": "node scripts/incremental-build.js build",
     "build:watch": "node scripts/incremental-build.js watch",
     "build:clean": "node scripts/incremental-build.js clean",
-    "quality:check": "tsx scripts/quality-check.ts",
-    "quality:fix": "tsx scripts/fix-code-quality.ts",
-    "quality:report": "tsx scripts/quality-check.ts && echo 'Quality report generated'",
-    "code:format": "prettier --write src/renderer/**/*.{ts,vue}",
-    "code:lint": "eslint src/renderer/**/*.{ts,vue}",
-    "code:lint:fix": "eslint src/renderer/**/*.{ts,vue} --fix"
+    "quality:check": "tsx scripts/quality-check.ts && echo 'Quality report generated'"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",

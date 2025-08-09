@@ -1,15 +1,16 @@
 /**
- * 🎯 增强型API类型定义
+ * 🎯 增强型API类型定义 - 企业级类型安全版本
  * 基于现有API响应结构，提供更精确的类型定义
  *
  * 设计原则：
  * - 核心业务类型：精确定义
- * - 临时/不稳定API：使用SafeAny
+ * - 临时/不稳定API：使用UnknownData和JsonValue
  * - 第三方库集成：使用ThirdPartyData
+ * - 类型安全优先：避免any类型，使用联合类型和泛型
  */
 
 // 导入基础类型工具
-import type { SafeAny } from '../utils/typeHelpers';
+import type { JsonValue, ThirdPartyData, UnknownData } from '../utils/typeHelpers';
 
 // ==================== 基础响应结构 ====================
 
@@ -96,15 +97,15 @@ export interface EnhancedSong {
   rUrl?: string | null;
   mark?: number;
   originCoverType?: number;
-  originSongSimpleData?: SafeAny; // 复杂嵌套结构，使用SafeAny
-  tagPicList?: SafeAny; // 标签图片列表，结构可能变化
+  originSongSimpleData?: ThirdPartyData; // 复杂嵌套结构，使用ThirdPartyData
+  tagPicList?: JsonValue[]; // 标签图片列表，结构可能变化
   resourceState?: boolean;
   version?: number;
-  songJumpInfo?: SafeAny; // 跳转信息，结构不稳定
-  entertainmentTags?: SafeAny; // 娱乐标签，第三方数据
-  awardTags?: SafeAny; // 奖项标签，第三方数据
+  songJumpInfo?: UnknownData; // 跳转信息，结构不稳定
+  entertainmentTags?: ThirdPartyData; // 娱乐标签，第三方数据
+  awardTags?: ThirdPartyData; // 奖项标签，第三方数据
   single?: number;
-  noCopyrightRcmd?: SafeAny; // 版权推荐，结构复杂
+  noCopyrightRcmd?: ThirdPartyData; // 版权推荐，结构复杂
   mst?: number;
   cp?: number;
   mv?: number;
@@ -151,9 +152,9 @@ export interface EnhancedPlaylist {
   specialType?: number;
   anonimous?: boolean;
   coverStatus?: number;
-  recommendInfo?: SafeAny; // 推荐信息，结构可能变化
-  relateResType?: SafeAny; // 相关资源类型，第三方数据
-  subscribers?: SafeAny[]; // 订阅者列表，结构复杂
+  recommendInfo?: ThirdPartyData; // 推荐信息，结构可能变化
+  relateResType?: ThirdPartyData; // 相关资源类型，第三方数据
+  subscribers?: ThirdPartyData[]; // 订阅者列表，结构复杂
   tracks?: EnhancedSong[];
   trackIds?: Array<{
     id: number;
@@ -163,7 +164,7 @@ export interface EnhancedPlaylist {
     alg?: string;
     uid?: number;
     rcmdReason?: string;
-    sc?: SafeAny; // 来源信息，结构不稳定
+    sc?: UnknownData; // 来源信息，结构不稳定
   }>;
 }
 
@@ -188,8 +189,8 @@ export interface EnhancedUser {
   authStatus?: number;
   djStatus?: number;
   defaultAvatar?: boolean;
-  expertTags?: SafeAny; // 专家标签，第三方数据
-  experts?: SafeAny; // 专家信息，结构复杂
+  expertTags?: ThirdPartyData; // 专家标签，第三方数据
+  experts?: ThirdPartyData; // 专家信息，结构复杂
   mutual?: boolean;
   followed?: boolean;
   authority?: number;
@@ -206,7 +207,7 @@ export interface EnhancedUser {
   playlistCount?: number;
   playlistBeSubscribedCount?: number;
   // 扩展信息（可能来自第三方）
-  profile?: SafeAny; // 档案信息，结构可能变化
+  profile?: ThirdPartyData; // 档案信息，结构可能变化
   level?: number;
   listenSongs?: number;
   createTime?: number;
@@ -240,7 +241,7 @@ export interface EnhancedLoginResponse {
   };
   token?: string;
   profile?: EnhancedUser;
-  bindings?: SafeAny[]; // 绑定信息，第三方数据
+  bindings?: ThirdPartyData[]; // 绑定信息，第三方数据
   cookie?: string;
 }
 
@@ -271,12 +272,12 @@ export interface EnhancedSearchResult {
     hasMore: boolean;
   };
   mvs?: {
-    mvs: SafeAny[]; // MV结构复杂，使用SafeAny,
+    mvs: ThirdPartyData[]; // MV结构复杂，使用ThirdPartyData
     mvCount: number;
     hasMore: boolean;
   };
   djRadios?: {
-    djRadios: SafeAny[]; // 电台结构复杂，使用SafeAny,
+    djRadios: ThirdPartyData[]; // 电台结构复杂，使用ThirdPartyData
     djRadiosCount: number;
     hasMore: boolean;
   };
@@ -295,7 +296,7 @@ export interface EnhancedSearchResult {
  */
 export type SongDetailResponse = StandardApiResponse<{
   songs: EnhancedSong[];
-  privileges: SafeAny[]; // 权限信息，结构复杂
+  privileges: ThirdPartyData[]; // 权限信息，结构复杂
 }>;
 
 /**
@@ -313,19 +314,19 @@ export type SongUrlResponse = StandardApiResponse<{
     type: string;
     gain: number;
     fee: number;
-    uf: SafeAny; // 用户标识，结构不稳定,
+    uf: UnknownData; // 用户标识，结构不稳定
     payed: number;
     flag: number;
     canExtend: boolean;
-    freeTrialInfo: SafeAny | null; // 试听信息，第三方数据,
+    freeTrialInfo: ThirdPartyData | null; // 试听信息，第三方数据
     level: string;
     encodeType: string;
-    freeTrialPrivilege: SafeAny; // 试听权限，结构复杂,
-    freeTimeTrialPrivilege: SafeAny; // 时长试听权限，结构复杂,
+    freeTrialPrivilege: ThirdPartyData; // 试听权限，结构复杂
+    freeTimeTrialPrivilege: ThirdPartyData; // 时长试听权限，结构复杂
     urlSource: number;
     rightSource: number;
-    podcastCtrp: SafeAny | null; // 播客控制，第三方数据,
-    effectTypes: SafeAny | null; // 音效类型，结构可能变化,
+    podcastCtrp: ThirdPartyData | null; // 播客控制，第三方数据
+    effectTypes: UnknownData | null; // 音效类型，结构可能变化
     time: number;
   }>;
 }>;

@@ -1,10 +1,10 @@
-import { IData } from '@/type';
 import { IAlbumNew } from '@/type/album';
 import { IDayRecommend } from '@/type/day_recommend';
 import { IRecommendMusic } from '@/type/music';
 import { IPlayListSort } from '@/type/playlist';
 import { IHotSearch, ISearchKeyword } from '@/type/search';
 import { IHotSinger } from '@/type/singer';
+import { IData } from '@/types';
 import request from '@/utils/request';
 
 interface IHotSingerParams {

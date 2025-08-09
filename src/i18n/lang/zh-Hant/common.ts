@@ -36,6 +36,14 @@ export default {
     selectRequired: '請選擇一個選項',
     numberRange: '請輸入 {min} 到 {max} 之間的數字'
   },
+  network: {
+    online: '網路已連接',
+    offline: '網路連接中斷',
+    slow: '網路連接緩慢',
+    onlineDescription: '網路連接正常',
+    offlineDescription: '請檢查網路設定',
+    slowDescription: '網路回應較慢，可能影響使用體驗'
+  },
   viewMore: '查看更多',
   noMore: '沒有更多了',
   selectAll: '全選',
