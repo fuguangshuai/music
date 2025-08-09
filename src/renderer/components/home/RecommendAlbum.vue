@@ -18,7 +18,7 @@
             lazy
             preview-disabled
           />
-          <div class="recommend-album-list-item-content">{{ item.name }}</div>
+          <div class="recommend-album-list-item-content">{{ item?.name }}</div>
         </div>
       </template>
     </div>
@@ -45,27 +45,27 @@ const loadAlbumList = async () => {
 
 const router = useRouter();
 
-const handleClick = async (item: any) => {
+const handleClick = async (item: unknown) => {
   openAlbum(item);
 };
 
-const openAlbum = async (album: any) => {
+const openAlbum = async (album: unknown) => {
   if (!album) return;
 
   try {
-    const res = await getAlbum(album.id);
+    const res = await getAlbum((album as any).id);
     const { songs, album: albumInfo } = res.data;
 
-    const formattedSongs = songs.map((song: any) => {
-      song.al.picUrl = song.al.picUrl || albumInfo.picUrl;
-      song.picUrl = song.al.picUrl || albumInfo.picUrl || song.picUrl;
+    const formattedSongs = songs.map((song: unknown) => {
+      (song as any).al.picUrl = (song as any).al.picUrl || albumInfo.picUrl;
+      (song as any).picUrl = (song as any).al.picUrl || albumInfo.picUrl || (song as any).picUrl;
       return song;
     });
 
     navigateToMusicList(router, {
-      id: album.id,
+      id: (album as any).id,
       type: 'album',
-      name: album.name,
+      name: (album as any).name,
       songList: formattedSongs,
       listInfo: {
         ...albumInfo,

@@ -34,7 +34,7 @@ async function getSystemFonts(): Promise<string[]> {
 /**
  * 初始化字体管理模块
  */
-export function initializeFonts() {
+export function initializeFonts(): void {
   // 添加获取系统字体的 IPC 处理
   ipcMain.handle('get-system-fonts', async () => {
     return await getSystemFonts();

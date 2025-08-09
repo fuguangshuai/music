@@ -31,7 +31,7 @@
 
               <div class="mt-2">
                 <p v-for="item in getDisplayDaySongs.slice(0, 5)" :key="item.id" class="text-el">
-                  {{ item.name }}
+                  {{ item?.name }}
                   <br />
                 </p>
               </div>
@@ -58,7 +58,7 @@
                 <div class="user-play-item-img">
                   <img :src="getImgUrl(item.coverImgUrl, '200y200')" alt="" />
                   <div class="user-play-item-title">
-                    <div class="user-play-item-title-name">{{ item.name }}</div>
+                    <div class="user-play-item-title-name">{{ item?.name }}</div>
 
                     <div class="user-play-item-list">
                       <div
@@ -66,7 +66,7 @@
                         :key="String(song.id)"
                         class="user-play-item-list-name"
                       >
-                        {{ song.name }}
+                        {{ song?.name }}
                       </div>
                     </div>
                   </div>
@@ -106,7 +106,7 @@
             </div>
             <div class="recommend-singer-item-info z-10">
               <div class="recommend-singer-item-info-name text-el text-right line-clamp-1">
-                {{ item.name }}
+                {{ item?.name }}
               </div>
             </div>
             <!-- 播放按钮(hover时显示) -->
@@ -189,7 +189,7 @@ const getCarouselItemStyle = (
   const width = `calc((100% / ${totalItems}) - 16px)`;
   const maxWidthStyle = maxWidth ? `max-width: ${maxWidth}px;` : '';
 
-  return `${animationDelay}; width: ${width}; ${maxWidthStyle}`;
+  return `${animationDelay} width: ${width} ${maxWidthStyle}`;
 };
 
 /**
@@ -223,7 +223,7 @@ const getCarouselItemStyleForPlaylist = (playlistCount: number) => {
       maxWidth = 'max-width: 656px;';
   }
 
-  return `${animationDelay}; width: ${width}; ${maxWidth}`;
+  return `${animationDelay} width: ${width} ${maxWidth}`;
 };
 
 onMounted(async () => {
@@ -240,7 +240,7 @@ const loadDayRecommendData = async () => {
     dayRecommendData.value = {
       ...dayRecommendSource,
       dailySongs: dayRecommendSource.dailySongs.filter(
-        (song: any) => !playerStore.dislikeList.includes(song.id)
+        (song: unknown) => !playerStore.dislikeList.includes((song as any).id)
       )
     };
   } catch (error) {
@@ -268,7 +268,7 @@ const loadNonUserData = async () => {
 const loadUserData = async () => {
   try {
     if (userStore.user) {
-      const { data: playlistData } = await getUserPlaylist(userStore.user?.userId);
+      const { data: playlistData } = await getUserPlaylist(userStore.user?.userId) as any;
       // 确保最多只显示4个歌单，并按播放次数排序
       userPlaylist.value = (playlistData.playlist as Playlist[])
         .sort((a, b) => b.playCount - a.playCount)
@@ -297,24 +297,24 @@ const showDayRecommend = () => {
   navigateToMusicList(router, {
     type: 'dailyRecommend',
     name: t('comp.recommendSinger.songlist'),
-    songList: getDisplayDaySongs.value,
+    songList: getDisplayDaySongs.value as any,
     canRemove: false
   });
 };
 
-const openPlaylist = (item: any) => {
-  playlistItem.value = item;
+const openPlaylist = (item: unknown) => {
+  playlistItem.value = item as any;
   playlistLoading.value = true;
 
-  getListDetail(item.id).then((res) => {
+  getListDetail((item as any).id).then((res) => {
     playlistDetail.value = res.data;
     playlistLoading.value = false;
 
     navigateToMusicList(router, {
-      id: item.id,
+      id: (item as any).id,
       type: 'playlist',
-      name: item.name,
-      songList: res.data.playlist.tracks || [],
+      name: (item as any).name,
+      songList: res.data.playlist.tracks as any || [],
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -467,7 +467,7 @@ const getPlaylistGridClass = (length: number) => {
         @apply absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 z-20 opacity-0 transition-all duration-300 flex items-center justify-center;
         backdrop-filter: blur(1px);
 
-        .recommend-singer-item:hover & {
+        .recommend-singer-item: hover & {
           opacity: 1;
         }
       }
@@ -477,7 +477,7 @@ const getPlaylistGridClass = (length: number) => {
         transform: translateY(50px) scale(0.8);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-        .recommend-singer-item:hover & {
+        .recommend-singer-item: hover & {
           transform: translateY(0) scale(1);
         }
       }
@@ -561,7 +561,7 @@ const getPlaylistGridClass = (length: number) => {
       transform: scale(0.8);
       transition: transform 0.3s ease;
 
-      .user-play-item:hover & {
+      .user-play-item: hover & {
         transform: scale(1);
       }
     }

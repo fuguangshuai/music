@@ -69,11 +69,11 @@ export async function handleShortcutAction(action: string) {
   const playerStore = usePlayerStore();
   const settingsStore = useSettingsStore();
 
-  const showToast = (message: string, iconName: string) => {
+  const showToast = (_message: string, _iconName: string) => {
     if (settingsStore.isMiniMode) {
       return;
     }
-    showShortcutToast(message, iconName);
+    showShortcutToast(_message, _iconName);
   };
 
   try {
@@ -113,26 +113,26 @@ export async function handleShortcutAction(action: string) {
           );
         }
         break;
-      case 'toggleFavorite': {
-        const isFavorite = playerStore.favoriteList.includes(Number(playerStore.playMusic.id));
-        const numericId = Number(playerStore.playMusic.id);
-        console.log(`[AppShortcuts] toggleFavorite 当前状态: ${isFavorite}, ID: ${numericId}`);
-        if (isFavorite) {
-          playerStore.removeFromFavorite(numericId);
-          console.log(`[AppShortcuts] 已从收藏中移除: ${numericId}`);
-        } else {
-          playerStore.addToFavorite(numericId);
-          console.log(`[AppShortcuts] 已添加到收藏: ${numericId}`);
+      case 'toggleFavorite':
+        {
+          const isFavorite = playerStore.favoriteList.includes(Number(playerStore.playMusic.id));
+          const numericId = Number(playerStore.playMusic.id);
+          console.log(`[AppShortcuts] toggleFavorite 当前状态: ${isFavorite}, _ID: ${numericId}`);
+          if (isFavorite) {
+            playerStore.removeFromFavorite(numericId);
+            console.log(`[AppShortcuts] 已从收藏中移除: ${numericId}`);
+          } else {
+            playerStore.addToFavorite(numericId);
+            console.log(`[AppShortcuts] 已添加到收藏: ${numericId}`);
+          }
+          showToast(
+            isFavorite
+              ? t('player.playBar.unFavorite', { name: playerStore.playMusic.name })
+              : t('player.playBar.favorite', { name: playerStore.playMusic.name }),
+            isFavorite ? 'ri-heart-line' : 'ri-heart-fill'
+          );
+          break;
         }
-        showToast(
-          isFavorite
-            ? t('player.playBar.unFavorite', { name: playerStore.playMusic.name })
-            : t('player.playBar.favorite', { name: playerStore.playMusic.name }),
-          isFavorite ? 'ri-heart-line' : 'ri-heart-fill'
-        );
-        break;
-      }
-      default:
         console.log('未知的快捷键动作:', action);
         break;
     }
@@ -211,7 +211,7 @@ export function updateAppShortcuts(shortcuts: ShortcutsConfig) {
 /**
  * 初始化应用内快捷键
  */
-export function initAppShortcuts() {
+export function initAppShortcuts(): void {
   if (isElectron) {
     // 监听全局快捷键事件
     window.electron.ipcRenderer.on('global-shortcut', async (_, action: string) => {
@@ -237,7 +237,7 @@ export function initAppShortcuts() {
 /**
  * 清理应用内快捷键
  */
-export function cleanupAppShortcuts() {
+export function cleanupAppShortcuts(): void {
   if (isElectron) {
     // 移除全局事件监听
     window.electron.ipcRenderer.removeAllListeners('global-shortcut');
@@ -251,7 +251,7 @@ export function cleanupAppShortcuts() {
 /**
  * 使用应用内快捷键的组合函数
  */
-export function useAppShortcuts() {
+export function useAppShortcuts(): void {
   onMounted(() => {
     initAppShortcuts();
   });

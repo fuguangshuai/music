@@ -14,7 +14,7 @@
             :style="getAnimationDelay(index)"
             @click="selectedCategory = category.value"
           >
-            {{ category.label }}
+            {{ category?.label }}
           </span>
         </div>
       </n-scrollbar>
@@ -44,7 +44,7 @@
               <i class="iconfont icon-videofill"></i>
             </div>
           </div>
-          <div class="mv-item-title">{{ item.name }}</div>
+          <div class="mv-item-title">{{ item?.name }}</div>
         </div>
 
         <div v-if="loadingMore" class="loading-more">加载中...</div>
@@ -140,7 +140,7 @@ const playNextMv = async (setLoading: (value: boolean) => void) => {
       await handleShowMv(nextItem, currentIndex.value + 1);
     } else if (hasMore.value) {
       await loadMvList();
-      if (mvList.value.length > currentIndex.value + 1) {
+      if ((mvList.value.length, currentIndex.value + 1)) {
         const nextItem = mvList.value[currentIndex.value + 1];
         await handleShowMv(nextItem, currentIndex.value + 1);
       } else {

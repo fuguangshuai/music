@@ -2,7 +2,11 @@ import { useUserStore } from '@/store/modules/user';
 import { appConfig } from '@/utils/config';
 import { getApiEnvVars } from '@/utils/env';
 
-import { createRequest, type ExtendedAxiosRequestConfig, type RequestConfig } from './requestFactory';
+import {
+  createRequest,
+  type ExtendedAxiosRequestConfig,
+  type RequestConfig
+} from './requestFactory';
 
 /**
  * 主API请求配置
@@ -36,7 +40,7 @@ const mainApiConfig: RequestConfig = {
           config.params = {};
         }
 
-        console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount || 0} 次`);
+        console.log(`301 状态码，清除登录信息后重试第 ${config.retryCount || 0}, 次`);
         config.retryCount = 3;
       }
 

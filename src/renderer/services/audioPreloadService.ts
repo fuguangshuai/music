@@ -1,7 +1,7 @@
 /**
  * 🎵 音频预加载服务
  * 统一管理音频预加载逻辑，防止内存泄漏，提升性能
- * 
+ *
  * 功能特性:
  * - 智能预加载策略（最多2首歌曲）
  * - 自动内存管理和清理
@@ -11,7 +11,7 @@
  */
 
 import { Howl } from 'howler';
-import { type Ref, ref } from 'vue';
+import { ref } from 'vue';
 
 import type { SongResult } from '@/type/music';
 
@@ -27,33 +27,33 @@ interface PreloadedAudio {
 
 // 用户行为模式接口
 interface UserBehaviorPattern {
-  favoriteGenres: string[]; // 偏好的音乐类型
-  playTimePatterns: number[]; // 播放时间模式（小时）
+  favoriteGenres: string[]; // 偏好的音乐类型,
+  playTimePatterns: number[]; // 播放时间模式（小时）,
   skipPatterns: { songId: string; skipTime: number }[]; // 跳过模式
-  repeatPatterns: string[]; // 重复播放的歌曲
+  repeatPatterns: string[]; // 重复播放的歌曲,
   sequentialPlay: boolean; // 是否倾向于顺序播放
 }
 
 // 网络状况接口
 interface NetworkCondition {
   type: 'slow' | 'fast' | 'offline';
-  speed: number; // Mbps
-  latency: number; // ms
+  speed: number; // Mbps,
+  latency: number; // ms,
   isMetered: boolean; // 是否为计费网络
 }
 
 // 智能预加载配置
 interface SmartPreloadConfig extends PreloadConfig {
-  enableBehaviorAnalysis: boolean; // 启用行为分析
-  enableNetworkAdaptation: boolean; // 启用网络适配
-  predictionAccuracy: number; // 预测准确率阈值
+  enableBehaviorAnalysis: boolean; // 启用行为分析,
+  enableNetworkAdaptation: boolean; // 启用网络适配,
+  predictionAccuracy: number; // 预测准确率阈值,
   maxPredictionCount: number; // 最大预测数量
 }
 
 // 预加载服务配置
 interface PreloadConfig {
-  maxPreloadCount: number;  // 最大预加载数量
-  maxAge: number;          // 预加载音频最大存活时间（毫秒）
+  maxPreloadCount: number; // 最大预加载数量,
+  maxAge: number; // 预加载音频最大存活时间（毫秒）,
   cleanupInterval: number; // 清理检查间隔（毫秒）
 }
 
@@ -75,14 +75,14 @@ const DEFAULT_SMART_CONFIG: SmartPreloadConfig = {
 
 class AudioPreloadService {
   protected preloadedAudios: Ref<PreloadedAudio[]> = ref([]);
-  private config: PreloadConfig;
+  private config!: PreloadConfig;
   private cleanupTimer: NodeJS.Timeout | null = null;
   private isDestroyed = false;
 
   constructor(config: Partial<PreloadConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.startCleanupTimer();
-    
+
     // 页面卸载时清理资源
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', () => this.destroy());
@@ -99,7 +99,7 @@ class AudioPreloadService {
     return new Promise((resolve) => {
       try {
         if (this.isDestroyed) {
-          console.warn('🚫 AudioPreloadService已销毁，无法预加载');
+          console.warn('🚫, AudioPreloadService已销毁，无法预加载');
           resolve(null);
           return;
         }
@@ -130,7 +130,7 @@ class AudioPreloadService {
           html5: true,
           preload: true,
           autoplay: false,
-          volume: 0, // 预加载时静音
+          volume: 0 // 预加载时静音
         });
 
         const preloadedAudio: PreloadedAudio = {
@@ -153,7 +153,7 @@ class AudioPreloadService {
 
         // 监听加载错误事件
         sound.on('loaderror', (_id, error) => {
-          console.error('❌ 音频预加载失败:', url, error);
+          console.error('❌ 音频预加载失败: ', url, error);
           this.removePreloadedAudio(url);
           resolve(null);
         });
@@ -166,7 +166,6 @@ class AudioPreloadService {
             resolve(null);
           }
         }, 10000); // 10秒超时
-
       } catch (error) {
         console.error('💥 预加载音频异常:', error);
         resolve(null);
@@ -180,7 +179,7 @@ class AudioPreloadService {
    * @returns Howl实例或null
    */
   getPreloadedAudio(url: string): Howl | null {
-    const preloaded = this.preloadedAudios.value.find(audio => audio.url === url);
+    const preloaded = this.preloadedAudios.value.find((audio) => audio.url === url);
     return preloaded?.sound || null;
   }
 
@@ -189,8 +188,8 @@ class AudioPreloadService {
    * @param url 音频URL
    */
   removePreloadedAudio(url: string): void {
-    const index = this.preloadedAudios.value.findIndex(audio => audio.url === url);
-    if (index > -1) {
+    const index = this.preloadedAudios.value.findIndex((audio) => audio.url === url);
+    if (index !== -1) {
       const audio = this.preloadedAudios.value[index];
       try {
         audio.sound.stop();
@@ -207,8 +206,8 @@ class AudioPreloadService {
    * 🧹 清理所有预加载缓存
    */
   clearPreloadCache(): void {
-    console.log('🧹 清理所有预加载缓存');
-    this.preloadedAudios.value.forEach(audio => {
+    console.log('🧹, 清理所有预加载缓存');
+    this.preloadedAudios.value.forEach((audio) => {
       try {
         audio.sound.stop();
         audio.sound.unload();
@@ -238,7 +237,7 @@ class AudioPreloadService {
     return {
       count: this.preloadedAudios.value.length,
       maxCount: this.config.maxPreloadCount,
-      audios: this.preloadedAudios.value.map(audio => ({
+      audios: this.preloadedAudios.value.map((audio) => ({
         url: audio.url,
         isLoaded: audio.isLoaded,
         age: Date.now() - audio.createdAt
@@ -252,10 +251,11 @@ class AudioPreloadService {
   private cleanupOldAudios(): void {
     const now = Date.now();
     const toRemove = this.preloadedAudios.value.filter(
-      audio => now - audio.createdAt > this.config.maxAge
+      (audio) => now - audio.createdAt,
+      this.config.maxAge
     );
 
-    toRemove.forEach(audio => {
+    toRemove.forEach((audio) => {
       this.removePreloadedAudio(audio.url);
     });
 
@@ -270,7 +270,7 @@ class AudioPreloadService {
   private enforceMaxCount(): void {
     while (this.preloadedAudios.value.length >= this.config.maxPreloadCount) {
       // 移除最旧的预加载音频
-      const oldest = this.preloadedAudios.value.reduce((prev, current) => 
+      const oldest = this.preloadedAudios.value.reduce((prev, current) =>
         prev.createdAt < current.createdAt ? prev : current
       );
       this.removePreloadedAudio(oldest.url);
@@ -297,8 +297,8 @@ class AudioPreloadService {
    */
   destroy(): void {
     if (this.isDestroyed) return;
-    
-    console.log('💥 销毁AudioPreloadService');
+
+    console.log('💥, 销毁AudioPreloadService');
     this.isDestroyed = true;
 
     // 清理定时器
@@ -317,10 +317,10 @@ class AudioPreloadService {
  * 基于AudioPreloadService扩展，添加智能预测和网络适配功能
  */
 class SmartPreloadService extends AudioPreloadService {
-  private userBehavior: UserBehaviorPattern;
-  private networkCondition: NetworkCondition;
+  private userBehavior!: UserBehaviorPattern;
+  private networkCondition!: NetworkCondition;
   private playHistory: SongResult[] = [];
-  private smartConfig: SmartPreloadConfig;
+  private smartConfig!: SmartPreloadConfig;
 
   constructor(config: Partial<SmartPreloadConfig> = {}) {
     super(config);
@@ -351,7 +351,7 @@ class SmartPreloadService extends AudioPreloadService {
 
     if (sound && songInfo) {
       // 更新预加载音频的信息
-      const preloaded = this.preloadedAudios.value.find(audio => audio.url === url);
+      const preloaded = this.preloadedAudios.value.find((audio) => audio.url === url);
       if (preloaded) {
         preloaded.priority = priority;
         preloaded.songInfo = songInfo;
@@ -400,15 +400,15 @@ class SmartPreloadService extends AudioPreloadService {
     if (condition.type === 'slow' || condition.isMetered) {
       // 慢网络或计费网络：减少预加载
       this.setMaxPreloadCount(1);
-      console.log('🐌 检测到慢网络，减少预加载数量');
+      console.log('🐌, 检测到慢网络，减少预加载数量');
     } else if (condition.type === 'fast') {
       // 快网络：增加预加载
       this.setMaxPreloadCount(this.smartConfig.maxPreloadCount);
-      console.log('🚀 检测到快网络，增加预加载数量');
+      console.log('🚀, 检测到快网络，增加预加载数量');
     } else if (condition.type === 'offline') {
       // 离线：停止预加载
       this.clearPreloadCache();
-      console.log('📴 检测到离线状态，清理预加载缓存');
+      console.log('📴, 检测到离线状态，清理预加载缓存');
     }
   }
 
@@ -422,7 +422,7 @@ class SmartPreloadService extends AudioPreloadService {
 
     // 分析偏好的音乐类型
     const genreCount = new Map<string, number>();
-    playHistory.forEach(song => {
+    playHistory.forEach((song) => {
       const genre = song.al?.name || 'unknown';
       genreCount.set(genre, (genreCount.get(genre) || 0) + 1);
     });
@@ -459,9 +459,10 @@ class SmartPreloadService extends AudioPreloadService {
 
     // 保留高优先级的音频，清理低优先级的
     while (this.preloadedAudios.value.length > this.smartConfig.maxPreloadCount) {
-      const toRemove = sortedAudios.find(audio => audio.priority === 'low') ||
-                      sortedAudios.find(audio => audio.priority === 'medium') ||
-                      sortedAudios[0];
+      const toRemove =
+        sortedAudios.find((audio) => audio.priority === 'low') ||
+        sortedAudios.find((audio) => audio.priority === 'medium') ||
+        sortedAudios[0];
 
       if (toRemove) {
         this.removePreloadedAudio(toRemove.url);
@@ -480,8 +481,10 @@ class SmartPreloadService extends AudioPreloadService {
       userBehavior: this.userBehavior,
       networkCondition: this.networkCondition,
       smartConfig: this.smartConfig,
-      predictions: this.playHistory.length > 0 ?
-        this.predictNextSongs(this.playHistory[this.playHistory.length - 1], this.playHistory) : []
+      predictions:
+        this.playHistory.length > 0
+          ? this.predictNextSongs(this.playHistory[this.playHistory.length - 1], this.playHistory)
+          : []
     };
   }
 
@@ -507,7 +510,10 @@ class SmartPreloadService extends AudioPreloadService {
 
   private detectNetworkCondition(): NetworkCondition {
     // 使用Navigator API检测网络状况
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
 
     if (connection) {
       const speed = connection.downlink || 1; // Mbps
@@ -541,13 +547,13 @@ class SmartPreloadService extends AudioPreloadService {
     // 监听在线/离线状态
     window.addEventListener('online', () => {
       this.networkCondition.type = 'fast';
-      console.log('🌐 网络已连接');
+      console.log('🌐, 网络已连接');
     });
 
     window.addEventListener('offline', () => {
       this.networkCondition.type = 'offline';
       this.clearPreloadCache();
-      console.log('📴 网络已断开');
+      console.log('📴, 网络已断开');
     });
   }
 
@@ -563,7 +569,7 @@ class SmartPreloadService extends AudioPreloadService {
 
   private predictSequentialSongs(currentSong: SongResult, playHistory: SongResult[]): SongResult[] {
     // 简化的序列预测：基于播放历史中的相邻歌曲
-    const currentIndex = playHistory.findIndex(song => song.id === currentSong.id);
+    const currentIndex = playHistory.findIndex((song) => song.id === currentSong.id);
     if (currentIndex >= 0 && currentIndex < playHistory.length - 1) {
       return [playHistory[currentIndex + 1]];
     }
@@ -576,16 +582,16 @@ class SmartPreloadService extends AudioPreloadService {
     if (!currentGenre) return [];
 
     return playHistory
-      .filter(song => song.al?.name === currentGenre && song.id !== currentSong.id)
+      .filter((song) => song.al?.name === currentGenre && song.id !== currentSong.id)
       .slice(0, 2);
   }
 
   private deduplicatePredictions(predictions: SongResult[]): SongResult[] {
     const seen = new Set<string>();
-    return predictions.filter(song => {
-      const key = song.id.toString();
-      if (seen.has(key)) return false;
-      seen.add(key);
+    return predictions.filter((song) => {
+      const _key = song.id.toString();
+      if (seen.has(_key)) return false;
+      seen.add(_key);
       return true;
     });
   }
@@ -593,7 +599,7 @@ class SmartPreloadService extends AudioPreloadService {
   private analyzeTimePatterns(playTimes: number[]): number[] {
     // 分析播放时间模式，返回最常播放的时间段
     const timeCount = new Map<number, number>();
-    playTimes.forEach(time => {
+    playTimes.forEach((time) => {
       timeCount.set(time, (timeCount.get(time) || 0) + 1);
     });
 
@@ -628,12 +634,13 @@ export type {
   PreloadConfig,
   PreloadedAudio,
   SmartPreloadConfig,
-  UserBehaviorPattern};
+  UserBehaviorPattern
+};
 export { AudioPreloadService, SmartPreloadService };
 
 // 🔧 开发环境调试工具
 if (import.meta.env.DEV) {
   // @ts-ignore
   window.audioPreloadService = audioPreloadService;
-  console.log('🔧 AudioPreloadService已挂载到window对象，可用于调试');
+  console.log('🔧, AudioPreloadService已挂载到window对象，可用于调试');
 }

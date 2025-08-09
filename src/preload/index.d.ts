@@ -4,7 +4,7 @@ interface API {
   minimize: () => void;
   maximize: () => void;
   close: () => void;
-  dragStart: (data: any) => void;
+  dragStart: (data: unknown) => void;
   miniTray: () => void;
   miniWindow: () => void;
   restore: () => void;
@@ -12,23 +12,23 @@ interface API {
   resizeWindow: (width: number, height: number) => void;
   resizeMiniWindow: (showPlaylist: boolean) => void;
   openLyric: () => void;
-  sendLyric: (data: any) => void;
-  sendSong: (data: any) => void;
-  unblockMusic: (id: number, data: any, enabledSources?: string[]) => Promise<any>;
+  sendLyric: (data: unknown) => void;
+  sendSong: (data: unknown) => void;
+  unblockMusic: (id: number, data: unknown, enabledSources?: string[]) => Promise<any>;
   onLyricWindowClosed: (callback: () => void) => void;
   startDownload: (url: string) => void;
   onDownloadProgress: (callback: (progress: number, status: string) => void) => void;
   onDownloadComplete: (callback: (success: boolean, filePath: string) => void) => void;
   onLanguageChanged: (callback: (locale: string) => void) => void;
   removeDownloadListeners: () => void;
-  invoke: (channel: string, ...args: any[]) => Promise<any>;
+  invoke: (channel: string, ...args: unknown[]) => Promise<any>;
 }
 
 // 🔒 安全IPC渲染进程通信接口 - 仅允许白名单通道
 interface SecureIpcRenderer {
-  send: (channel: string, ...args: any[]) => void;
-  invoke: (channel: string, ...args: any[]) => Promise<any>;
-  on: (channel: string, listener: (...args: any[]) => void) => () => void;
+  send: (channel: string, ...args: unknown[]) => void;
+  invoke: (channel: string, ...args: unknown[]) => Promise<any>;
+  on: (channel: string, listener: (...args: unknown[]) => void) => () => void;
   cleanup: () => void;
 }
 
@@ -63,8 +63,14 @@ declare global {
   interface Window {
     electron: ElectronAPI;
     api: API;
-    ipcRenderer: SecureIpcRenderer; // 🔒 使用安全的IPC接口
+    ipcRenderer: SecureIpcRenderer; // 🔒 使用安全的IPC接口,
     IPC_CHANNELS: IPCChannels; // 🔒 暴露通道常量
-    $message: any;
+    $message: {
+      info: (_message: string) => void;
+      success: (_message: string) => void;
+      warning: (_message: string) => void;
+      error: (_message: string) => void;
+      loading: (_message: string) => void;
+    };
   }
 }

@@ -36,7 +36,7 @@ let store: Store<StoreType>;
 /**
  * 初始化配置管理
  */
-export function initializeConfig() {
+export function initializeConfig(): Store<StoreType> {
   store = new Store<StoreType>({
     name: 'config',
     defaults: {
@@ -48,18 +48,18 @@ export function initializeConfig() {
   store.get('set.downloadPath') || store.set('set.downloadPath', app.getPath('downloads'));
 
   // 定义ipcRenderer监听事件
-  ipcMain.on('set-store-value', (_, key, value) => {
-    store.set(key, value);
+  ipcMain.on('set-store-value', (_, _key, value) => {
+    store.set(_key, value);
   });
 
-  ipcMain.on('get-store-value', (_, key) => {
-    const value = store.get(key);
+  ipcMain.on('get-store-value', (_, _key) => {
+    const value = store.get(_key);
     _.returnValue = value || '';
   });
 
   return store;
 }
 
-export function getStore() {
+export function getStore(): Store<StoreType> {
   return store;
 }

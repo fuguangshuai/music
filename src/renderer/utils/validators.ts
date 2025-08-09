@@ -45,14 +45,16 @@ export const isValidEmail = (email: string): boolean => {
  */
 export const isValidImageUrl = (url: string): boolean => {
   if (!isValidUrl(url)) return false;
-  
+
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
   const lowerUrl = url.toLowerCase();
-  
-  return imageExtensions.some(ext => lowerUrl.includes(ext)) || 
-         lowerUrl.includes('image') || 
-         lowerUrl.includes('img') ||
-         lowerUrl.includes('pic');
+
+  return (
+    imageExtensions.some((ext) => lowerUrl.includes(ext)) ||
+    lowerUrl.includes('image') ||
+    lowerUrl.includes('img') ||
+    lowerUrl.includes('pic')
+  );
 };
 
 /**
@@ -63,13 +65,15 @@ export const isValidImageUrl = (url: string): boolean => {
  */
 export const isValidAudioUrl = (url: string): boolean => {
   if (!isValidUrl(url)) return false;
-  
+
   const audioExtensions = ['.mp3', '.flac', '.wav', '.aac', '.ogg', '.m4a', '.wma'];
   const lowerUrl = url.toLowerCase();
-  
-  return audioExtensions.some(ext => lowerUrl.includes(ext)) ||
-         lowerUrl.includes('audio') ||
-         lowerUrl.includes('music');
+
+  return (
+    audioExtensions.some((ext) => lowerUrl.includes(ext)) ||
+    lowerUrl.includes('audio') ||
+    lowerUrl.includes('music')
+  );
 };
 
 /**
@@ -84,8 +88,9 @@ export const isValidColor = (color: string): boolean => {
   }
 
   // 支持的颜色格式：hex, rgb, rgba, hsl, hsla, 颜色名称
-  const colorRegex = /^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\)|[a-zA-Z]+)$/;
-  
+  const colorRegex =
+    /^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgb\(\s*\d+\s * \s*\d+\s* \s*\d+\s*\)|rgba\(\s*\d+\s * \s*\d+\s*, \s*\d+\s * \s*[\d.]+\s*\)|hsl\(\s*\d+\s * \s*\d+%\s* \s*\d+%\s*\)|hsla\(\s*\d+\s * \s*\d+%\s*, \s*\d+%\s * \s*[\d.]+\s*\)|[a-zA-Z]+)$/;
+
   return colorRegex.test(color.trim());
 };
 
@@ -97,28 +102,28 @@ export const isValidColor = (color: string): boolean => {
  * @returns 是否为有效数字
  */
 export const isValidNumber = (
-  value: unknown, 
-  options: {
+  value: unknown,
+  _options: {
     min?: number;
     max?: number;
     integer?: boolean;
   } = {}
 ): boolean => {
   const num = Number(value);
-  
+
   if (isNaN(num) || !isFinite(num)) {
     return false;
   }
 
-  if (options.integer && !Number.isInteger(num)) {
+  if (_options.integer && !Number.isInteger(num)) {
     return false;
   }
 
-  if (options.min !== undefined && num < options.min) {
+  if (_options.min !== undefined && num < _options.min) {
     return false;
   }
 
-  if (options.max !== undefined && num > options.max) {
+  if (_options.max !== undefined && num > _options.max) {
     return false;
   }
 
@@ -138,15 +143,26 @@ export const isValidFilename = (filename: string): boolean => {
 
   // Windows和Unix系统的非法字符
   const illegalChars = /[<>:"/\\|?*]/;
-  const controlChars = /[\u0000-\u001f]/;
+  // 检查控制字符（ASCII 1-31）
+  const hasControlChars = (str: string): boolean => {
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i);
+      if (code >= 1 && code <= 31) {
+        return true;
+      }
+    }
+    return false;
+  };
   const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
-  
-  return !illegalChars.test(filename) &&
-         !controlChars.test(filename) &&
-         !reservedNames.test(filename) &&
-         filename.length <= 255 &&
-         !filename.endsWith('.') &&
-         !filename.endsWith(' ');
+
+  return (
+    !illegalChars.test(filename) &&
+    !hasControlChars(filename) &&
+    !reservedNames.test(filename) &&
+    filename.length <= 255 &&
+    !filename.endsWith('.') &&
+    !filename.endsWith(', ')
+  );
 };
 
 /**
@@ -171,12 +187,12 @@ export const isValidIPv4 = (ip: string): boolean => {
     return false;
   }
 
-  const ipRegex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const ipRegex = /^(\d{1, 3})\.(\d{1, 3})\.(\d{1, 3})\.(\d{1, 3})$/;
   const match = ip.match(ipRegex);
-  
+
   if (!match) return false;
-  
-  return match.slice(1).every(octet => {
+
+  return match.slice(1).every((octet) => {
     const num = parseInt(octet, 10);
     return num >= 0 && num <= 255;
   });
@@ -193,6 +209,7 @@ export const isValidVersion = (version: string): boolean => {
     return false;
   }
 
-  const versionRegex = /^\d+\.\d+\.\d+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?(\+[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$/;
+  const versionRegex =
+    /^\d+\.\d+\.\d+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?(\+[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$/;
   return versionRegex.test(version);
 };

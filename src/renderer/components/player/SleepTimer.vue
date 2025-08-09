@@ -154,12 +154,12 @@ function handleSetSongsTimer(songs: number) {
 }
 
 // 处理设置播放列表结束定时器
-function handleSetPlaylistEndTimer() {
+function handleSetPlaylistEndTimer(): void {
   playerStore.setSleepTimerAtPlaylistEnd();
 }
 
 // 处理取消定时器
-function handleCancelTimer() {
+function handleCancelTimer(): void {
   playerStore.clearSleepTimer();
 }
 
@@ -205,7 +205,7 @@ onMounted(() => {
 });
 
 // 启动定时器更新UI
-function startTimerUpdate() {
+function startTimerUpdate(): void {
   stopTimerUpdate(); // 先停止之前的计时器
 
   // 每秒更新UI
@@ -216,7 +216,7 @@ function startTimerUpdate() {
 }
 
 // 停止定时器更新UI
-function stopTimerUpdate() {
+function stopTimerUpdate(): void {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;

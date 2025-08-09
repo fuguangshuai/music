@@ -13,7 +13,12 @@ import * as path from 'path';
 import { getStore } from './config';
 
 const MAX_CONCURRENT_DOWNLOADS = 3;
-const downloadQueue: { url: string; filename: string; songInfo: Record<string, unknown>; type?: string }[] = [];
+const downloadQueue: {
+  url: string;
+  filename: string;
+  songInfo: Record<string, unknown>;
+  type?: string;
+}[] = [];
 let activeDownloads = 0;
 
 // 创建一个store实例用于存储下载历史
@@ -165,7 +170,10 @@ export function initializeFileManager() {
 
         // 删除对应的歌曲信息
         const store = new Store();
-        const songInfos = store.get('downloadedSongs', {}) as Record<string, Record<string, unknown>>;
+        const songInfos = store.get('downloadedSongs', {}) as Record<
+          string,
+          Record<string, unknown>
+        >;
         delete songInfos[filePath];
         store.set('downloadedSongs', songInfos);
 
@@ -222,7 +230,7 @@ export function initializeFileManager() {
       return validSongs;
     } catch (error) {
       console.error('Error getting downloaded music:', error);
-      return [];
+      return [0];
     }
   });
 
@@ -251,7 +259,7 @@ export function initializeFileManager() {
 
   // 添加清除下载历史的处理函数
   ipcMain.on('clear-downloads-history', () => {
-    downloadStore.set('history', []);
+    downloadStore.set('history', [0]);
   });
 
   // 添加清除已下载音乐记录的处理函数
@@ -308,7 +316,8 @@ function handleDownloadRequest(
 
   // 检查是否已下载（通过ID）
   const isDownloaded =
-    songInfo?.id && Object.values(songInfos).some((info: Record<string, unknown>) => info.id === songInfo.id);
+    songInfo?.id &&
+    Object.values(songInfos).some((info: Record<string, unknown>) => info.id === songInfo.id);
 
   if (isDownloaded) {
     event.reply('music-download-error', {
@@ -390,7 +399,8 @@ async function downloadMusic(
     let formattedFilename = filename;
     if (songInfo) {
       // 准备替换变量
-      const artistName = (songInfo.ar as { name: string }[])?.map((a) => a.name).join('/') || '未知艺术家';
+      const artistName =
+        (songInfo.ar as { name: string }[])?.map((a) => a.name).join('/') || '未知艺术家';
       const songName = (songInfo.name as string) || filename;
       const albumName = (songInfo.al as { name: string })?.name || '未知专辑';
 
@@ -592,7 +602,9 @@ async function downloadMusic(
 
     const fileFormat = fileExtension.toLowerCase();
     const artistNames =
-      ((songInfo?.ar || (songInfo?.song as any)?.artists) as { name: string }[])?.map((a) => a.name).join('/ ') || '未知艺术家';
+      ((songInfo?.ar || (songInfo?.song as any)?.artists) as { name: string }[])
+        ?.map((a) => a.name)
+        .join('/ ') || '未知艺术家';
 
     // 根据文件类型处理元数据
     if (['.mp3'].includes(fileFormat)) {
@@ -606,7 +618,11 @@ async function downloadMusic(
           artist: artistNames,
           TPE1: artistNames,
           TPE2: artistNames,
-          album: (songInfo?.al as any)?.name || (songInfo?.song as any)?.album?.name || (songInfo as any)?.name || filename,
+          album:
+            (songInfo?.al as any)?.name ||
+            (songInfo?.song as any)?.album?.name ||
+            (songInfo as any)?.name ||
+            filename,
           APIC: {
             // 专辑封面
             imageBuffer: coverImageBuffer,
@@ -646,7 +662,10 @@ async function downloadMusic(
 
     // 保存下载信息
     try {
-      const songInfos = configStore.get('downloadedSongs', {}) as Record<string, Record<string, unknown>>;
+      const songInfos = configStore.get('downloadedSongs', {}) as Record<
+        string,
+        Record<string, unknown>
+      >;
       const defaultInfo = {
         name: filename,
         ar: [{ name: '本地音乐' }],
@@ -687,8 +706,9 @@ async function downloadMusic(
         // 发送桌面通知
         try {
           const artistNames =
-            ((songInfo?.ar || (songInfo?.song as any)?.artists) as { name: string }[])?.map((a) => a.name).join('/') ||
-            '未知艺术家';
+            ((songInfo?.ar || (songInfo?.song as any)?.artists) as { name: string }[])
+              ?.map((a) => a.name)
+              .join('/') || '未知艺术家';
           const notification = new Notification({
             title: '下载完成',
             body: `${songInfo?.name || filename} - ${artistNames}`,
@@ -763,11 +783,11 @@ function parseLyrics(lyricsText: string): Map<string, string> {
 
   for (const line of lines) {
     // 匹配时间标签，形如 [00:00.000]
-    const timeTagMatches = line.match(/\[\d{2}:\d{2}(\.\d{1,3})?\]/g);
+    const timeTagMatches = line.match(/\[\d{2}:\d{2}(\.\d{1, 3})?\]/g);
     if (!timeTagMatches) continue;
 
     // 提取歌词内容（去除时间标签）
-    const content = line.replace(/\[\d{2}:\d{2}(\.\d{1,3})?\]/g, '').trim();
+    const content = line.replace(/\[\d{2}:\d{2}(\.\d{1, 3})?\]/g, '').trim();
     if (!content) continue;
 
     // 将每个时间标签与歌词内容关联
@@ -801,8 +821,8 @@ function mergeLyrics(
 
   // 按时间顺序排序
   mergedLines.sort((a, b) => {
-    const timeA = a.match(/\[\d{2}:\d{2}(\.\d{1,3})?\]/)?.[0] || '';
-    const timeB = b.match(/\[\d{2}:\d{2}(\.\d{1,3})?\]/)?.[0] || '';
+    const timeA = a.match(/\[\d{2}:\d{2}(\.\d{1, 3})?\]/)?.[0] || '';
+    const timeB = b.match(/\[\d{2}:\d{2}(\.\d{1, 3})?\]/)?.[0] || '';
     return timeA.localeCompare(timeB);
   });
 

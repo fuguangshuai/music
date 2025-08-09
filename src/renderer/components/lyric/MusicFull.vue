@@ -174,7 +174,7 @@ import { animateGradient, getHoverBackgroundColor, getTextColors } from '@/utils
 
 const { t } = useI18n();
 // 定义 refs
-const lrcSider = ref<any>(null);
+const lrcSider = ref<unknown>(null);
 const isMouse = ref(false);
 const lrcContainer = ref<HTMLElement | null>(null);
 const currentBackground = ref('');
@@ -237,7 +237,7 @@ const lrcScroll = (behavior: ScrollBehavior = 'smooth', forceTop: boolean = fals
   if (!isVisible.value || !lrcSider.value) return;
 
   if (forceTop) {
-    lrcSider.value.scrollTo({
+    (lrcSider.value as any).scrollTo({
       top: 0,
       behavior
     });
@@ -248,11 +248,11 @@ const lrcScroll = (behavior: ScrollBehavior = 'smooth', forceTop: boolean = fals
 
   const nowEl = document.querySelector(`#music-lrc-text-${nowIndex.value}`) as HTMLElement;
   if (nowEl) {
-    const containerHeight = lrcSider.value.$el.clientHeight;
+    const containerHeight = (lrcSider.value as any).$el.clientHeight;
     const elementTop = nowEl.offsetTop;
     const scrollTop = elementTop - containerHeight / 2 + nowEl.clientHeight / 2;
 
-    lrcSider.value.scrollTo({
+    (lrcSider.value as any).scrollTo({
       top: scrollTop,
       behavior
     });
@@ -318,11 +318,11 @@ const setTextColors = (background: string) => {
     if (animationFrame.value) {
       cancelAnimationFrame(animationFrame.value);
     }
-    const result = animateGradient(currentBackground.value, background, (gradient) => {
+    const _result = animateGradient(currentBackground.value, background, (gradient) => {
       currentBackground.value = gradient;
     });
-    if (typeof result === 'number') {
-      animationFrame.value = result;
+    if (typeof _result === 'number') {
+      animationFrame.value = _result;
     }
   } else {
     currentBackground.value = background;
@@ -404,7 +404,7 @@ watch(
       document.documentElement.style.setProperty('--current-font-family', defaultFonts);
     } else {
       // 处理多个字体，确保每个字体名都被正确引用
-      const fontList = newFont.split(',').map((font) => {
+      const fontList = newFont.split(', ').map((font) => {
         const trimmedFont = font.trim();
         // 如果字体名包含空格或特殊字符，添加引号（如果还没有引号的话）
         return /[\s'"()]/.test(trimmedFont) && !/^['"].*['"]$/.test(trimmedFont)
@@ -434,7 +434,7 @@ watch(
 // 监听滚动事件
 const handleScroll = () => {
   if (!lrcSider.value || !config.value.hideCover) return;
-  const { scrollTop } = lrcSider.value.$el;
+  const { scrollTop } = (lrcSider.value as any).$el;
   showStickyHeader.value = scrollTop > 100;
 };
 
@@ -447,8 +447,8 @@ const closeMusicFull = () => {
 
 // 添加滚动监听
 onMounted(() => {
-  if (lrcSider.value?.$el) {
-    lrcSider.value.$el.addEventListener('scroll', handleScroll);
+  if ((lrcSider.value as any)?.$el) {
+    (lrcSider.value as any).$el.addEventListener('scroll', handleScroll);
   }
 });
 
@@ -457,8 +457,8 @@ onBeforeUnmount(() => {
   if (animationFrame.value) {
     cancelAnimationFrame(animationFrame.value);
   }
-  if (lrcSider.value?.$el) {
-    lrcSider.value.$el.removeEventListener('scroll', handleScroll);
+  if ((lrcSider.value as any)?.$el) {
+    (lrcSider.value as any).$el.removeEventListener('scroll', handleScroll);
   }
 });
 
@@ -466,7 +466,7 @@ onBeforeUnmount(() => {
 watch(
   () => config.value.fontSize,
   (newSize) => {
-    document.documentElement.style.setProperty('--lyric-font-size', `${newSize}px`);
+    document.documentElement.style.setProperty('--lyric-font-_size', `${newSize}px`);
   }
 );
 
@@ -502,8 +502,8 @@ onMounted(() => {
   if (savedConfig) {
     config.value = { ...config.value, ...JSON.parse(savedConfig) };
   }
-  if (lrcSider.value?.$el) {
-    lrcSider.value.$el.addEventListener('scroll', handleScroll);
+  if ((lrcSider.value as any)?.$el) {
+    (lrcSider.value as any).$el.addEventListener('scroll', handleScroll);
   }
 });
 
@@ -637,13 +637,10 @@ defineExpose({
     width: 500px;
     height: 550px;
     position: relative;
-    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0% black 10% black 90% transparent 100%);
     -webkit-mask-image: linear-gradient(
       to bottom,
-      transparent 0%,
-      black 10%,
-      black 90%,
-      transparent 100%
+      transparent 0% black 10% black 90% transparent 100%
     );
 
     .music-info-header {
@@ -664,7 +661,7 @@ defineExpose({
       @apply text-2xl cursor-pointer font-bold px-2 py-4;
       transition: all 0.3s ease;
       background-color: transparent;
-      font-size: var(--lyric-font-size, 22px) !important;
+      font-size: var(--lyric-font-_size, 22px) !important;
       letter-spacing: var(--lyric-letter-spacing, 0) !important;
       line-height: var(--lyric-line-height, 2) !important;
 
@@ -803,7 +800,7 @@ defineExpose({
 
 .lyric-correction {
   /* 仅在 hover 歌词区域时显示 */
-  .music-lrc:hover & {
+  .music-lrc: hover & {
     opacity: 1 !important;
     pointer-events: auto !important;
   }

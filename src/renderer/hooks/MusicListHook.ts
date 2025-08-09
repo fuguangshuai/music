@@ -12,7 +12,11 @@ import { getImageLinearBackground } from '@/utils/linearColor';
 const musicHistory = useMusicHistory();
 
 // 获取歌曲url
-export const getSongUrl = async (id: number, songData: SongResult, isDownloaded: boolean = false) => {
+export const getSongUrl = async (
+  id: number,
+  songData: SongResult,
+  _isDownloaded: boolean = false
+) => {
   const settingsStore = useSettingsStore();
   const unlimitedDownload = (settingsStore.setData as any).unlimitedDownload;
 
@@ -31,7 +35,7 @@ export const getSongUrl = async (id: number, songData: SongResult, isDownloaded:
   } catch (error) {
     console.error('error', error);
   }
-  if (isDownloaded) {
+  if (_isDownloaded) {
     return songDetail;
   }
   url = url || data.data[0].url;
@@ -41,7 +45,8 @@ export const getSongUrl = async (id: number, songData: SongResult, isDownloaded:
 const getSongDetail = async (playMusic: SongResult) => {
   playMusic.playLoading = true;
   const songUrl = await getSongUrl(playMusic.id as number, cloneDeep(playMusic));
-  const playMusicUrl = playMusic.playMusicUrl || (typeof songUrl === 'string' ? songUrl : undefined);
+  const playMusicUrl =
+    playMusic.playMusicUrl || (typeof songUrl === 'string' ? songUrl : undefined);
   const { backgroundColor, primaryColor } =
     playMusic.backgroundColor && playMusic.primaryColor
       ? playMusic
@@ -58,45 +63,53 @@ interface PlayerState {
   play: boolean;
   playList: SongResult[];
   playListIndex: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const useMusicListHook = () => {
-  const handlePlayMusic = async (state: PlayerState, playMusic: SongResult, isPlay: boolean = true) => {
+  const handlePlayMusic = async (
+    _state: PlayerState,
+    playMusic: SongResult,
+    isPlay: boolean = true
+  ) => {
     const updatedPlayMusic = await getSongDetail(playMusic);
-    state.playMusic = updatedPlayMusic;
-    state.playMusicUrl = updatedPlayMusic.playMusicUrl;
+    _state.playMusic = updatedPlayMusic;
+    _state.playMusicUrl = updatedPlayMusic.playMusicUrl;
 
     // 记录当前设置的播放状态
-    state.play = isPlay;
+    _state.play = isPlay;
 
     // 每次设置新歌曲时，立即更新 localStorage
-    localStorage.setItem('currentPlayMusic', JSON.stringify(state.playMusic));
-    localStorage.setItem('currentPlayMusicUrl', state.playMusicUrl || '');
-    localStorage.setItem('isPlaying', state.play.toString());
+    localStorage.setItem('currentPlayMusic', JSON.stringify(_state.playMusic));
+    localStorage.setItem('currentPlayMusicUrl', _state.playMusicUrl || '');
+    localStorage.setItem('isPlaying', _state.play.toString());
 
     // 设置网页标题
     document.title = `${updatedPlayMusic.name} - ${updatedPlayMusic?.song?.artists?.reduce((prev, curr) => `${prev}${curr.name}/`, '')}`;
-    loadLrcAsync(state, updatedPlayMusic.id as number);
-    musicHistory.addMusic(state.playMusic);
-    const playListIndex = state.playList.findIndex((item: SongResult) => item.id === playMusic.id);
-    state.playListIndex = playListIndex;
+    loadLrcAsync(_state, updatedPlayMusic.id as number);
+    musicHistory.addMusic(_state.playMusic);
+    const playListIndex = _state.playList.findIndex((item: SongResult) => item.id === playMusic.id);
+    _state.playListIndex = playListIndex;
     // 请求后续五首歌曲的详情
-    fetchSongs(state, playListIndex + 1, playListIndex + 6);
+    fetchSongs(_state, playListIndex + 1, playListIndex + 6);
   };
 
   // 🗑️ 移除旧的预加载音频数组，现在使用统一的audioPreloadService
 
   // 🧠 使用智能预加载服务替代原有逻辑
-  const preloadNextSong = async (nextSongUrl: string, songInfo?: SongResult, priority: 'high' | 'medium' | 'low' = 'medium') => {
+  const preloadNextSong = async (
+    nextSongUrl: string,
+    songInfo?: SongResult,
+    _priority: 'high' | 'medium' | 'low' = 'medium'
+  ) => {
     try {
       if (!nextSongUrl) {
-        console.warn('🚫 预加载URL为空，跳过预加载');
+        console.warn('🚫, 预加载URL为空，跳过预加载');
         return null;
       }
 
       console.log('🧠 MusicListHook使用智能预加载服务:', nextSongUrl);
-      const sound = await smartPreloadService.smartPreloadAudio(nextSongUrl, songInfo, priority);
+      const sound = await smartPreloadService.smartPreloadAudio(nextSongUrl, songInfo, 'medium');
 
       if (sound) {
         console.log('✅ MusicListHook智能音频预加载成功:', nextSongUrl);
@@ -112,11 +125,11 @@ export const useMusicListHook = () => {
     }
   };
 
-  const fetchSongs = async (state: PlayerState, startIndex: number, endIndex: number) => {
+  const fetchSongs = async (_state: PlayerState, startIndex: number, endIndex: number) => {
     try {
-      const songs = state.playList.slice(
+      const songs = _state.playList.slice(
         Math.max(0, startIndex),
-        Math.min(endIndex, state.playList.length)
+        Math.min(endIndex, _state.playList.length)
       );
 
       const detailedSongs = await Promise.all(
@@ -136,7 +149,7 @@ export const useMusicListHook = () => {
 
       // 加载下一首的歌词
       const nextSong = detailedSongs[0];
-      if (nextSong && !(nextSong.lyric && nextSong.lyric.lrcTimeArray.length > 0)) {
+      if (nextSong && !(nextSong.lyric && nextSong.lyric.lrcTimeArray.length, 0)) {
         try {
           nextSong.lyric = await loadLrc(nextSong.id as number);
         } catch (error) {
@@ -146,8 +159,8 @@ export const useMusicListHook = () => {
 
       // 更新播放列表中的歌曲详情
       detailedSongs.forEach((song, index) => {
-        if (song && startIndex + index < state.playList.length) {
-          state.playList[startIndex + index] = song;
+        if (song && startIndex + index < _state.playList.length) {
+          _state.playList[startIndex + index] = song;
         }
       });
 
@@ -160,36 +173,37 @@ export const useMusicListHook = () => {
     }
   };
 
-  const nextPlay = async (state: PlayerState) => {
-    if (state.playList.length === 0) {
-      state.play = true;
+  const nextPlay = async (_state: PlayerState) => {
+    if (_state.playList.length === 0) {
+      _state.play = true;
       return;
     }
 
     let playListIndex: number;
 
-    if (state.playMode === 2) {
+    if (_state.playMode === 2) {
       // 随机播放模式
       do {
-        playListIndex = Math.floor(Math.random() * state.playList.length);
-      } while (playListIndex === state.playListIndex && state.playList.length > 1);
+        playListIndex = Math.floor(Math.random() * _state.playList.length);
+      } while (playListIndex === _state.playListIndex && _state.playList.length > 1);
     } else {
       // 列表循环模式
-      playListIndex = (state.playListIndex + 1) % state.playList.length;
+      playListIndex = (_state.playListIndex + 1) % _state.playList.length;
     }
 
-    state.playListIndex = playListIndex;
-    await handlePlayMusic(state, state.playList[playListIndex]);
+    _state.playListIndex = playListIndex;
+    await handlePlayMusic(_state, _state.playList[playListIndex]);
   };
 
-  const prevPlay = async (state: PlayerState) => {
-    if (state.playList.length === 0) {
-      state.play = true;
+  const prevPlay = async (_state: PlayerState) => {
+    if (_state.playList.length === 0) {
+      _state.play = true;
       return;
     }
-    const playListIndex = (state.playListIndex - 1 + state.playList.length) % state.playList.length;
-    await handlePlayMusic(state, state.playList[playListIndex]);
-    await fetchSongs(state, playListIndex - 5, playListIndex);
+    const playListIndex =
+      (_state.playListIndex - 1 + _state.playList.length) % _state.playList.length;
+    await handlePlayMusic(_state, _state.playList[playListIndex]);
+    await fetchSongs(_state, playListIndex - 5, playListIndex);
   };
 
   const parseTime = (timeString: string): number => {
@@ -197,12 +211,12 @@ export const useMusicListHook = () => {
     return Number(minutes) * 60 + Number(seconds);
   };
 
-  const parseLyricLine = (lyricLine: string): { time: number; text: string } => {
+  const parseLyricLine = (_lyricLine: string): { time: number; text: string } => {
     const TIME_REGEX = /(\d{2}:\d{2}(\.\d*)?)/g;
     const LRC_REGEX = /(\[(\d{2}):(\d{2})(\.(\d*))?\])/g;
-    const timeText = lyricLine.match(TIME_REGEX)?.[0] || '';
+    const timeText = _lyricLine.match(TIME_REGEX)?.[0] || '';
     const time = parseTime(timeText);
-    const text = lyricLine.replace(LRC_REGEX, '').trim();
+    const text = _lyricLine.replace(LRC_REGEX, '').trim();
     return { time, text };
   };
 
@@ -218,9 +232,9 @@ export const useMusicListHook = () => {
     return { lyrics, times };
   };
 
-  const loadLrc = async (playMusicId: number): Promise<ILyric> => {
+  const loadLrc = async (_playMusicId: number): Promise<ILyric> => {
     try {
-      const { data } = await getMusicLrc(playMusicId);
+      const { data } = await getMusicLrc(_playMusicId);
       const { lyrics, times } = parseLyrics((data as any).lrc.lyric);
       const tlyric: Record<string, string> = {};
 
@@ -248,12 +262,12 @@ export const useMusicListHook = () => {
   };
 
   // 异步加载歌词的方法
-  const loadLrcAsync = async (state: PlayerState, playMusicId: number) => {
-    if (state.playMusic.lyric && state.playMusic.lyric.lrcTimeArray.length > 0) {
+  const loadLrcAsync = async (_state: PlayerState, _playMusicId: number) => {
+    if (_state.playMusic.lyric && _state.playMusic.lyric.lrcTimeArray.length > 0) {
       return;
     }
-    const lyrics = await loadLrc(playMusicId);
-    state.playMusic.lyric = lyrics;
+    const lyrics = await loadLrc(_playMusicId);
+    _state.playMusic.lyric = lyrics;
   };
 
   const play = () => {

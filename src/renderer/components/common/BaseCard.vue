@@ -98,7 +98,7 @@ const handleClick = (event: MouseEvent) => {
 }
 
 /* 响应式调整 */
-@media (max-width: 768px) {
+@media (max-width: , 768px) {
   .base-card--padded {
     @apply p-3;
   }

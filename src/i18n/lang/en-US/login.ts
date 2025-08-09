@@ -30,7 +30,8 @@ export default {
     tokenInvalid: 'Invalid Cookie, please check and try again',
     autoGetCookieSuccess: 'Auto get Cookie successful',
     autoGetCookieFailed: 'Auto get Cookie failed',
-    autoGetCookieTip: 'Will open NetEase Cloud Music login page, please complete login and close the window'
+    autoGetCookieTip:
+      'Will open NetEase Cloud Music login page, please complete login and close the window'
   },
   qrTitle: 'NetEase Cloud Music QR Code Login'
 };

@@ -4,7 +4,7 @@
     :class="[
       setAnimationClass('animate__bounceInUp'),
       musicFullVisible ? 'play-bar-opcity' : '',
-      musicFullVisible && MusicFullRef?.musicFullRef?.config?.hidePlayBar
+      musicFullVisible && (MusicFullRef as any)?.musicFullRef?.config?.hidePlayBar
         ? 'animate__animated animate__slideOutDown'
         : ''
     ]"
@@ -77,7 +77,7 @@
             class="cursor-pointer hover:text-green-500"
             @click="handleArtistClick(artists.id)"
           >
-            {{ artists.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
+            {{ artists?.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
           </span>
         </n-ellipsis>
       </div>
@@ -316,22 +316,22 @@ const togglePlayMode = () => {
   playerStore.togglePlayMode();
 };
 
-function handleNext() {
+function handleNext(): void {
   playerStore.nextPlay();
 }
 
-function handlePrev() {
+function handlePrev(): void {
   playerStore.prevPlay();
 }
 
-const MusicFullRef = ref<any>(null);
+const MusicFullRef = ref<unknown>(null);
 const showSliderTooltip = ref(false);
 
 // 播放暂停按钮事件
 const playMusicEvent = async () => {
   try {
-    const result = await playerStore.setPlay({ ...playMusic.value });
-    if (result) {
+    const _result = await playerStore.setPlay({ ...playMusic.value });
+    if (_result) {
       playerStore.setPlayMusic(true);
     }
   } catch (error) {

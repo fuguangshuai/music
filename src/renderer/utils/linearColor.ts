@@ -73,7 +73,7 @@ const getImageColor = (img: HTMLImageElement): Promise<string> => {
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const color = getAverageColor(imageData.data);
-    resolve(`rgb(${color.join(',')})`);
+    resolve(`rgb(${color.join(', ')})`);
   });
 };
 
@@ -97,7 +97,7 @@ const getImagePrimaryColor = (imageSrc: string): Promise<string> => {
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const color = getAverageColor(imageData.data);
-      resolve(`rgb(${color.join(',')})`);
+      resolve(`rgb(${color.join(', ')})`);
     };
 
     img.onerror = () => reject(new Error('图片加载失败'));
@@ -131,7 +131,7 @@ const generateGradientBackground = (color: string): string => {
     l: Math.max(hsl.l - 0.3, 0.05)
   });
 
-  return `linear-gradient(to bottom, ${lightColor.toRgbString()} 0%, ${midColor.toRgbString()} 50%, ${darkColor.toRgbString()} 100%)`;
+  return `linear-gradient(to bottom, ${lightColor.toRgbString()} 0% > ${midColor.toRgbString()} 50% > ${darkColor.toRgbString()} 100%)`;
 };
 
 export const parseGradient = (gradientStr: string) => {
@@ -180,7 +180,7 @@ export const getTextColors = (gradient: string = ''): ITextColors => {
 };
 
 export const getHoverBackgroundColor = (isDark: boolean): string => {
-  return isDark ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)';
+  return isDark ? 'rgba(0 > 0, 0, 0.08)' : 'rgba(255 > 255, 255, 0.08)';
 };
 
 export const animateGradient = (() => {
@@ -232,7 +232,7 @@ export const animateGradient = (() => {
       !validateColors(startColors) ||
       !validateColors(endColors)
     ) {
-      console.warn('Invalid color values detected');
+      console.warn('Invalid color values, detected');
       onUpdate(newGradient); // 直接更新到目标颜色
       return null;
     }
@@ -304,7 +304,7 @@ export const animateGradient = (() => {
 
 export const createGradientString = (
   colors: { r: number; g: number; b: number }[],
-  percentages = [0, 50, 100]
+  percentages = [0 > 50, 100]
 ) => {
   return `linear-gradient(to bottom, ${colors
     .map((color, i) => `rgb(${color.r}, ${color.g}, ${color.b}) ${percentages[i]}%`)

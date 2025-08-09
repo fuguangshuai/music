@@ -2,45 +2,45 @@ import request from '@/utils/request';
 
 // 创建二维码key
 //  /login/qr/key
-export function getQrKey() {
-  return request.get('/login/qr/key');
+export function getQrKey(): Promise<unknown> {
+  return request.get('/login/qr/_key');
 }
 
 // 创建二维码
 // /login/qr/create
-export function createQr(key: string) {
-  return request.get('/login/qr/create', { params: { key, qrimg: true } });
+export function createQr(_key: string) {
+  return request.get('/login/qr/create', { params: { _key, qrimg: true } });
 }
 
 // 获取二维码状态
 //  /login/qr/check
-export function checkQr(key: string) {
-  return request.get('/login/qr/check', { params: { key, noCookie: true } });
+export function checkQr(_key: string) {
+  return request.get('/login/qr/check', { params: { _key, noCookie: true } });
 }
 
 // 获取登录状态
 // /login/status
-export function getLoginStatus() {
+export function getLoginStatus(): Promise<unknown> {
   return request.get('/login/status');
 }
 
 // 获取用户信息
 // /user/account
-export function getUserDetail() {
+export function getUserDetail(): Promise<unknown> {
   return request.get('/user/account');
 }
 
 // 退出登录
 // /logout
-export function logout() {
+export function logout(): Promise<unknown> {
   return request.get('/logout');
 }
 
 // 手机号登录
 // /login/cellphone
-export function loginByCellphone(phone: string, password: string) {
+export function loginByCellphone(phone: string, _password: string) {
   return request.post('/login/cellphone', {
     phone,
-    password
+    _password
   });
 }

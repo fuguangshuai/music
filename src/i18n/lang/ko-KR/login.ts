@@ -30,7 +30,8 @@ export default {
     tokenInvalid: 'Cookie이 유효하지 않습니다. 확인 후 다시 시도하세요',
     autoGetCookieSuccess: 'Cookie 자동 가져오기 성공',
     autoGetCookieFailed: 'Cookie 자동 가져오기 실패',
-    autoGetCookieTip: '넷이즈 클라우드 뮤직 로그인 페이지를 열겠습니다. 로그인 완료 후 창을 닫아주세요'
+    autoGetCookieTip:
+      '넷이즈 클라우드 뮤직 로그인 페이지를 열겠습니다. 로그인 완료 후 창을 닫아주세요'
   },
   qrTitle: '넷이즈 클라우드 뮤직 QR코드 로그인'
 };

@@ -31,7 +31,7 @@ const createDownloadManager = () => {
     },
 
     // 移除下载
-    removeDownload: (filename: string) => {
+    _removeDownload: (filename: string) => {
       activeDownloads.delete(filename);
       // 延迟清理通知记录
       setTimeout(() => {
@@ -40,23 +40,26 @@ const createDownloadManager = () => {
     },
 
     // 标记文件已通知
-    markNotified: (filename: string) => {
+    _markNotified: (filename: string) => {
       notifiedDownloads.add(filename);
     },
 
     // 检查文件是否已通知
-    isNotified: (filename: string) => {
+    _isNotified: (filename: string) => {
       return notifiedDownloads.has(filename);
     },
 
     // 清理所有下载
-    clearDownloads: () => {
+    _clearDownloads: () => {
       activeDownloads.clear();
       notifiedDownloads.clear();
     },
 
     // 初始化事件监听器
-    initEventListeners: (message: { success: (msg: string) => void; error: (msg: string) => void }, t: (key: string) => string) => {
+    _initEventListeners: (
+      _message: { success: (msg: string) => void; error: (msg: string) => void },
+      t: (_key: string) => string
+    ) => {
       if (isInitialized) return;
 
       // 移除可能存在的旧监听器
@@ -69,35 +72,35 @@ const createDownloadManager = () => {
       }
 
       // 创建新的监听器
-      completeListener = (_event, data: any) => {
-        if (!data.filename || !activeDownloads.has(data.filename)) return;
+      completeListener = (_event, data: unknown) => {
+        if (!(data as any).filename || !activeDownloads.has((data as any).filename)) return;
 
         // 如果该文件已经通知过，则跳过
-        if (notifiedDownloads.has(data.filename)) return;
+        if (notifiedDownloads.has((data as any).filename)) return;
 
         // 标记为已通知
-        notifiedDownloads.add(data.filename);
+        notifiedDownloads.add((data as any).filename);
 
         // 从活动下载移除
-        activeDownloads.delete(data.filename);
+        activeDownloads.delete((data as any).filename);
       };
 
-      errorListener = (_event, data: any) => {
-        if (!data.filename || !activeDownloads.has(data.filename)) return;
+      errorListener = (_event, data: unknown) => {
+        if (!(data as any).filename || !activeDownloads.has((data as any).filename)) return;
 
         // 如果该文件已经通知过，则跳过
-        if (notifiedDownloads.has(data.filename)) return;
+        if (notifiedDownloads.has((data as any).filename)) return;
 
         // 标记为已通知
-        notifiedDownloads.add(data.filename);
+        notifiedDownloads.add((data as any).filename);
 
         // 显示失败通知
-        message.error(
-          `${t('songItem.message.downloadFailed')}: ${data.filename} - ${data.error || '未知错误'}`
+        (_message as any).error(
+          `${t('(songItem instanceof Error ? songItem.message : String(songItem)).downloadFailed')}: ${(data as any).filename} - ${(data as any).error || '未知错误'}`
         );
 
         // 从活动下载移除
-        activeDownloads.delete(data.filename);
+        activeDownloads.delete((data as any).filename);
       };
 
       // 添加监听器
@@ -108,7 +111,7 @@ const createDownloadManager = () => {
     },
 
     // 清理事件监听器
-    cleanupEventListeners: () => {
+    _cleanupEventListeners: () => {
       if (!isInitialized) return;
 
       if (completeListener) {
@@ -125,12 +128,12 @@ const createDownloadManager = () => {
     },
 
     // 获取活跃下载数量
-    getActiveDownloadCount: () => {
+    _getActiveDownloadCount: () => {
       return activeDownloads.size;
     },
 
     // 检查是否有特定文件正在下载
-    hasDownload: (filename: string) => {
+    _hasDownload: (filename: string) => {
       return activeDownloads.has(filename);
     }
   };
@@ -145,7 +148,7 @@ export const useDownload = () => {
   const isDownloading = ref(false);
 
   // 初始化事件监听器
-  downloadManager.initEventListeners(message, t);
+  downloadManager._initEventListeners(message, t);
 
   /**
    * 下载单首音乐
@@ -154,7 +157,9 @@ export const useDownload = () => {
    */
   const downloadMusic = async (song: SongResult) => {
     if (isDownloading.value) {
-      message.warning(t('songItem.message.downloading'));
+      message.warning(
+        t('(songItem instanceof Error ? songItem.message : String(songItem)).downloading')
+      );
       return;
     }
 
@@ -163,15 +168,19 @@ export const useDownload = () => {
 
       const musicUrl = (await getSongUrl(song.id as number, cloneDeep(song), true)) as string;
       if (!musicUrl) {
-        throw new Error(t('songItem.message.getUrlFailed'));
+        throw new Error(
+          t('(songItem instanceof Error ? songItem.message : String(songItem)).getUrlFailed')
+        );
       }
 
       // 构建文件名
-      const artistNames = (song.ar || (song.song as any)?.artists)?.map((a: any) => a.name).join(',');
+      const artistNames = (song.ar || (song.song as any)?.artists)
+        ?.map((a: unknown) => (a as any).name)
+        .join(', ');
       const filename = `${song.name} - ${artistNames}`;
 
       // 检查是否已在下载
-      if (downloadManager.hasDownload(filename)) {
+      if (downloadManager._hasDownload(filename)) {
         isDownloading.value = false;
         return;
       }
@@ -193,7 +202,9 @@ export const useDownload = () => {
         type: typeof musicUrl === 'string' ? 'mp3' : (musicUrl as any)?.type || 'mp3'
       });
 
-      message.success(t('songItem.message.downloadQueued'));
+      message.success(
+        t('(songItem instanceof Error ? songItem.message : String(songItem)).downloadQueued')
+      );
 
       // 简化的监听逻辑，基本通知由全局监听器处理
       setTimeout(() => {
@@ -202,7 +213,10 @@ export const useDownload = () => {
     } catch (error: unknown) {
       console.error('Download error:', error);
       isDownloading.value = false;
-      message.error((error as Error)?.message || t('songItem.message.downloadFailed'));
+      message.error(
+        (error as Error)?.message ||
+          t('(songItem instanceof Error ? songItem.message : String(songItem)).downloadFailed')
+      );
     }
   };
 
@@ -265,10 +279,10 @@ export const useDownload = () => {
         }
 
         const songData = cloneDeep(song);
-        const filename = `${song.name} - ${(song.ar || song.song?.artists)?.map((a) => a.name).join(',')}`;
+        const filename = `${song.name} - ${(song.ar || song.song?.artists)?.map((a) => a.name).join(', ')}`;
 
         // 检查是否已在下载
-        if (downloadManager.hasDownload(filename)) {
+        if (downloadManager._hasDownload(filename)) {
           failCount++;
           trackProgress();
           return;

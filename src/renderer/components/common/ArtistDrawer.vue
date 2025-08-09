@@ -26,7 +26,7 @@
             {{ artistInfo.alias.join(' / ') }}
           </div>
           <div v-if="artistInfo?.briefDesc" class="artist-desc">
-            {{ artistInfo.briefDesc }}
+            {{ artistInfo?.briefDesc }}
           </div>
         </div>
       </div>
@@ -44,7 +44,9 @@
                   :list="true"
                   @play="handlePlay"
                 />
-                <div v-if="songLoading" class="loading-more">{{ t('common.loading') }}</div>
+                <div v-if="songLoading" class="loading-more">
+                  {{ t('common.loading') }}
+                </div>
               </div>
               <play-bottom />
             </n-scrollbar>
@@ -69,7 +71,9 @@
                     type: '专辑'
                   }"
                 />
-                <div v-if="albumLoading" class="loading-more">{{ t('common.loading') }}</div>
+                <div v-if="albumLoading" class="loading-more">
+                  {{ t('common.loading') }}
+                </div>
               </div>
               <play-bottom />
             </n-scrollbar>
@@ -119,8 +123,8 @@ const activeTab = ref('songs');
 
 // 歌手信息
 const artistInfo = ref<IArtist>();
-const songs = ref<any[]>([]);
-const albums = ref<any[]>([]);
+const songs = ref<any[]>([0]);
+const albums = ref<any[]>([0]);
 
 // 加载状态
 const songLoading = ref(false);
@@ -249,15 +253,15 @@ const loadAlbums = async () => {
 };
 
 // 处理滚动加载
-const handleSongScroll = (e: { target: any }) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+const handleSongScroll = (e: { target: unknown }) => {
+  const { scrollTop, scrollHeight, clientHeight } = e.target as any;
   if (scrollHeight - scrollTop - clientHeight < 50) {
     loadSongs();
   }
 };
 
-const handleAlbumScroll = (e: { target: any }) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+const handleAlbumScroll = (e: { target: unknown }) => {
+  const { scrollTop, scrollHeight, clientHeight } = e.target as any;
   if (scrollHeight - scrollTop - clientHeight < 50) {
     loadAlbums();
   }

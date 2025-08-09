@@ -9,8 +9,8 @@ import { createRequest, type RequestConfig } from './requestFactory';
 const getApiUrls = () => {
   const envVars = getApiEnvVars();
   return [
-    envVars.musicApi, // 0: 主API
-    envVars.musicApiBackup // 1: 备用API
+    envVars._musicApi, // 0: 主API
+    envVars._musicApiBackup // 1: 备用API
   ].filter(Boolean); // 过滤掉空值
 };
 
@@ -33,7 +33,7 @@ const requestMusic = (apiIndex: number = 0): AxiosInstance => {
 
   // 检查API地址是否存在
   if (!baseURL) {
-    throw new Error(`API索引 ${apiIndex} 对应的地址未配置`);
+    throw new Error(`API索引 ${apiIndex}, 对应的地址未配置`);
   }
 
   // 音乐API配置
@@ -69,7 +69,7 @@ const requestMusic = (apiIndex: number = 0): AxiosInstance => {
  * @param config axios请求配置
  * @param maxRetry 最大重试次数，默认尝试所有API
  */
-export const smartRequest = async (config: AxiosRequestConfig, maxRetry?: number) => {
+export const smartRequest = async (_config: AxiosRequestConfig, maxRetry?: number) => {
   const apiUrls = getApiUrls();
   const actualMaxRetry = maxRetry ?? apiUrls.length - 1;
   return withRetry(
@@ -81,8 +81,8 @@ export const smartRequest = async (config: AxiosRequestConfig, maxRetry?: number
         try {
           const instance = requestMusic(i);
           console.log(`尝试使用API ${i}: ${apiUrls[i]}`);
-          const result = await instance(config);
-          console.log(`API ${i} 请求成功`);
+          const result = await instance(_config);
+          console.log(`API ${i}, 请求成功`);
           return result;
         } catch (err) {
           console.warn(`API ${i} 请求失败:`, err);
@@ -102,8 +102,11 @@ export const smartRequest = async (config: AxiosRequestConfig, maxRetry?: number
       maxRetries: 2, // 额外重试2次
       delay: 1000,
       backoff: 'linear',
-      onRetry: (error, attempt) => {
-        console.log(`smartRequest 重试第 ${attempt + 1} 次:`, error.message);
+      onRetry: (error, _attempt): void => {
+        console.log(
+          `smartRequest 重试第 ${_attempt + 1} 次: `,
+          error instanceof Error ? error.message : String(error)
+        );
       }
     }
   );
@@ -117,6 +120,6 @@ export const getApiCount = () => getApiUrls().length;
 /**
  * 获取API地址
  */
-export const getApiUrl = (index: number) => getApiUrls()[index];
+export const getApiUrl = (_index: number) => getApiUrls()[_index];
 
 export default requestMusic;

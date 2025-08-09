@@ -18,7 +18,7 @@
             <span class="hot-search-item-count" :class="{ 'hot-search-item-count-3': index < 3 }">{{
               index + 1
             }}</span>
-            {{ item.searchWord }}
+            {{ item?.searchWord }}
           </div>
         </template>
       </div>
@@ -37,7 +37,7 @@
           @click="searchDetail = null"
         ></i>
         {{ hotKeyword }}
-        <div v-if="searchDetail?.songs?.length" class="title-play-all">
+        <div v-if="(searchDetail as any)?.songs?.length" class="title-play-all">
           <div class="play-all-btn" @click="handlePlayAll">
             <i class="ri-play-circle-fill"></i>
             <span>{{ t('search.button.playAll') }}</span>
@@ -48,7 +48,7 @@
         <template v-if="searchDetail">
           <!-- 音乐搜索结果 -->
           <div
-            v-for="(item, index) in searchDetail?.songs"
+            v-for="(item, index) in (searchDetail as any)?.songs"
             :key="item.id"
             :class="setAnimationClass('animate__bounceInRight')"
             :style="getSearchListAnimation(index)"
@@ -56,10 +56,10 @@
             <song-item :item="item" @play="handlePlay" :is-next="true" />
           </div>
           <template v-for="(list, key) in searchDetail">
-            <template v-if="key.toString() !== 'songs'">
+            <template v-if="(key as any).toString() !== 'songs'">
               <div
                 v-for="(item, index) in list"
-                :key="item.id"
+                :key="(item as any).id"
                 class="mb-3"
                 :class="setAnimationClass('animate__bounceInRight')"
                 :style="getSearchListAnimation(index)"
@@ -73,7 +73,9 @@
             <n-spin size="small" />
             <span class="ml-2">{{ t('search.loading.more') }}</span>
           </div>
-          <div v-if="!hasMore && searchDetail" class="no-more">{{ t('search.noMore') }}</div>
+          <div v-if="!hasMore && searchDetail" class="no-more">
+            {{ t('search.noMore') }}
+          </div>
         </template>
         <!-- 搜索历史 -->
         <template v-else>
@@ -122,8 +124,8 @@ import SongItem from '@/components/common/SongItem.vue';
 import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSearchStore } from '@/store/modules/search';
-import type { IHotSearch } from '@/type/search';
 import type { SongResult } from '@/type/music';
+import type { IHotSearch } from '@/type/search';
 import type { Album, Artist, MV, Playlist, Song } from '@/types/common';
 import { isMobile, setAnimationClass, setAnimationDelay } from '@/utils';
 
@@ -136,7 +138,7 @@ const route = useRoute();
 const playerStore = usePlayerStore();
 const searchStore = useSearchStore();
 
-const searchDetail = ref<any>();
+const searchDetail = ref<unknown>();
 const searchType = computed(() => searchStore.searchType as number);
 const searchDetailLoading = ref(false);
 const searchHistory = ref<Array<{ keyword: string; type: number }>>([]);
@@ -164,7 +166,7 @@ const saveSearchHistory = (keyword: string, type: number) => {
   const history = searchHistory.value;
   // 移除重复的关键词
   const index = history.findIndex((item) => item.keyword === keyword);
-  if (index > -1) {
+  if (index !== -1) {
     history.splice(index, 1);
   }
   // 添加到开头
@@ -244,7 +246,7 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
 
     const songs = (data as any).result.songs || [];
     const albums = (data as any).result.albums || [];
-    const mvs = ((data as any).result.mvs || []).map(
+    const mvs = ((data as any).result.mvs || [0]).map(
       (item: MV): MV => ({
         ...item,
         picUrl: item.cover,
@@ -254,7 +256,7 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
       })
     );
 
-    const playlists = ((data as any).result.playlists || []).map(
+    const playlists = ((data as any).result.playlists || [0]).map(
       (item: Playlist): Playlist => ({
         ...item,
         picUrl: item.coverImgUrl,
@@ -275,10 +277,10 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
 
     if (isLoadMore && searchDetail.value) {
       // 合并数据
-      searchDetail.value.songs = [...searchDetail.value.songs, ...songs];
-      searchDetail.value.albums = [...searchDetail.value.albums, ...albums];
-      searchDetail.value.mvs = [...searchDetail.value.mvs, ...mvs];
-      searchDetail.value.playlists = [...searchDetail.value.playlists, ...playlists];
+      (searchDetail.value as any).songs = [...(searchDetail.value as any).songs, ...songs];
+      (searchDetail.value as any).albums = [...(searchDetail.value as any).albums, ...albums];
+      (searchDetail.value as any).mvs = [...(searchDetail.value as any).mvs, ...mvs];
+      (searchDetail.value as any).playlists = [...(searchDetail.value as any).playlists, ...playlists];
     } else {
       searchDetail.value = {
         songs,
@@ -385,14 +387,14 @@ const handleSearchHistory = (item: { keyword: string; type: number }) => {
 // 播放全部搜索结果 (用于模板中的@click事件)
 // @ts-ignore - 用于模板中的@click事件
 const handlePlayAll = async () => {
-  if (!searchDetail.value?.songs?.length) return;
+  if (!(searchDetail.value as any)?.songs?.length) return;
 
   // 设置播放列表为搜索结果中的所有歌曲
-  playerStore.setPlayList(searchDetail.value.songs);
+  playerStore.setPlayList((searchDetail.value as any).songs);
 
   // 使用统一的播放控制服务开始播放第一首歌
-  if (searchDetail.value.songs[0]) {
-    await playControl(searchDetail.value.songs[0], 'SearchPage-PlayAll');
+  if ((searchDetail.value as any).songs[0]) {
+    await playControl((searchDetail.value as any).songs[0], 'SearchPage-PlayAll');
   }
 };
 </script>

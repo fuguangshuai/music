@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n';
 import type { MessageOptions } from '@/types/common';
 import { AppError, globalErrorHandler } from '@/utils/errorHandler';
 import { ErrorTypes } from '@/utils/errorHandler';
-import { type RetryOptions,withAudioRetry, withNetworkRetry, withRetry } from '@/utils/retry';
+import { type RetryOptions, withAudioRetry, withNetworkRetry, withRetry } from '@/utils/retry';
 
 /**
  * 错误处理组合式函数 - 适配器模式
@@ -63,7 +63,9 @@ export const useErrorHandler = () => {
           message.error(errorMessage);
       }
     } else {
-      errorMessage = error.message || t('error.unknown', '发生了未知错误');
+      errorMessage =
+        (error instanceof Error ? error.message : String(error)) ||
+        t('error.unknown', '发生了未知错误');
       message.error(errorMessage);
     }
   };
@@ -101,7 +103,7 @@ export const useErrorHandler = () => {
     };
 
     const typeMessage = typeMessages[error.type] || '未知错误';
-    return `${typeMessage}: ${error.message}`;
+    return `${typeMessage}: ${error instanceof Error ? error.message : String(error)}`;
   };
 
   /**
@@ -129,20 +131,26 @@ export const useErrorHandler = () => {
    * 重试功能适配器 - 通用重试
    */
   const retry = <T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> => {
-    return withRetry(fn, options);
+    return withRetry(fn, options || {});
   };
 
   /**
    * 网络请求重试适配器
    */
-  const retryNetwork = <T>(fn: () => Promise<T>, options?: Omit<RetryOptions, 'shouldRetry'>): Promise<T> => {
-    return withNetworkRetry(fn, options);
+  const retryNetwork = <T>(
+    fn: () => Promise<T>,
+    options?: Omit<RetryOptions, 'shouldRetry'>
+  ): Promise<T> => {
+    return withNetworkRetry(fn, options || {});
   };
 
   /**
    * 音频操作重试适配器
    */
-  const retryAudio = <T>(fn: () => Promise<T>, options?: Omit<RetryOptions, 'shouldRetry'>): Promise<T> => {
+  const retryAudio = <T>(
+    fn: () => Promise<T>,
+    options?: Omit<RetryOptions, 'shouldRetry'>
+  ): Promise<T> => {
     return withAudioRetry(fn, options);
   };
 

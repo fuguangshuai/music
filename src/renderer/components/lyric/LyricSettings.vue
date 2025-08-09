@@ -157,7 +157,7 @@ watch(
 );
 
 const updateCSSVariables = (config: LyricConfig) => {
-  document.documentElement.style.setProperty('--lyric-font-size', `${config.fontSize}px`);
+  document.documentElement.style.setProperty('--lyric-font-_size', `${config.fontSize}px`);
   document.documentElement.style.setProperty('--lyric-letter-spacing', `${config.letterSpacing}px`);
   document.documentElement.style.setProperty('--lyric-line-height', config.lineHeight.toString());
 };

@@ -55,7 +55,6 @@ const otherRouter = [
     },
     component: () => import('@/views/artist/detail.vue')
   },
-
   {
     path: '/music-list/:id?',
     name: 'musicList',

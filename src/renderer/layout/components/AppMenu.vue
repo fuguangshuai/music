@@ -42,7 +42,7 @@ import icon from '@/assets/icon.png';
 import { isMobile } from '@/utils';
 
 const props = defineProps({
-  size: {
+  _size: {
     type: String,
     default: '26px'
   },
@@ -77,7 +77,7 @@ const isChecked = (index: number) => {
 
 const iconStyle = (index: number) => {
   const style = {
-    fontSize: props.size,
+    fontSize: props._size,
     color: isChecked(index) ? props.selectColor : props.color
   };
   return style;

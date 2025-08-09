@@ -3,11 +3,11 @@
  * 提供Vue组件中使用性能监控的便捷接口
  */
 
-import { onMounted, onUnmounted,ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 import { performanceMonitor, type PerformanceReport } from '@/services/performanceMonitor';
 
-export function usePerformanceMonitor() {
+export function usePerformanceMonitor(): unknown {
   const isActive = ref(false);
   const currentReport = ref<PerformanceReport | null>(null);
   const reportInterval = ref<number | null>(null);
@@ -26,7 +26,7 @@ export function usePerformanceMonitor() {
       currentReport.value = performanceMonitor.generateRealTimeReport();
     }, 10000); // 每10秒生成一次报告
 
-    console.log('🔍 性能监控已启动');
+    console.log('🔍, 性能监控已启动');
   };
 
   /**
@@ -38,7 +38,7 @@ export function usePerformanceMonitor() {
       reportInterval.value = null;
     }
     isActive.value = false;
-    console.log('⏹️ 性能监控已停止');
+    console.log('⏹️, 性能监控已停止');
   };
 
   /**
@@ -99,7 +99,7 @@ export function usePerformanceMonitor() {
     // 状态
     isActive,
     currentReport,
-    
+
     // 方法
     startMonitoring,
     stopMonitoring,
@@ -115,15 +115,15 @@ export function usePerformanceMonitor() {
 /**
  * 路由性能监控组合式函数
  */
-export function useRoutePerformanceMonitor() {
-  const { trackRouteChange } = usePerformanceMonitor();
-  
+export function useRoutePerformanceMonitor(): unknown {
+  const { trackRouteChange } = usePerformanceMonitor() as any;
+
   /**
    * 监控路由切换性能
    */
   const monitorRouteChange = (to: string, from: string) => {
     const startTime = performance.now();
-    
+
     return () => {
       const duration = performance.now() - startTime;
       trackRouteChange(from, to, duration);
@@ -138,15 +138,15 @@ export function useRoutePerformanceMonitor() {
 /**
  * 音频性能监控组合式函数
  */
-export function useAudioPerformanceMonitor() {
-  const { trackAudioLoad } = usePerformanceMonitor();
-  
+export function useAudioPerformanceMonitor(): unknown {
+  const { trackAudioLoad } = usePerformanceMonitor() as any;
+
   /**
    * 监控音频加载性能
    */
   const monitorAudioLoad = (url: string) => {
     const startTime = performance.now();
-    
+
     return () => {
       const duration = performance.now() - startTime;
       trackAudioLoad(url, duration);

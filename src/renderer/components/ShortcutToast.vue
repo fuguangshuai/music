@@ -31,13 +31,13 @@ const text = ref('');
 const icon = ref('');
 let timer: NodeJS.Timeout | null = null;
 
-const show = (message: string, iconName = '') => {
+const show = (_message: string, _iconName = '') => {
   if (timer) {
     clearTimeout(timer);
   }
 
-  text.value = message;
-  icon.value = iconName;
+  text.value = _message;
+  icon.value = _iconName;
   visible.value = true;
 
   timer = setTimeout(() => {

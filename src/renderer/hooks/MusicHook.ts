@@ -1,14 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { createDiscreteApi } from 'naive-ui';
-import {
-  computed,
-  type ComputedRef,
-  getCurrentInstance,
-  nextTick,
-  onUnmounted,
-  ref,
-  watch
-} from 'vue';
+import { computed, getCurrentInstance, nextTick, onUnmounted, ref, watch } from 'vue';
 
 import useIndexedDB from '@/hooks/IndexDBHook';
 import { audioService } from '@/services/audioService';
@@ -51,12 +43,12 @@ export const initMusicHook = (store: ReturnType<typeof usePlayerStore>) => {
 // 获取 playerStore 的辅助函数
 const getPlayerStore = () => {
   if (!playerStore) {
-    throw new Error('MusicHook not initialized. Call initMusicHook first.');
+    throw new Error('MusicHook not initialized. Call initMusicHook, first.');
   }
   return playerStore;
 };
 export const lrcArray = ref<ILyricText[]>([]); // 歌词数组
-export const lrcTimeArray = ref<number[]>([]); // 歌词时间数组
+export const lrcTimeArray = ref<number[]>([0]); // 歌词时间数组
 export const nowTime = ref(0); // 当前播放时间
 export const allTime = ref(0); // 总播放时间
 export const nowIndex = ref(0); // 当前播放歌词
@@ -87,7 +79,7 @@ const setupKeyboardListeners = () => {
     const store = getPlayerStore();
     switch (e.code) {
       case 'Space':
-        console.log('空格键播放/暂停，当前状态:', store.play ? '播放' : '暂停');
+        console.log('空格键播放/暂停，当前状态: ', store.play ? '播放' : '暂停');
         // 使用统一的播放/暂停逻辑
         store.setPlay(store.playMusic);
         break;
@@ -138,7 +130,7 @@ const updateProgress = () => {
 
   const currentSound = sound.value;
   if (!currentSound) {
-    console.log('进度更新：无效的 sound 对象');
+    console.log('进度更新：无效的 sound, 对象');
     // 不是立即返回，而是设置定时器稍后再次尝试
     globalAnimationFrameId = setTimeout(() => {
       requestAnimationFrame(updateProgress);
@@ -147,7 +139,7 @@ const updateProgress = () => {
   }
 
   if (typeof currentSound.seek !== 'function') {
-    console.log('进度更新：无效的 seek 函数');
+    console.log('进度更新：无效的 seek, 函数');
     // 不是立即返回，而是设置定时器稍后再次尝试
     globalAnimationFrameId = setTimeout(() => {
       requestAnimationFrame(updateProgress);
@@ -190,7 +182,7 @@ const updateProgress = () => {
         }
       }
     } catch (seekError) {
-      console.error('调用 seek() 方法出错:', seekError);
+      console.error('调用, seek() 方法出错:', seekError);
       globalAnimationFrameId = requestAnimationFrame(updateProgress);
       return;
     }
@@ -246,22 +238,22 @@ const initProgressAnimation = () => {
         if (newIsPlaying) {
           // 确保 sound 对象有效时才启动进度更新
           if (sound.value) {
-            console.log('sound 对象已存在，立即启动进度更新');
+            console.log('sound, 对象已存在，立即启动进度更新');
             startProgressAnimation();
           } else {
-            console.log('等待 sound 对象初始化...');
+            console.log('等待 sound, 对象初始化...');
             // 定时检查 sound 对象是否已初始化
             const checkInterval = setInterval(() => {
               if (sound.value) {
                 clearInterval(checkInterval);
-                console.log('sound 对象已初始化，开始进度更新');
+                console.log('sound, 对象已初始化，开始进度更新');
                 startProgressAnimation();
               }
             }, 100);
             // 设置超时，防止无限等待
             setTimeout(() => {
               clearInterval(checkInterval);
-              console.log('等待 sound 对象超时，已停止等待');
+              console.log('等待 sound, 对象超时，已停止等待');
             }, 5000);
           }
         } else {
@@ -408,18 +400,18 @@ const setupAudioListeners = () => {
     // 这防止暂停过程中的意外播放事件干扰用户意图
     console.log('🔍 检查用户播放意图:', store.userPlayIntent);
     if (store.userPlayIntent) {
-      console.log('✅ 用户意图播放，更新播放状态为true');
+      console.log('✅, 用户意图播放，更新播放状态为true');
       store.setPlayMusic(true);
 
       if (isElectron) {
         window.api.sendSong(cloneDeep(store.playMusic));
       }
     } else {
-      console.log('❌ 用户意图暂停，忽略播放事件，保持暂停状态');
+      console.log('❌, 用户意图暂停，忽略播放事件，保持暂停状态');
       // 如果用户意图是暂停，但音频开始播放了，强制暂停
       const currentSound = audioService.getCurrentSound();
       if (currentSound && currentSound.playing()) {
-        console.log('🔧 强制暂停音频以符合用户意图');
+        console.log('🔧, 强制暂停音频以符合用户意图');
         currentSound.pause();
       }
     }
@@ -428,14 +420,14 @@ const setupAudioListeners = () => {
       try {
         const currentSound = sound.value;
         if (!currentSound) {
-          console.error('Invalid sound object: sound is null or undefined');
+          console.error('Invalid sound object: sound is null or, undefined');
           clearInterval();
           return;
         }
 
         // 确保 seek 方法存在且可调用
         if (typeof currentSound.seek !== 'function') {
-          console.error('Invalid sound object: seek function not available');
+          console.error('Invalid sound object: seek function not, available');
           clearInterval();
           return;
         }
@@ -489,11 +481,11 @@ const setupAudioListeners = () => {
 
       // 重新播放当前歌曲
       if (getPlayerStore().playMusicUrl && playMusic.value) {
-        const newSound = await audioService.play(getPlayerStore().playMusicUrl, playMusic.value);
+        const newSound = await audioService.play(getPlayerStore().playMusicUrl);
         sound.value = newSound as Howl;
         setupAudioListeners();
       } else {
-        console.error('No music URL or playMusic data available');
+        console.error('No music URL or playMusic data, available');
         getPlayerStore().nextPlay();
       }
     } catch (error) {
@@ -669,10 +661,10 @@ export const getLrcStyle = (index: number) => {
     const progress = ((currentTime - start) / (end - start)) * 100;
     return {
       backgroundImage: `linear-gradient(to right, #ffffff ${progress}%, #ffffff8a ${progress}%)`,
-      backgroundClip: 'text',
-      WebkitBackgroundClip: 'text',
-      color: 'transparent',
-      transition: 'background-image 0.1s linear'
+      _backgroundClip: 'text',
+      _WebkitBackgroundClip: 'text',
+      _color: 'transparent',
+      _transition: 'background-image 0.1s linear'
     };
   }
   // 其它句
@@ -761,7 +753,7 @@ export const sendLyricToWin = () => {
       // 发送数据到歌词窗口
       window.api.sendLyric(JSON.stringify(updateData));
     } else {
-      console.log('No lyric data available, sending empty lyric message');
+      console.log('No lyric data available, sending empty lyric _message');
 
       // 发送没有歌词的提示
       const emptyLyricData = {
@@ -772,7 +764,7 @@ export const sendLyricToWin = () => {
         nextTime: 0,
         isPlay: getPlayerStore().play,
         lrcArray: [{ text: '当前歌曲暂无歌词', trText: '' }],
-        lrcTimeArray: [0],
+        lrcTimeArray: [],
         allTime: allTime.value,
         playMusic: playMusic.value
       };
@@ -850,7 +842,7 @@ export const openLyric = () => {
         nextTime: 0,
         isPlay: getPlayerStore().play,
         lrcArray: [{ text: '加载歌词中...', trText: '' }],
-        lrcTimeArray: [0],
+        lrcTimeArray: [],
         allTime: allTime.value,
         playMusic: playMusic.value
       };
@@ -1161,7 +1153,7 @@ export const cleanupMusicHook = () => {
     // 清理音频服务事件监听器
     audioService.removeAllListeners();
 
-    console.log('MusicHook 清理完成');
+    console.log('MusicHook, 清理完成');
   } catch (error) {
     console.error('MusicHook 清理失败:', error);
   }

@@ -54,7 +54,7 @@ export default {
   },
   playback: {
     quality: '음질 설정',
-    qualityDesc: '음악 재생 음질 선택 (넷이즈 클라우드 VIP)',
+    qualityDesc: '음악 재생 음질 선택 (넷이즈 클라우드, VIP)',
     qualityOptions: {
       standard: '표준',
       higher: '높음',
@@ -78,7 +78,7 @@ export default {
     autoPlay: '자동 재생',
     autoPlayDesc: '앱을 다시 열 때 자동으로 재생을 계속할지 여부',
     showStatusBar: '상태바 제어 기능 표시 여부',
-    showStatusBarContent: 'Mac 상태바에 음악 제어 기능을 표시할 수 있습니다 (재시작 후 적용)'
+    showStatusBarContent: 'Mac 상태바에 음악 제어 기능을 표시할 수 있습니다 (재시작 후, 적용)'
   },
   application: {
     closeAction: '닫기 동작',
@@ -94,7 +94,7 @@ export default {
     downloadDesc: '다운로드 목록 버튼을 항상 표시할지 여부',
     unlimitedDownload: '무제한 다운로드',
     unlimitedDownloadDesc:
-      '활성화하면 음악을 무제한으로 다운로드합니다 (다운로드 실패가 발생할 수 있음), 기본 제한 300곡',
+      '활성화하면 음악을 무제한으로 다운로드합니다 (다운로드 실패가 발생할 수, 있음), 기본 제한 300곡',
     downloadPath: '다운로드 디렉토리',
     downloadPathDesc: '음악 파일의 다운로드 위치 선택'
   },
@@ -128,7 +128,7 @@ export default {
       },
       favorite: {
         label: '즐겨찾기 기록',
-        description: '로컬 즐겨찾기 곡 기록 지우기 (클라우드 즐겨찾기에는 영향 없음)'
+        description: '로컬 즐겨찾기 곡 기록 지우기 (클라우드 즐겨찾기에는 영향, 없음)'
       },
       user: {
         label: '사용자 데이터',
@@ -140,7 +140,7 @@ export default {
       },
       downloads: {
         label: '다운로드 기록',
-        description: '다운로드 기록 지우기 (다운로드된 파일은 삭제되지 않음)'
+        description: '다운로드 기록 지우기 (다운로드된 파일은 삭제되지, 않음)'
       },
       resources: {
         label: '음악 리소스',

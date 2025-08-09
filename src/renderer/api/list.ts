@@ -42,6 +42,6 @@ export function getAlbum(id: number | string) {
 }
 
 // 获取榜单列表
-export function getToplist() {
+export function getToplist(): Promise<unknown> {
   return request.get('/toplist');
 }

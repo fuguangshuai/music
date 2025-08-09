@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const path = require('path');
 
 /**
  * 开发工具链集成脚本
@@ -7,7 +8,6 @@
 
 const { execSync, spawn } = require('child_process');
 const fs = require('fs');
-const path = require('path');
 
 console.log('🛠️  开发工具链管理器\n');
 
@@ -16,14 +16,14 @@ console.log('🛠️  开发工具链管理器\n');
  */
 function executeCommand(command, options = {}) {
   try {
-    const result = execSync(command, { 
-      encoding: 'utf8', 
+    const result = execSync(command, {
+      encoding: 'utf8',
       stdio: options.silent ? 'pipe' : 'inherit',
-      ...options 
+      ...options
     });
     return { success: true, output: result };
-  } catch (error) {
-    return { success: false, error: error.message, output: error.stdout };
+  } catch (_error) {
+    return { success: false, _error: _error.message, output: _error.stdout };
   }
 }
 
@@ -87,7 +87,7 @@ function checkProjectStatus() {
     const passed = check();
     const status = passed ? '✅' : '❌';
     console.log(`${status} ${name}`);
-    
+
     if (!passed) {
       console.log(`   修复建议: ${fix}`);
       allPassed = false;
@@ -113,12 +113,12 @@ async function runQualityCheck() {
   for (const task of tasks) {
     console.log(`📋 ${task.name}...`);
     const result = executeCommand(task.command, { silent: true });
-    
+
     if (result.success) {
       console.log(`✅ ${task.name} 通过\n`);
     } else {
       console.log(`❌ ${task.name} 失败`);
-      console.log(result.output || result.error);
+      console.log(result.output || result._error);
       console.log('');
     }
   }
@@ -138,7 +138,7 @@ async function runPerformanceTest() {
   for (const task of tasks) {
     console.log(`📊 ${task.name}...`);
     const result = executeCommand(task.command);
-    
+
     if (result.success) {
       console.log(`✅ ${task.name} 完成\n`);
     } else {
@@ -154,7 +154,7 @@ async function runE2ETest() {
   console.log('🎭 运行E2E测试...\n');
 
   const result = executeCommand('npm run test:e2e');
-  
+
   if (result.success) {
     console.log('✅ E2E测试通过\n');
   } else {
@@ -170,13 +170,13 @@ async function buildProject(incremental = false) {
 
   const command = incremental ? 'npm run build:incremental' : 'npm run build';
   const result = executeCommand(command);
-  
+
   if (result.success) {
     console.log('✅ 项目构建成功\n');
   } else {
     console.log('❌ 项目构建失败\n');
   }
-  
+
   return result.success;
 }
 
@@ -188,8 +188,8 @@ async function developmentMode() {
 
   try {
     await spawnCommand('npm', ['run', 'dev']);
-  } catch (error) {
-    console.error('❌ 开发服务器启动失败:', error.error || error);
+  } catch (_error) {
+    console._error('❌ 开发服务器启动失败:', _error._error || _error);
   }
 }
 
@@ -201,8 +201,8 @@ async function watchMode() {
 
   try {
     await spawnCommand('npm', ['run', 'build:watch']);
-  } catch (error) {
-    console.error('❌ 监听模式启动失败:', error.error || error);
+  } catch (_error) {
+    console._error('❌ 监听模式启动失败:', _error._error || _error);
   }
 }
 
@@ -221,7 +221,7 @@ function cleanProject() {
   cleanTasks.forEach(({ name, command }) => {
     console.log(`🗑️  ${name}...`);
     const result = executeCommand(command);
-    
+
     if (result.success) {
       console.log(`✅ ${name} 完成`);
     } else {
@@ -290,12 +290,12 @@ async function runAll() {
   const buildOk = await buildProject(false);
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-  
+
   console.log('📊 完整检查结果:');
   console.log(`⏱️  总耗时: ${duration}s`);
   console.log(`📋 项目状态: ${statusOk ? '✅ 正常' : '❌ 异常'}`);
   console.log(`🔨 构建状态: ${buildOk ? '✅ 成功' : '❌ 失败'}`);
-  
+
   if (statusOk && buildOk) {
     console.log('\n🎉 所有检查通过，项目状态良好！');
   } else {
@@ -308,7 +308,7 @@ async function runAll() {
  */
 async function main() {
   const command = process.argv[2] || 'help';
-  
+
   try {
     switch (command) {
       case 'status':
@@ -349,8 +349,8 @@ async function main() {
         showHelp();
         process.exit(1);
     }
-  } catch (error) {
-    console.error('❌ 执行失败:', error.message || error);
+  } catch (_error) {
+    console._error('❌ 执行失败:', _error.message || _error);
     process.exit(1);
   }
 }

@@ -22,7 +22,7 @@ const token = ref('');
 // Token登录
 const loginByToken = async () => {
   if (!token.value.trim()) {
-    message.error(t('login.message.tokenRequired'));
+    message.error(t('login._message.tokenRequired'));
     return;
   }
 
@@ -32,20 +32,20 @@ const loginByToken = async () => {
 
     // 获取用户信息验证token有效性
     const user = await getUserDetail();
-    if (user.data && user.data.profile) {
-      userStore.user = user.data.profile;
-      localStorage.setItem('user', JSON.stringify(user.data.profile));
-      message.success(t('login.message.tokenLoginSuccess'));
+    if ((user as any).data && (user as any).data.profile) {
+      userStore.user = (user as any).data.profile;
+      localStorage.setItem('user', JSON.stringify((user as any).data.profile));
+      message.success(t('login._message.tokenLoginSuccess'));
       router.push('/user');
     } else {
       // token无效，清除localStorage
       localStorage.removeItem('token');
-      message.error(t('login.message.tokenInvalid'));
+      message.error(t('login._message.tokenInvalid'));
     }
   } catch (error) {
     // token无效，清除localStorage
     localStorage.removeItem('token');
-    message.error(t('login.message.tokenInvalid'));
+    message.error(t('login._message.tokenInvalid'));
     console.error('Token登录失败:', error);
   }
 };
@@ -57,30 +57,30 @@ const autoGetCookie = () => {
     return;
   }
 
-  message.info(t('login.message.autoGetCookieTip'));
+  message.info(t('login._message.autoGetCookieTip'));
   window.electron.ipcRenderer.send('open-login');
 };
 
 // 监听Cookie接收
-const handleCookieReceived = async (_event: any, cookieValue: string) => {
+const handleCookieReceived = async (_event: unknown, cookieValue: string) => {
   try {
     // 设置Cookie到localStorage
     localStorage.setItem('token', cookieValue);
 
     // 验证Cookie有效性
     const user = await getUserDetail();
-    if (user.data && user.data.profile) {
-      userStore.user = user.data.profile;
-      localStorage.setItem('user', JSON.stringify(user.data.profile));
-      message.success(t('login.message.autoGetCookieSuccess'));
+    if ((user as any).data && (user as any).data.profile) {
+      userStore.user = (user as any).data.profile;
+      localStorage.setItem('user', JSON.stringify((user as any).data.profile));
+      message.success(t('login._message.autoGetCookieSuccess'));
       router.push('/user');
     } else {
       localStorage.removeItem('token');
-      message.error(t('login.message.autoGetCookieFailed'));
+      message.error(t('login._message.autoGetCookieFailed'));
     }
   } catch (error) {
     localStorage.removeItem('token');
-    message.error(t('login.message.autoGetCookieFailed'));
+    message.error(t('login._message.autoGetCookieFailed'));
     console.error('自动获取Cookie失败:', error);
   }
 };

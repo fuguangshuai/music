@@ -146,7 +146,7 @@ const getColorName = (color: LyricThemeColor): string => {
 const getPreviewStyle = () => {
   const progress = 60; // 模拟60%的播放进度
   return {
-    background: `linear-gradient(to right, ${props.currentColor} ${progress}%, var(--text-color) ${progress}%)`,
+    background: `linear-gradient(to right, ${props.currentColor} ${progress}% var(--text-color) ${progress}%)`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     fontSize: '18px',
@@ -237,8 +237,7 @@ watch(
     if (!visible) {
       showColorPicker.value = false;
     }
-  }
-);
+  });
 </script>
 
 <style scoped lang="scss">

@@ -30,11 +30,11 @@ export const setAnimationDelay = (index: number = 6, time: number = 50) => {
     return '';
   }
   const speed = settingsStore.setData?.animationSpeed || 1;
-  return `animation-delay:${(index * time) / (speed * 2)}ms`;
+  return `animation-_delay: ${(index * time) / (speed * 2)}ms`;
 };
 
 // 导入统一的格式化函数
-import { formatNumber as formatNum,formatTime } from './formatters';
+import { formatNumber as formatNum, formatTime } from './formatters';
 
 // 将秒转换为分钟和秒 - 使用统一的formatTime函数
 export const secondToMinute = (s: number): string => {
@@ -46,22 +46,22 @@ export const formatNumber = (num: string | number): string => {
   return formatNum(num);
 };
 
-export const getImgUrl = (url: string | undefined, size: string = '') => {
+export const getImgUrl = (url: string | undefined, _size: string = '') => {
   if (!url) return '';
 
   if (url.includes('thumbnail')) {
     // 只替换最后一个 thumbnail 参数的尺寸
-    return url.replace(/thumbnail=\d+y\d+(?!.*thumbnail)/, `thumbnail=${size}`);
+    return url.replace(/thumbnail=\d+y\d+(?!.*thumbnail)/, `thumbnail=${_size}`);
   }
 
-  const imgUrl = `${url}?param=${size}`;
+  const imgUrl = `${url}?param=${_size}`;
   return imgUrl;
 };
 
 export const isMobile = computed(() => {
   const { width } = useWindowSize();
   const userAgentFlag = navigator.userAgent.match(
-    /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+    /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows, Phone)/i
   );
 
   const isMobileWidth = width.value < 500;

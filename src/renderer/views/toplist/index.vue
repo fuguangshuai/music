@@ -24,7 +24,7 @@
               <i class="iconfont icon-videofill"></i>
             </div>
           </div>
-          <div class="toplist-item-title">{{ item.name }}</div>
+          <div class="toplist-item-title">{{ item?.name }}</div>
           <div class="toplist-item-desc">{{ item.updateFrequency || '' }}</div>
         </div>
       </div>
@@ -61,18 +61,18 @@ const listLoading = ref(true);
 
 const router = useRouter();
 
-const openToplist = (item: any) => {
+const openToplist = (item: unknown) => {
   listLoading.value = true;
 
-  getListDetail(item.id).then((res) => {
+  getListDetail((item as any).id).then((res) => {
     listDetail.value = res.data;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: item.id,
+      id: (item as any).id,
       type: 'playlist',
-      name: item.name,
-      songList: res.data.playlist.tracks || [],
+      name: (item as any).name,
+      songList: res.data.playlist.tracks as any || [],
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -83,7 +83,7 @@ const loading = ref(false);
 const loadToplist = async () => {
   loading.value = true;
   try {
-    const { data } = await getToplist();
+    const { data } = await getToplist() as any;
     topList.value = data.list || [];
   } catch (error) {
     console.error('加载榜单列表失败:', error);

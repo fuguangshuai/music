@@ -9,9 +9,9 @@ interface UserData {
   [key: string]: unknown;
 }
 
-function getLocalStorageItem<T>(key: string, defaultValue: T): T {
+function getLocalStorageItem<T>(_key: string, defaultValue: T): T {
   try {
-    const item = localStorage.getItem(key);
+    const item = localStorage.getItem(_key);
     return item ? JSON.parse(item) : defaultValue;
   } catch {
     return defaultValue;

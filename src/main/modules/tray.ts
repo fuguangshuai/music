@@ -125,7 +125,9 @@ function updateStatusBarTray() {
     icon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
     playPauseTray.setImage(icon);
     playPauseTray.setToolTip(
-      isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
+      isPlaying
+        ? String(i18n.global.t('common.tray.pause'))
+        : String(i18n.global.t('common.tray.play'))
     );
   }
 }
@@ -349,7 +351,9 @@ function initializeStatusBarTray(mainWindow: BrowserWindow) {
   playPauseIcon.setTemplateImage(true); // 设置为模板图片，适合macOS深色/浅色模式
   playPauseTray = new Tray(playPauseIcon);
   playPauseTray.setToolTip(
-    isPlaying ? String(i18n.global.t('common.tray.pause')) : String(i18n.global.t('common.tray.play'))
+    isPlaying
+      ? String(i18n.global.t('common.tray.pause'))
+      : String(i18n.global.t('common.tray.play'))
   );
   playPauseTray.on('click', () => {
     mainWindow.webContents.send('global-shortcut', 'togglePlay');

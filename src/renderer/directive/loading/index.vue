@@ -4,7 +4,9 @@
     <div class="mask"></div>
     <div class="loading-content-box">
       <n-spin size="small" />
-      <div :style="{ color: textColor }" class="tip">{{ tip }}</div>
+      <div :style="{ color: textColor }" class="tip">
+        {{ tip }}
+      </div>
     </div>
   </div>
 </template>

@@ -14,7 +14,7 @@
         <n-grid :cols="2" :x-gap="12" :y-gap="8">
           <n-grid-item v-for="source in musicSourceOptions" :key="source.value">
             <n-checkbox :value="source.value">
-              {{ source.label }}
+              {{ source?.label }}
               <template v-if="source.value === 'gdmusic'">
                 <n-tooltip>
                   <template #trigger>
@@ -51,7 +51,7 @@
 import { defineEmits, defineProps, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { type Platform } from '@/types/music';
+import { Platform } from '@/types/music';
 import { isElectron } from '@/utils';
 
 const props = defineProps({

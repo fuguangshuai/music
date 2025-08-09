@@ -46,9 +46,7 @@ export interface RetryResult<T> {
 const defaultShouldRetry = (error: Error, _attempt: number): boolean => {
   // 网络错误或超时错误通常可以重试
   const retryableErrors = ['NETWORK_ERROR', 'TIMEOUT', 'ECONNRESET', 'ENOTFOUND'];
-  return retryableErrors.some(type => 
-    error.message.includes(type) || error.name.includes(type)
-  );
+  return retryableErrors.some((type) => error.message.includes(type) || error.name.includes(type));
 };
 
 /**
@@ -100,19 +98,16 @@ export const withRetry = async <T>(
       }
 
       // 计算延迟时间
-      const currentDelay = backoff === 'exponential'
-        ? Math.min(delay * Math.pow(2, attempt), maxDelay)
-        : delay;
+      const currentDelay =
+        backoff === 'exponential' ? Math.min(delay * Math.pow(2, attempt), maxDelay) : delay;
 
       // 等待延迟
-      await new Promise(resolve => setTimeout(resolve, currentDelay));
+      await new Promise((resolve) => setTimeout(resolve, currentDelay));
     }
   }
 
   // 所有重试都失败，抛出最后的错误
-  throw new Error(
-    `操作失败，已重试 ${attempts} 次: ${lastError?.message || '未知错误'}`
-  );
+  throw new Error(`操作失败，已重试 ${attempts} 次: ${lastError?.message || '未知错误'}`);
 };
 
 /**
@@ -153,9 +148,7 @@ export const createRetryForErrors = (errorTypes: string[]) => {
     return withRetry(fn, {
       ...options,
       shouldRetry: (error: Error) => {
-        return errorTypes.some(type => 
-          error.message.includes(type) || error.name.includes(type)
-        );
+        return errorTypes.some((type) => error.message.includes(type) || error.name.includes(type));
       }
     });
   };

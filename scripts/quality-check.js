@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+const path = require('path');
 
 /**
  * 🔍 代码质量自动化检查脚本
  * 用于验证代码质量、构建状态和功能完整性
- * 
+ *
  * 使用方法:
  * node scripts/quality-check.js
  * npm run quality-check
@@ -11,7 +12,6 @@
 
 const { execSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
 
 // 颜色输出工具
 const colors = {
@@ -47,23 +47,23 @@ const results = {
 function runCommand(command, options = {}) {
   try {
     const startTime = Date.now();
-    const output = execSync(command, { 
-      encoding: 'utf8', 
+    const output = execSync(command, {
+      encoding: 'utf8',
       stdio: options.silent ? 'pipe' : 'inherit',
-      ...options 
+      ...options
     });
     const endTime = Date.now();
-    return { 
-      success: true, 
-      output, 
-      time: endTime - startTime 
+    return {
+      success: true,
+      output,
+      time: endTime - startTime
     };
-  } catch (error) {
-    return { 
-      success: false, 
-      error: error.message,
-      output: error.stdout || '',
-      stderr: error.stderr || ''
+  } catch (_error) {
+    return {
+      success: false,
+      _error: _error.message,
+      output: _error.stdout || '',
+      stderr: _error.stderr || ''
     };
   }
 }
@@ -73,9 +73,9 @@ function runCommand(command, options = {}) {
  */
 async function checkTypeScript() {
   log.title('TypeScript 类型检查');
-  
+
   const result = runCommand('npx tsc --noEmit', { silent: true });
-  
+
   if (result.success) {
     results.typescript.passed = true;
     log.success('TypeScript 类型检查通过');
@@ -93,19 +93,19 @@ async function checkTypeScript() {
  */
 async function checkESLint() {
   log.title('ESLint 代码质量检查');
-  
+
   const result = runCommand('npm run lint', { silent: true });
-  
+
   // ESLint可能有警告但仍然成功
   const output = result.output || result.stderr || '';
   const warningMatch = output.match(/(\d+) problems? \(\d+ errors?, (\d+) warnings?\)/);
-  
+
   if (warningMatch) {
     const totalProblems = parseInt(warningMatch[1]);
     const warnings = parseInt(warningMatch[2]);
     results.eslint.warnings = warnings;
     results.eslint.errors = totalProblems - warnings;
-    
+
     if (results.eslint.errors === 0) {
       results.eslint.passed = true;
       log.success(`ESLint 检查通过: ${warnings} 个警告`);
@@ -128,9 +128,9 @@ async function checkESLint() {
  */
 async function checkBuild() {
   log.title('项目构建验证');
-  
+
   const result = runCommand('npm run build', { silent: true });
-  
+
   if (result.success) {
     results.build.passed = true;
     results.build.time = result.time;
@@ -147,23 +147,18 @@ async function checkBuild() {
  */
 async function checkFileStructure() {
   log.title('项目文件结构检查');
-  
+
   const issues = [];
-  
+
   // 检查是否存在无用文件
-  const unwantedFiles = [
-    '1panel.sh',
-    'electron-builder.yml',
-    '.DS_Store',
-    'Thumbs.db'
-  ];
-  
-  unwantedFiles.forEach(file => {
+  const unwantedFiles = ['1panel.sh', 'electron-builder.yml', '.DS_Store', 'Thumbs.db'];
+
+  unwantedFiles.forEach((file) => {
     if (fs.existsSync(file)) {
       issues.push(`发现无用文件: ${file}`);
     }
   });
-  
+
   // 检查关键文件是否存在
   const requiredFiles = [
     'package.json',
@@ -173,34 +168,30 @@ async function checkFileStructure() {
     'src/renderer/main.ts',
     'src/preload/index.ts'
   ];
-  
-  requiredFiles.forEach(file => {
+
+  requiredFiles.forEach((file) => {
     if (!fs.existsSync(file)) {
       issues.push(`缺少关键文件: ${file}`);
     }
   });
-  
+
   // 检查项目文档
-  const docFiles = [
-    'README.md',
-    'CHANGELOG.md',
-    'DEV.md'
-  ];
-  
-  docFiles.forEach(file => {
+  const docFiles = ['README.md', 'CHANGELOG.md', 'DEV.md'];
+
+  docFiles.forEach((file) => {
     if (!fs.existsSync(file)) {
       issues.push(`建议添加文档: ${file}`);
     }
   });
-  
+
   results.fileStructure.issues = issues;
   results.fileStructure.passed = issues.length === 0;
-  
+
   if (results.fileStructure.passed) {
     log.success('文件结构检查通过');
   } else {
     log.warning(`文件结构检查发现 ${issues.length} 个问题:`);
-    issues.forEach(issue => log.warning(`  - ${issue}`));
+    issues.forEach((issue) => log.warning(`  - ${issue}`));
   }
 }
 
@@ -209,16 +200,16 @@ async function checkFileStructure() {
  */
 async function checkDependencies() {
   log.title('依赖安全检查');
-  
+
   const result = runCommand('npm audit --audit-level=moderate', { silent: true });
-  
+
   if (result.success) {
     results.dependencies.passed = true;
     log.success('依赖安全检查通过');
   } else {
     const output = result.output || result.stderr || '';
     const vulnMatch = output.match(/(\d+) vulnerabilities/);
-    
+
     if (vulnMatch) {
       results.dependencies.vulnerabilities = parseInt(vulnMatch[1]);
       results.dependencies.passed = false;
@@ -236,23 +227,33 @@ async function checkDependencies() {
  */
 function generateReport() {
   log.title('质量检查报告');
-  
+
   const totalChecks = Object.keys(results).length;
-  const passedChecks = Object.values(results).filter(r => r.passed).length;
+  const passedChecks = Object.values(results).filter((r) => r.passed).length;
   const score = Math.round((passedChecks / totalChecks) * 100);
-  
+
   console.log(`📊 总体评分: ${score}/100`);
   console.log(`✅ 通过检查: ${passedChecks}/${totalChecks}`);
   console.log('');
-  
+
   // 详细结果
   console.log('📋 详细结果:');
-  console.log(`  TypeScript: ${results.typescript.passed ? '✅ 通过' : `❌ 失败 (${results.typescript.errors} 错误)`}`);
-  console.log(`  ESLint: ${results.eslint.passed ? '✅ 通过' : `❌ 失败`} (${results.eslint.warnings} 警告, ${results.eslint.errors} 错误)`);
-  console.log(`  构建: ${results.build.passed ? '✅ 通过' : '❌ 失败'} ${results.build.time ? `(${(results.build.time/1000).toFixed(2)}s)` : ''}`);
-  console.log(`  文件结构: ${results.fileStructure.passed ? '✅ 通过' : `⚠️ ${results.fileStructure.issues.length} 个问题`}`);
-  console.log(`  依赖安全: ${results.dependencies.passed ? '✅ 通过' : `⚠️ ${results.dependencies.vulnerabilities} 个漏洞`}`);
-  
+  console.log(
+    `  TypeScript: ${results.typescript.passed ? '✅ 通过' : `❌ 失败 (${results.typescript.errors} 错误)`}`
+  );
+  console.log(
+    `  ESLint: ${results.eslint.passed ? '✅ 通过' : `❌ 失败`} (${results.eslint.warnings} 警告, ${results.eslint.errors} 错误)`
+  );
+  console.log(
+    `  构建: ${results.build.passed ? '✅ 通过' : '❌ 失败'} ${results.build.time ? `(${(results.build.time / 1000).toFixed(2)}s)` : ''}`
+  );
+  console.log(
+    `  文件结构: ${results.fileStructure.passed ? '✅ 通过' : `⚠️ ${results.fileStructure.issues.length} 个问题`}`
+  );
+  console.log(
+    `  依赖安全: ${results.dependencies.passed ? '✅ 通过' : `⚠️ ${results.dependencies.vulnerabilities} 个漏洞`}`
+  );
+
   // 建议
   console.log('\n💡 改进建议:');
   if (!results.typescript.passed) {
@@ -270,7 +271,7 @@ function generateReport() {
   if (!results.dependencies.passed) {
     console.log('  - 修复安全漏洞: npm audit fix');
   }
-  
+
   // 保存报告到文件
   const reportData = {
     timestamp: new Date().toISOString(),
@@ -282,10 +283,10 @@ function generateReport() {
       failed: totalChecks - passedChecks
     }
   };
-  
+
   fs.writeFileSync('quality-report.json', JSON.stringify(reportData, null, 2));
   log.info('详细报告已保存到 quality-report.json');
-  
+
   return score >= 80;
 }
 
@@ -294,23 +295,23 @@ function generateReport() {
  */
 async function main() {
   console.log(`${colors.cyan}🔍 Alger音乐播放器 - 代码质量自动化检查${colors.reset}\n`);
-  
+
   const startTime = Date.now();
-  
+
   try {
     await checkTypeScript();
     await checkESLint();
     await checkBuild();
     await checkFileStructure();
     await checkDependencies();
-    
+
     const success = generateReport();
-    
+
     const endTime = Date.now();
     const totalTime = (endTime - startTime) / 1000;
-    
+
     console.log(`\n⏱️ 总检查时间: ${totalTime.toFixed(2)}s`);
-    
+
     if (success) {
       log.success('质量检查通过！项目状态良好 🎉');
       process.exit(0);
@@ -318,9 +319,8 @@ async function main() {
       log.warning('质量检查发现问题，请查看上述建议进行改进');
       process.exit(1);
     }
-    
-  } catch (error) {
-    log.error(`检查过程中发生错误: ${error.message}`);
+  } catch (_error) {
+    log._error(`检查过程中发生错误: ${_error.message}`);
     process.exit(1);
   }
 }

@@ -104,19 +104,14 @@ AlgerMusicPlayer/
 
 渲染进程是基于 Vue 3 的前端应用，负责 UI 渲染和用户交互。
 
-- **components/**: 包含各种 UI 组件
-    - **common/**: 通用组件
-    - **home/**: 首页相关组件
-    - **lyric/**: 歌词显示组件
-    - **settings/**: 设置界面组件
-    - **MusicList.vue**: 音乐列表组件
-    - **MvPlayer.vue**: MV 播放器
-    - **EQControl.vue**: 均衡器控制
-    - **...**: 其他组件
+- **components/**: 包含各种 UI 组件   - **common/**: 通用组件   -
+  **home/**: 首页相关组件   - **lyric/**: 歌词显示组件   -
+  **settings/**: 设置界面组件   - **MusicList.vue**: 音乐列表组件   -
+  **MvPlayer.vue**: MV 播放器   - **EQControl.vue**: 均衡器控制   -
+  **...**: 其他组件
 
-- **store/**: Pinia 状态管理
-    - **modules/**: 各功能模块的状态管理
-    - **index.ts**: 状态管理入口
+- **store/**: Pinia 状态管理   - **modules/**: 各功能模块的状态管理   -
+  **index.ts**: 状态管理入口
 
 - **views/**: 页面视图组件
 

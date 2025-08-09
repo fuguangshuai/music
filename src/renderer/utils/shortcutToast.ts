@@ -3,14 +3,16 @@ import { createVNode, render } from 'vue';
 import ShortcutToast from '@/components/ShortcutToast.vue';
 
 let container: HTMLDivElement | null = null;
-let toastInstance: { show: (message: string, iconName: string, options: { showIcon?: boolean }) => void } | null = null;
+let toastInstance: {
+  show: (message: string, _iconName: string, _options: { showIcon?: boolean }) => void;
+} | null = null;
 
 interface ToastOptions {
   position?: 'top' | 'center' | 'bottom';
   showIcon?: boolean;
 }
 
-export function showShortcutToast(message: string, iconName = '', options: ToastOptions = {}) {
+export function showShortcutToast(message: string, _iconName = '', _options: ToastOptions = {}) {
   // 如果容器不存在，创建一个新的容器
   if (!container) {
     container = document.createElement('div');
@@ -25,8 +27,8 @@ export function showShortcutToast(message: string, iconName = '', options: Toast
 
   // 创建新的 toast 实例
   const vnode = createVNode(ShortcutToast, {
-    position: options.position || 'center',
-    showIcon: options.showIcon !== undefined ? options.showIcon : true,
+    position: _options.position || 'center',
+    showIcon: _options.showIcon !== undefined ? _options.showIcon : true,
     onDestroy: () => {
       if (container) {
         render(null, container);
@@ -42,11 +44,11 @@ export function showShortcutToast(message: string, iconName = '', options: Toast
 
   // 显示 toast
   if (toastInstance) {
-    toastInstance.show(message, iconName, { showIcon: options.showIcon });
+    toastInstance.show(message, _iconName, { showIcon: _options.showIcon });
   }
 }
 
 // 新增便捷方法 - 底部无图标 toast
-export function showBottomToast(message: string) {
-  showShortcutToast(message, '', { position: 'bottom', showIcon: false });
+export function showBottomToast(_message: string) {
+  showShortcutToast(_message, '', { position: 'bottom', showIcon: false });
 }

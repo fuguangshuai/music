@@ -60,9 +60,9 @@ export const parseFromGDMusic = async (
 
         // 处理不同的艺术家字段结构
         if (data.artists && Array.isArray(data.artists)) {
-          artistNames = data.artists.map((artist) => artist.name).join(' ');
+          artistNames = data.artists.map((artist) => artist.name).join(', ');
         } else if (data.ar && Array.isArray(data.ar)) {
-          artistNames = data.ar.map((artist) => artist.name).join(' ');
+          artistNames = data.ar.map((artist) => artist.name).join(', ');
         } else if (data.artist) {
           artistNames = typeof data.artist === 'string' ? data.artist : '';
         }
@@ -84,7 +84,7 @@ export const parseFromGDMusic = async (
           try {
             const result = await searchAndGetUrl(source, searchQuery, quality);
             if (result) {
-              console.log(`GD音乐台成功通过 ${result.source} 解析音乐!`);
+              console.log(`GD音乐台成功通过 ${result.source}, 解析音乐!`);
               // 返回符合原API格式的数据
               return {
                 data: {
@@ -155,7 +155,7 @@ async function searchAndGetUrl(
   if (searchResponse.data && Array.isArray(searchResponse.data) && searchResponse.data.length > 0) {
     const firstResult = searchResponse.data[0];
     if (!firstResult || !firstResult.id) {
-      console.log(`GD音乐台 ${source} 搜索结果无效`);
+      console.log(`GD音乐台 ${source}, 搜索结果无效`);
       return null;
     }
 
@@ -164,7 +164,7 @@ async function searchAndGetUrl(
 
     // 2. 获取歌曲URL
     const songUrl = `${baseUrl}?types=url&source=${trackSource}&id=${trackId}&br=${quality}`;
-    console.log(`GD音乐台尝试获取 ${trackSource} 歌曲URL:`, songUrl);
+    console.log(`GD音乐台尝试获取 ${trackSource} 歌曲_URL: `, songUrl);
 
     const songResponse = await axios.get(songUrl, { timeout: 5000 });
 
@@ -176,11 +176,11 @@ async function searchAndGetUrl(
         source: trackSource
       };
     } else {
-      console.log(`GD音乐台 ${trackSource} 未返回有效URL`);
+      console.log(`GD音乐台 ${trackSource}, 未返回有效URL`);
       return null;
     }
   } else {
-    console.log(`GD音乐台 ${source} 搜索结果为空`);
+    console.log(`GD音乐台 ${source}, 搜索结果为空`);
     return null;
   }
 }

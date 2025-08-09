@@ -321,12 +321,12 @@ export function createMainWindow(icon: Electron.NativeImage): BrowserWindow {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-          "style-src 'self' 'unsafe-inline'; " +
-          "img-src 'self' data: https: http:; " +
-          "media-src 'self' data: https: http: blob:; " +
-          "connect-src 'self' https: http: ws: wss:; " +
-          "font-src 'self' data:;"
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data: https: http:; " +
+            "media-src 'self' data: https: http: blob:; " +
+            "connect-src 'self' https: http: ws: wss:; " +
+            "font-src 'self' data:;"
         ]
       }
     });

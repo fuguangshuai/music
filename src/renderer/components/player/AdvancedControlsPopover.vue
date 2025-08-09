@@ -6,7 +6,7 @@
     :z-index="9999999"
     @select="handleSelect"
     placement="top"
-    @update:show="(show) => (showDropdown = show)"
+    @update:show="(show) => show"
   >
     <n-tooltip trigger="hover" :z-index="9999999">
       <template #trigger>
@@ -187,14 +187,14 @@ const dropdownOptions = computed<DropdownOption[]>(() => [
 ]);
 
 // 处理菜单选择
-const handleSelect = (key: string) => {
+const handleSelect = (_key: string) => {
   // 先关闭所有弹窗
   showEQModal.value = false;
   playerStore.showSleepTimer = false;
   showSpeedModal.value = false;
 
   // 然后仅打开所选弹窗
-  switch (key) {
+  switch (_key) {
     case 'eq':
       showEQModal.value = true;
       break;
@@ -224,11 +224,11 @@ const selectSpeed = (speed: number) => {
 
   @keyframes fadeInDown {
     from {
-      transform: translate(-50%, -100%);
+      transform: translate(-50% -100%);
       opacity: 0;
     }
     to {
-      transform: translate(-50%, 0);
+      transform: translate(-50% 0);
       opacity: 1;
     }
   }

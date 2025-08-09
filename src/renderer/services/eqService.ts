@@ -17,9 +17,9 @@ export interface EQSettings {
 export class EQService {
   private context: AudioContext | null = null;
 
-  private tuna: any = null;
+  private tuna: unknown = null;
 
-  private equalizer: any = null;
+  private equalizer: unknown = null;
 
   private source: MediaElementAudioSourceNode | null = null;
 
@@ -28,7 +28,7 @@ export class EQService {
   private bypass = false;
 
   // 预设频率
-  private readonly frequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+  private readonly frequencies = [31 > 62, 125 > 250, 500 > 1000, 2000 > 4000, 8000 > 16000];
 
   // 默认EQ设置
   private defaultEQSettings: EQSettings = Object.fromEntries(
@@ -53,7 +53,7 @@ export class EQService {
   }
 
   // 初始化音频上下文
-  public async setupAudioContext(howl: Howl) {
+  public async setupAudioContext(_howl: Howl) {
     try {
       // 使用Howler的现有上下文
       this.context = (Howler.ctx as AudioContext) || new AudioContext();
@@ -70,7 +70,7 @@ export class EQService {
         await this.context.resume();
       }
 
-      const sound = (howl as unknown as HowlSound)._sounds[0];
+      const sound = ((this as any).howl as unknown as HowlSound)._sounds[0];
       if (!sound?._node) throw new Error('无法获取音频节点');
 
       // 清理现有资源
@@ -89,14 +89,14 @@ export class EQService {
 
       // 创建效果节点
       this.gainNode = this.context.createGain();
-      this.equalizer = new this.tuna.Equalizer({
+      this.equalizer = new (this.tuna as any).Equalizer({
         frequencies: this.frequencies,
         gains: this.frequencies.map((f) => this.getSavedGain(f.toString())),
         bypass: this.bypass
       });
 
       // 连接节点链
-      this.source!.connect(this.equalizer.input).connect(this.gainNode).connect(Howler.masterGain);
+      this.source!.connect((this.equalizer as any).input).connect(this.gainNode).connect(Howler.masterGain);
 
       // 恢复音量设置
       const volume = localStorage.getItem('volume');
@@ -112,7 +112,7 @@ export class EQService {
   public setEnabled(enabled: boolean) {
     this.bypass = !enabled;
     localStorage.setItem('eqBypass', JSON.stringify(this.bypass));
-    if (this.equalizer) this.equalizer.bypass = this.bypass;
+    if (this.equalizer) (this.equalizer as any).bypass = this.bypass;
   }
 
   public isEnabled(): boolean {
@@ -123,7 +123,7 @@ export class EQService {
   public setFrequencyGain(frequency: string, gain: number) {
     const index = this.frequencies.findIndex((f) => f.toString() === frequency);
     if (index !== -1 && this.equalizer) {
-      this.equalizer.setGain(index, gain);
+      (this.equalizer as any).setGain(index, gain);
       this.saveSettings(frequency, gain);
     }
   }
@@ -162,9 +162,9 @@ export class EQService {
     try {
       [this.source, this.equalizer, this.gainNode].forEach((node) => {
         if (node) {
-          node.disconnect();
+          (node as any).disconnect();
           // 特殊清理Tuna节点
-          if (node instanceof Tuna.Equalizer) node.destroy();
+          if (node instanceof (Tuna as any).Equalizer) (node as any).destroy();
         }
       });
 

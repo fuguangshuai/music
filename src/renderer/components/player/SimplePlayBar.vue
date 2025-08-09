@@ -158,9 +158,9 @@ const handleNext = () => playerStore.nextPlay();
 
 // 主播放按钮事件 - 使用统一的播放控制服务
 const playMusicEvent = async () => {
-  const result = await fastPlayControl(playMusic.value, 'SimplePlayBar');
+  const _result = await fastPlayControl(playMusic.value, 'SimplePlayBar');
   // 如果播放失败，尝试下一首
-  if (!result) {
+  if (!_result) {
     playerStore.nextPlay();
   }
 };
@@ -323,7 +323,7 @@ onMounted(() => {
       color: var(--text-on-fill);
     }
 
-    .volume-control .iconfont:hover {
+    .volume-control.iconfont:hover {
       color: var(--fill-color-alt);
     }
   }
@@ -346,7 +346,7 @@ onMounted(() => {
       }
     }
 
-    .volume-control .iconfont:hover {
+    .volume-control.iconfont:hover {
       color: var(--fill-color-light);
     }
   }

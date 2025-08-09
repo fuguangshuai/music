@@ -494,7 +494,7 @@ import ProxySettings from '@/components/settings/ProxySettings.vue';
 import ShortcutSettings from '@/components/settings/ShortcutSettings.vue';
 import { useSettingsStore } from '@/store/modules/settings';
 import { useUserStore } from '@/store/modules/user';
-import { type Platform } from '@/types/music';
+import { Platform } from '@/types/music';
 import { isElectron, isMobile } from '@/utils';
 import { openDirectory, selectDirectory } from '@/utils/fileOperation';
 
@@ -625,7 +625,7 @@ watch(
     // 将选择的字体组合成字体列表
     setData.value = {
       ...setData.value,
-      fontFamily: newFonts.join(',')
+      fontFamily: newFonts.join(', ')
     };
   },
   { deep: true }
@@ -639,7 +639,7 @@ watch(
       if (newFont === 'system-ui') {
         selectedFonts.value = [];
       } else {
-        selectedFonts.value = newFont.split(',');
+        selectedFonts.value = newFont.split(', ');
       }
     }
   },
@@ -688,7 +688,7 @@ const handleProxyConfirm = async (proxyConfig) => {
 };
 
 const validateAndSaveRealIP = () => {
-  const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+  const ipRegex = /^(\d{1, 3}\.){3}\d{1,3}$/;
   if (!setData.value.realIP || ipRegex.test(setData.value.realIP)) {
     setData.value = {
       ...setData.value,
@@ -788,7 +788,7 @@ const clearCache = async (selectedCacheTypes) => {
 
 const showShortcutModal = ref(false);
 
-const handleShortcutsChange = (shortcuts: any) => {
+const handleShortcutsChange = (shortcuts: unknown) => {
   console.log('快捷键已更新:', shortcuts);
 };
 
@@ -833,9 +833,9 @@ const saveToken = async () => {
 
     // 验证token有效性
     const user = await getUserDetail();
-    if (user.data && user.data.profile) {
+    if ((user as any).data && (user as any).data.profile) {
       // token有效，更新用户信息
-      userStore.setUser(user.data.profile);
+      userStore.setUser((user as any).data.profile);
       currentToken.value = tokenInput.value.trim();
       message.success('Token设置成功');
       showTokenModal.value = false;

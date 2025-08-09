@@ -55,7 +55,7 @@
               <div v-for="item in downloadList" :key="item.path" class="download-item">
                 <div class="item-left flex items-center gap-3">
                   <div class="item-cover">
-                    <img :src="getImgUrl(item.songInfo?.picUrl, '200y200')" alt="Cover" />
+                    <img :src="getImgUrl((item as any).songInfo?.picUrl, '200y200')" alt="Cover" />
                   </div>
                   <div class="item-info flex items-center gap-4 w-full">
                     <div
@@ -66,7 +66,7 @@
                     </div>
                     <div class="item-artist min-w-[120px] max-w-[120px] truncate">
                       {{
-                        item.songInfo?.ar?.map((a) => a.name).join(', ') ||
+                        (item as any).songInfo?.ar?.map((a: any) => a.name).join(', ') ||
                         t('download.artist.unknown')
                       }}
                     </div>
@@ -182,7 +182,7 @@
       </div>
       <div class="modal-body">
         {{
-          t('download.delete.message', {
+          t('download.delete._message', {
             filename: itemToDelete?.displayName || itemToDelete?.filename
           })
         }}
@@ -206,7 +206,7 @@
         <span>{{ t('download.clear.title') }}</span>
       </div>
       <div class="modal-body">
-        {{ t('download.clear.message') }}
+        {{ t('download.clear._message') }}
       </div>
       <div class="modal-footer">
         <button class="modal-btn cancel" @click="showClearConfirm = false">
@@ -445,7 +445,7 @@ interface DownloadItem {
   path: string;
   status: 'downloading' | 'completed' | 'error';
   error?: string;
-  songInfo?: any;
+  songInfo?: unknown;
 }
 
 interface DownloadedItem {
@@ -656,7 +656,7 @@ const clearDownloadRecords = async () => {
 const isLoadingDownloaded = ref(false);
 
 // 使用统一的歌曲名称格式化函数
-const formatSongNameLocal = (songInfo: any) => {
+const formatSongNameLocal = (songInfo: unknown) => {
   const nameFormat = downloadSettings.value.nameFormat || '{songName} - {artistName}';
   return formatSongName(songInfo, nameFormat);
 };
@@ -712,7 +712,7 @@ const refreshDownloadedList = async () => {
       downloadedList.value = updatedList;
       localStorage.setItem('downloadedList', JSON.stringify(updatedList));
     } catch (error) {
-      console.error('Failed to get music details:', error);
+      console.error('Failed to get music _details:', error);
       // 处理显示格式化文件名
       const updatedList = list.map((item) => ({
         ...item,
@@ -794,7 +794,7 @@ onMounted(() => {
       setTimeout(() => refreshDownloadedList(), 500);
 
       // 只在下载页面显示一次下载成功通知
-      message.success(t('download.message.downloadComplete', { filename: data.filename }));
+      message.success(t('download._message.downloadComplete', { filename: data.filename }));
 
       // 避免通知过多占用内存，设置一个超时来清理已处理的标记
       setTimeout(() => {
@@ -816,7 +816,7 @@ onMounted(() => {
       }
 
       message.error(
-        t('download.message.downloadFailed', { filename: data.filename, error: data.error })
+        t('download._message.downloadFailed', { filename: data.filename, error: data.error })
       );
     }
   });
@@ -927,9 +927,9 @@ const formatNamePreview = computed(() => {
 
 // 选择下载路径
 const selectDownloadPath = async () => {
-  const result = await window.electron.ipcRenderer.invoke('select-directory');
-  if (result && !result.canceled && result.filePaths.length > 0) {
-    downloadSettings.value.path = result.filePaths[0];
+  const _result = await window.electron.ipcRenderer.invoke('select-directory');
+  if (_result && !_result.canceled && _result.filePaths.length > 0) {
+    downloadSettings.value.path = _result.filePaths[0];
   }
 };
 

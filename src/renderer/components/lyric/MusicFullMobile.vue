@@ -32,10 +32,10 @@
       <transition name="fade">
         <div v-if="showFullLyrics && !isLandscape" class="fullscreen-lyrics" :class="config.theme">
           <div class="fullscreen-header">
-            <div class="song-title">{{ playMusic.name }}</div>
+            <div class="song-title">{{ playMusic?.name }}</div>
             <div class="artist-name">
               <span v-for="(item, index) in artistList" :key="index">
-                {{ item.name }}{{ index < artistList.length - 1 ? ' / ' : '' }}
+                {{ item?.name }}{{ index < artistList.length - 1 ? ' / ' : '' }}
               </span>
             </div>
           </div>
@@ -57,9 +57,9 @@
               :class="{ 'now-text': index === nowIndex, 'hover-text': item.text }"
               @click="jumpToLyricTime(index)"
             >
-              <span :style="getLrcStyle(index)">{{ item.text }}</span>
+              <span :style="getLrcStyle(index)">{{ item?.text }}</span>
               <div v-if="config.showTranslation && item.trText" class="translation">
-                {{ item.trText }}
+                {{ item?.trText }}
               </div>
             </div>
             <div class="lyrics-padding-bottom"></div>
@@ -97,7 +97,7 @@
             <!-- 歌曲信息 -->
             <div class="song-info">
               <div class="song-title-container">
-                <h1 class="song-title">{{ playMusic.name }}</h1>
+                <h1 class="song-title">{{ playMusic?.name }}</h1>
               </div>
               <p class="song-artist">
                 <span
@@ -106,7 +106,7 @@
                   class="artist-name"
                   @click="handleArtistClick(item.id)"
                 >
-                  {{ item.name }}
+                  {{ item?.name }}
                   {{ index < artistList.length - 1 ? ' / ' : '' }}
                 </span>
               </p>
@@ -119,7 +119,7 @@
             <div class="lyrics-container" v-if="!config.hideLyrics" @click="showFullLyricScreen">
               <div v-if="lrcArray.length > 0" class="lyrics-wrapper">
                 <div v-for="(line, idx) in visibleLyrics" :key="idx" class="lyric-line">
-                  {{ line.text }}
+                  {{ line?.text }}
                 </div>
               </div>
               <div v-else class="no-lyrics">
@@ -190,7 +190,7 @@
           <!-- 歌曲信息放置在顶部 -->
           <div class="landscape-song-info">
             <div class="flex flex-col flex-1">
-              <h1 class="song-title">{{ playMusic.name }}</h1>
+              <h1 class="song-title">{{ playMusic?.name }}</h1>
               <p class="song-artist">
                 <span
                   v-for="(item, index) in artistList"
@@ -198,7 +198,7 @@
                   class="artist-name"
                   @click="handleArtistClick(item.id)"
                 >
-                  {{ item.name }}{{ index < artistList.length - 1 ? ' / ' : '' }}
+                  {{ item?.name }}{{ index < artistList.length - 1 ? ' / ' : '' }}
                 </span>
               </p>
             </div>
@@ -225,9 +225,9 @@
               :class="{ 'now-text': index === nowIndex, 'hover-text': item.text }"
               @click="jumpToLyricTime(index)"
             >
-              <span :style="getLrcStyle(index)">{{ item.text }}</span>
+              <span :style="getLrcStyle(index)">{{ item?.text }}</span>
               <div v-if="config.showTranslation && item.trText" class="translation">
-                {{ item.trText }}
+                {{ item?.trText }}
               </div>
             </div>
             <div class="lyrics-padding-bottom"></div>
@@ -660,8 +660,8 @@ const handleMouseMove = (e: MouseEvent) => {
 
   // 查找当前视图中的进度条元素
   const progressBar = isLandscape.value
-    ? document.querySelector('.landscape-left-section .apple-style-progress')
-    : document.querySelector('.unified-controls .apple-style-progress');
+    ? document.querySelector('.landscape-left-section, .apple-style-progress')
+    : document.querySelector('.unified-controls, .apple-style-progress');
 
   if (!progressBar) return;
 
@@ -1075,12 +1075,12 @@ const getLrcStyle = (index: number) => {
         transition: transform 0.15s ease-out;
 
         &.active {
-          transform: translate(-50%, -50%) scale(1.3);
+          transform: translate(-50% -50%) scale(1.3);
           box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
         }
 
         &:active {
-          transform: translate(-50%, -50%) scale(1.3);
+          transform: translate(-50% -50%) scale(1.3);
         }
       }
     }
@@ -1118,7 +1118,7 @@ const getLrcStyle = (index: number) => {
       @apply absolute w-6 h-6 rounded-full bg-gray-900 z-20;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50% -50%);
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
     }
 
@@ -1134,7 +1134,7 @@ const getLrcStyle = (index: number) => {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50% -50%);
 
       &::after {
         content: '';
@@ -1293,17 +1293,11 @@ const getLrcStyle = (index: number) => {
           -webkit-overflow-scrolling: touch;
           mask-image: linear-gradient(
             to bottom,
-            transparent 5%,
-            black 15%,
-            black 85%,
-            transparent 95%
+            transparent 5% black 15% black 85% transparent 95%
           );
           -webkit-mask-image: linear-gradient(
             to bottom,
-            transparent 5%,
-            black 15%,
-            black 85%,
-            transparent 95%
+            transparent 5% black 15% black 85% transparent 95%
           );
         }
 
@@ -1636,13 +1630,10 @@ const getLrcStyle = (index: number) => {
     @apply flex-1 overflow-y-auto px-4;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0% black 10% black 90% transparent 100%);
     -webkit-mask-image: linear-gradient(
       to bottom,
-      transparent 0%,
-      black 10%,
-      black 90%,
-      transparent 100%
+      transparent 0% black 10% black 90% transparent 100%
     );
     padding-top: 100px;
     padding-bottom: 200px;
@@ -1661,7 +1652,7 @@ const getLrcStyle = (index: number) => {
 
     .lyric-line {
       @apply px-6 py-4 text-center;
-      font-size: var(--lyric-font-size, 22px);
+      font-size: var(--lyric-font-_size, 22px);
 
       span {
         padding-right: 10px;

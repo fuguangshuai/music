@@ -284,24 +284,24 @@ const handleImportByLink = async () => {
 
     const encodedLinks = JSON.stringify(links);
 
-    const params: any = {
+    const params: unknown = {
       link: encodedLinks
     };
 
     if (importToStarPlaylist.value) {
-      params.importStarPlaylist = true;
+      (params as any).importStarPlaylist = true;
     } else if (playlistName.value) {
-      params.playlistName = playlistName.value;
+      (params as any).playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params);
+    const res = await importPlaylist(params as any);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));
       taskId.value = res.data.data.taskId;
       startStatusCheck();
     } else {
-      message.error(res.data.message || t('comp.playlist.import.importFailed'));
+      message.error(res.data._message || t('comp.playlist.import.importFailed'));
     }
   } catch (error) {
     console.error('导入歌单失败:', error);
@@ -323,24 +323,24 @@ const handleImportByText = async () => {
 
     const encodedText = encodeURIComponent(textInput.value);
 
-    const params: any = {
+    const params: unknown = {
       text: encodedText
     };
 
     if (importToStarPlaylist.value) {
-      params.importStarPlaylist = true;
+      (params as any).importStarPlaylist = true;
     } else if (playlistName.value) {
-      params.playlistName = playlistName.value;
+      (params as any).playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params);
+    const res = await importPlaylist(params as any);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));
       taskId.value = res.data.data.taskId;
       startStatusCheck();
     } else {
-      message.error(res.data.message || t('comp.playlist.import.importFailed'));
+      message.error(res.data._message || t('comp.playlist.import.importFailed'));
     }
   } catch (error) {
     console.error('导入歌单失败:', error);
@@ -365,24 +365,24 @@ const handleImportByLocal = async () => {
 
     const encodedLocal = JSON.stringify(filteredData);
 
-    const params: any = {
+    const params: unknown = {
       local: encodedLocal
     };
 
     if (importToStarPlaylist.value) {
-      params.importStarPlaylist = true;
+      (params as any).importStarPlaylist = true;
     } else if (playlistName.value) {
-      params.playlistName = playlistName.value;
+      (params as any).playlistName = playlistName.value;
     }
 
-    const res = await importPlaylist(params);
+    const res = await importPlaylist(params as any);
 
     if (res.data.code === 200) {
       message.success(t('comp.playlist.import.importSuccess'));
       taskId.value = res.data.data.taskId;
       startStatusCheck();
     } else {
-      message.error(res.data.message || t('comp.playlist.import.importFailed'));
+      message.error(res.data._message || t('comp.playlist.import.importFailed'));
     }
   } catch (error) {
     console.error('导入歌单失败:', error);

@@ -12,23 +12,23 @@
         <div class="shortcut-content">
           <n-scrollbar>
             <n-space vertical>
-              <div v-for="(shortcut, key) in tempShortcuts" :key="key" class="shortcut-item">
+              <div v-for="(shortcut, _key) in tempShortcuts" :key="_key" class="shortcut-item">
                 <div class="shortcut-info">
-                  <span class="shortcut-label">{{ getShortcutLabel(key) }}</span>
+                  <span class="shortcut-label">{{ getShortcutLabel(_key) }}</span>
                 </div>
                 <div class="shortcut-controls">
                   <div class="shortcut-input">
                     <n-input
                       :value="formatShortcut(shortcut.key)"
-                      :status="duplicateKeys[key] ? 'error' : undefined"
+                      :status="duplicateKeys[_key] ? 'error' : undefined"
                       :placeholder="t('settings.shortcutSettings.inputPlaceholder')"
                       :disabled="!shortcut.enabled"
                       readonly
-                      @keydown="(e) => handleKeyDown(e, key)"
-                      @focus="() => startRecording(key)"
+                      @keydown="(e) => handleKeyDown(e, _key)"
+                      @focus="() => startRecording(_key)"
                       @blur="stopRecording"
                     />
-                    <n-tooltip v-if="duplicateKeys[key]" trigger="hover">
+                    <n-tooltip v-if="duplicateKeys[_key]" trigger="hover">
                       <template #trigger>
                         <n-icon class="error-icon" size="18">
                           <i class="ri-error-warning-line"></i>
@@ -173,11 +173,11 @@ onMounted(() => {
     // 转换旧格式的快捷键数据到新格式
     if (storedShortcuts && typeof storedShortcuts.togglePlay === 'string') {
       const convertedShortcuts = {} as Shortcuts;
-      Object.entries(storedShortcuts).forEach(([key, value]) => {
-        convertedShortcuts[key as keyof Shortcuts] = {
+      Object.entries(storedShortcuts).forEach(([_key, value]) => {
+        convertedShortcuts[_key as keyof Shortcuts] = {
           key: value as string,
           enabled: true,
-          scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(key) ? 'app' : 'global'
+          scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(_key) ? 'app' : 'global'
         };
       });
       shortcuts.value = convertedShortcuts;
@@ -197,7 +197,7 @@ const shortcutLabels: Record<keyof Shortcuts, string> = {
   toggleWindow: t('settings.shortcutSettings.toggleWindow')
 };
 
-const getShortcutLabel = (key: keyof Shortcuts) => shortcutLabels[key];
+const getShortcutLabel = (_key: keyof Shortcuts) => shortcutLabels[_key];
 
 const isRecording = ref(false);
 const currentKey = ref<keyof Shortcuts | ''>('');
@@ -208,7 +208,7 @@ const duplicateKeys = computed(() => {
   const result: Record<string, boolean> = {};
   const usedShortcuts = new Map<string, string>();
 
-  Object.entries(tempShortcuts.value).forEach(([key, shortcut]) => {
+  Object.entries(tempShortcuts.value).forEach(([_key, shortcut]) => {
     // 只检查启用的快捷键
     if (!shortcut.enabled) return;
 
@@ -217,10 +217,10 @@ const duplicateKeys = computed(() => {
       // 只有相同作用域的快捷键才会被认为冲突
       const conflictScope = tempShortcuts.value[conflictKey as keyof Shortcuts].scope;
       if (shortcut.scope === conflictScope) {
-        result[key] = true;
+        result[_key] = true;
       }
     } else {
-      usedShortcuts.set(shortcut.key, key);
+      usedShortcuts.set(shortcut.key, _key);
     }
   });
 
@@ -230,11 +230,11 @@ const duplicateKeys = computed(() => {
 // 是否存在冲突
 const hasConflict = computed(() => Object.keys(duplicateKeys.value).length > 0);
 
-const startRecording = (key: keyof Shortcuts) => {
-  if (!tempShortcuts.value[key].enabled) return;
+const startRecording = (_key: keyof Shortcuts) => {
+  if (!tempShortcuts.value[_key].enabled) return;
 
   isRecording.value = true;
-  currentKey.value = key;
+  currentKey.value = _key;
   // 禁用全局快捷键
   if (isElectron) {
     window.electron.ipcRenderer.send('disable-shortcuts');
@@ -250,8 +250,8 @@ const stopRecording = () => {
   }
 };
 
-const handleKeyDown = (e: KeyboardEvent, key: keyof Shortcuts) => {
-  if (!isRecording.value || currentKey.value !== key) return;
+const handleKeyDown = (e: KeyboardEvent, _key: keyof Shortcuts) => {
+  if (!isRecording.value || currentKey.value !== _key) return;
 
   e.preventDefault();
   e.stopPropagation();
@@ -292,7 +292,7 @@ const handleKeyDown = (e: KeyboardEvent, key: keyof Shortcuts) => {
   }
 
   if (!['Control', 'Alt', 'Shift', 'Meta', 'Command'].includes(keyName)) {
-    tempShortcuts.value[key].key = [...modifiers, keyName].join('+');
+    tempShortcuts.value[_key].key = [...modifiers, keyName].join('+');
   }
 };
 
@@ -399,16 +399,16 @@ const handleSave = () => {
 
 // 全部禁用快捷键
 const disableAllShortcuts = () => {
-  Object.keys(tempShortcuts.value).forEach((key) => {
-    tempShortcuts.value[key as keyof Shortcuts].enabled = false;
+  Object.keys(tempShortcuts.value).forEach((_key) => {
+    tempShortcuts.value[_key as keyof Shortcuts].enabled = false;
   });
   message.info(t('settings.shortcutSettings.messages.disableAll'));
 };
 
 // 全部启用快捷键
 const enableAllShortcuts = () => {
-  Object.keys(tempShortcuts.value).forEach((key) => {
-    tempShortcuts.value[key as keyof Shortcuts].enabled = true;
+  Object.keys(tempShortcuts.value).forEach((_key) => {
+    tempShortcuts.value[_key as keyof Shortcuts].enabled = true;
   });
   message.info(t('settings.shortcutSettings.messages.enableAll'));
 };

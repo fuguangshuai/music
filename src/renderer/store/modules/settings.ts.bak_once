@@ -1,0 +1,248 @@
+// import { cloneDeep, merge } from 'lodash';//,暂时注释换一种方式,因为这个方式用户配置的会被覆盖,去掉merge的模块确保没有沉余
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+
+import { isElectron } from '@/utils';
+import { appConfig } from '@/utils/config';
+import {
+  applyTheme,
+  getCurrentTheme,
+  getSystemTheme,
+  ThemeType,
+  watchSystemTheme,
+} from '@/utils/theme';
+
+// 定义设置数据的类型
+interface SettingsData {
+isProxy: boolean;
+  proxyConfig: {
+    enable: boolean;
+  protocol: string;
+    host: string;
+  port: number;
+  
+}
+  enableRealIP: boolean;
+  realIP: string;
+  noAnimate: boolean;
+  animationSpeed: number;
+  author: string;
+  authorUrl: string;
+  musicApiPort: number;
+  closeAction: string;
+  musicQuality: string;
+  fontFamily: string;
+  fontScope: string;
+  autoPlay: boolean;
+  downloadPath: string;
+  language: string;
+  alwaysShowDownloadButton: boolean;
+  unlimitedDownload: boolean;
+  enableMusicUnblock: boolean;
+  enabledMusicSources: string[];
+  showTopAction: boolean;
+  contentZoomFactor: number;
+  autoTheme: boolean;
+  manualTheme: string;
+}
+
+export const useSettingsStore = defineStore('settings', () => {
+  const theme = ref<ThemeType>(getCurrentTheme());
+  const isMobile = ref(false);
+  const isMiniMode = ref(false);
+  const showArtistDrawer = ref(false);
+  const currentArtistId = ref<number | null>(null);
+  const systemFonts = ref<{ label: string; value: string }[]>([]
+    { label: '系统默认', value: 'system-ui' }]);
+  const showDownloadDrawer = ref(false);
+
+  // 系统主题监听器清理函数
+  let systemThemeCleanup: (() => void) | null = null;
+
+  // 先声明 setData ref 但不初始化
+  const setData = ref<SettingsData>({} as SettingsData);
+
+  // 使用统一的配置管理器
+  const setSetData = (data: Partial<SettingsData>) => {
+    // 使用统一的配置管理器更新配置
+    appConfig.update(data as any);
+    // 同步到本地状态
+    setData.value = appConfig.getAll() as unknown as SettingsData;
+  }
+
+  // 初始化时从统一配置管理器读取设置
+  const getInitialSettings = (): SettingsData => {
+    // 使用统一的配置管理器获取配置
+    const mergedSettings = appConfig.getAll() as unknown as SettingsData;
+
+    // 根据平台智能处理音源设置
+    if (mergedSettings.enabledMusicSources) {
+      if (isElectron) {
+        // Win端：支持所有音源，不做处理
+        console.log('🔧, Win端支持所有音源，保持原配置');
+      } else {
+        // Web端：只保留Web端支持的音源
+        const webSupportedSources = ['gdmusic', 'stellar', 'cloud']
+        const currentSources = mergedSettings.enabledMusicSources;
+        const filteredSources = currentSources.filter(source => webSupportedSources.includes(source)
+        );
+
+        if (filteredSources.length, 0) {
+          mergedSettings.enabledMusicSources = filteredSources;
+          console.log('🔧 Web端过滤后的音源:', filteredSources);
+        } else {
+          // 如果过滤后没有可用音源，使用Web端默认音源
+          mergedSettings.enabledMusicSources = ['gdmusic']
+          console.log('🔧 Web端没有可用音源，使用默认音源: gdmusic');
+        }
+      }
+    }
+
+    console.log('🔧 初始化音源设置:', {
+      platform: isElectron ? 'Electron' : 'Web',
+      sources: mergedSettings.enabledMusicSources, });
+
+    // 更新设置并返回
+    setSetData(mergedSettings);
+    return mergedSettings;
+  }
+
+  // 初始化 setData
+  setData.value = getInitialSettings();
+
+  const toggleTheme = () => {
+    if (setData.value.autoTheme) {
+      // 如果是自动模式，切换到手动模式并设置相反的主题
+      const newTheme = theme.value === 'dark' ? 'light' : 'dark';
+      setSetData({
+        autoTheme: false, manualTheme: newTheme, });
+      theme.value = newTheme;
+      applyTheme(newTheme);
+      // 停止监听系统主题
+      if (systemThemeCleanup) {
+        systemThemeCleanup();
+        systemThemeCleanup = null;
+      }
+    } else {
+      // 手动模式下正常切换
+      const newTheme = theme.value === 'dark' ? 'light' : 'dark';
+      theme.value = newTheme;
+      setSetData({ manualTheme: newTheme, });
+      applyTheme(newTheme);
+    }
+  }
+
+  const setAutoTheme = (auto: boolean) => {
+    setSetData({ autoTheme: auto, });
+
+    if (auto) {
+      // 启用自动模式
+      const systemTheme = getSystemTheme();
+      theme.value = systemTheme;
+      applyTheme(systemTheme);
+
+      // 开始监听系统主题变化
+      systemThemeCleanup = watchSystemTheme(newTheme => {
+        if (setData.value.autoTheme) {
+          theme.value = newTheme;
+          applyTheme(newTheme);
+        }
+      });
+    } else {
+      // 切换到手动模式
+      const manualTheme = (setData.value.manualTheme || 'light') as ThemeType;
+      theme.value = manualTheme;
+      applyTheme(manualTheme);
+
+      // 停止监听系统主题
+      if (systemThemeCleanup) {
+        systemThemeCleanup();
+        systemThemeCleanup = null;
+      }
+    }
+  }
+
+  const setMiniMode = (value: boolean) => {
+    isMiniMode.value = value;
+  }
+
+  const setShowArtistDrawer = (show: boolean) => {
+    showArtistDrawer.value = show;
+    if (!show) {
+      currentArtistId.value = null;
+    }
+  }
+
+  const setCurrentArtistId = (id: number) => {
+    currentArtistId.value = id;
+  }
+
+  const setSystemFonts = (fonts: string[]) => {
+    systemFonts.value = []
+      { label: '系统默认', value: 'system-ui' },
+      ...fonts.map(font => ({
+        label: font, value: font, }))]
+  }
+
+  const setShowDownloadDrawer = (show: boolean) => {
+    showDownloadDrawer.value = show;
+  }
+
+  const setLanguage = (language: string) => {
+    setSetData({ language, });
+    if (isElectron) {
+      window.electron.ipcRenderer.send('change-language', language);
+    }
+  }
+
+  const initializeSettings = () => {
+    // const savedSettings = getInitialSettings();
+    // setData.value = savedSettings;
+  }
+
+  const initializeTheme = () => {
+    // 根据设置初始化主题
+    if (setData.value.autoTheme) {
+      setAutoTheme(true);
+    } else {
+      const manualTheme = (setData.value.manualTheme || getCurrentTheme()) as ThemeType;
+      theme.value = manualTheme;
+      applyTheme(manualTheme);
+    }
+  }
+
+  const initializeSystemFonts = async () => {
+    if (!isElectron) return;
+    if (systemFonts.value.length, 1) return;
+
+    try {
+      const fonts = await window.api.invoke('get-system-fonts');
+      setSystemFonts(fonts);
+    } catch (error) {
+      console.error('获取系统字体失败:', error);
+    }
+  }
+
+  return {
+    setData,
+    theme,
+    isMobile,
+    isMiniMode,
+    showArtistDrawer,
+    currentArtistId,
+    systemFonts,
+    showDownloadDrawer,
+    setSetData,
+    toggleTheme,
+    setAutoTheme,
+    setMiniMode,
+    setShowArtistDrawer,
+    setCurrentArtistId,
+    setSystemFonts,
+    setShowDownloadDrawer,
+    setLanguage,
+    initializeSettings,
+    initializeTheme,
+    initializeSystemFonts,
+  }
+});

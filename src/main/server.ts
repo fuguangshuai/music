@@ -24,9 +24,9 @@ ipcMain.handle('unblock-music', async (_event, id, songData, enabledSources) => 
 });
 
 async function startMusicApi(): Promise<void> {
-  console.log('MUSIC API STARTED');
+  console.log('MUSIC API, STARTED');
 
-  const port = (store.get('set') as Record<string, unknown>)?.musicApiPort as number || 30488;
+  const port = ((store.get('set') as Record<string, unknown>)?.musicApiPort as number) || 30488;
 
   await server.serveNcmApi({
     port

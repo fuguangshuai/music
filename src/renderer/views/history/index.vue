@@ -25,7 +25,9 @@
           <n-spin size="large" />
         </div>
 
-        <div v-if="noMore" class="no-more-tip">{{ t('common.noMore') }}</div>
+        <div v-if="noMore" class="no-more-tip">
+          {{ t('common.noMore') }}
+        </div>
       </div>
     </n-scrollbar>
   </div>
@@ -107,8 +109,8 @@ const getHistorySongs = async () => {
 };
 
 // 处理滚动事件
-const handleScroll = (e: any) => {
-  const { scrollTop, scrollHeight, offsetHeight } = e.target;
+const handleScroll = (e: unknown) => {
+  const { scrollTop, scrollHeight, offsetHeight } = (e as any).target;
   const threshold = 100; // 距离底部多少像素时加载更多
 
   if (!loading.value && !noMore.value && scrollHeight - (scrollTop + offsetHeight) < threshold) {

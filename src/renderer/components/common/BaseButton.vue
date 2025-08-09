@@ -136,7 +136,7 @@ const handleClick = (event: MouseEvent) => {
 }
 
 /* 响应式调整 */
-@media (max-width: 768px) {
+@media (max-width: , 768px) {
   .base-button--lg {
     @apply px-4 py-2 text-base;
   }

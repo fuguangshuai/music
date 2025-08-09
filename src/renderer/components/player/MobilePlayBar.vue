@@ -21,11 +21,11 @@
       <!-- 顶部信息区域 -->
       <div class="music-info-header">
         <div class="music-info-main">
-          <h1 class="music-title">{{ playMusic.name }}</h1>
+          <h1 class="music-title">{{ playMusic?.name }}</h1>
           <div class="artist-info">
             <span class="artist-name">
               <span v-for="(artists, artistsindex) in artistList" :key="artistsindex">
-                {{ artists.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
+                {{ artists?.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
               </span>
             </span>
           </div>
@@ -142,16 +142,16 @@ const timeSlider = computed({
 });
 
 // 播放控制
-function handleNext() {
+function handleNext(): void {
   playerStore.nextPlay();
 }
 
-function handlePrev() {
+function handlePrev(): void {
   playerStore.prevPlay();
 }
 
 // 全屏播放器
-const MusicFullRef = ref<any>(null);
+const MusicFullRef = ref<unknown>(null);
 const musicFullVisible = ref(false);
 
 // 设置musicFull
@@ -184,9 +184,9 @@ const toggleFavorite = () => {
 
 // 移动端播放按钮事件 - 使用快速播放控制服务
 const playMusicEvent = async () => {
-  const result = await fastPlayControl(playMusic.value, 'MobilePlayBar');
+  const _result = await fastPlayControl(playMusic.value, 'MobilePlayBar');
   // 如果播放失败，尝试下一首
-  if (!result) {
+  if (!_result) {
     playerStore.nextPlay();
   }
 };

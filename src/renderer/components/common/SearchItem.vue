@@ -12,13 +12,13 @@
       </div>
     </div>
     <div class="search-item-info">
-      <p class="search-item-name">{{ item.name }}</p>
-      <p class="search-item-artist">{{ item.desc }}</p>
+      <p class="search-item-name">{{ item?.name }}</p>
+      <p class="search-item-artist">{{ item?.desc }}</p>
     </div>
 
     <div v-if="item.type === '专辑'" class="search-item-size">
       <i class="ri-music-2-line"></i>
-      <span>{{ item.size }}</span>
+      <span>{{ item?.size }}</span>
     </div>
 
     <mv-player
@@ -49,7 +49,7 @@ const props = withDefaults(
       name: string;
       desc: string;
       type: string;
-      [key: string]: any;
+      [_key: string]: unknown;
     };
   }>(),
   {
@@ -57,10 +57,10 @@ const props = withDefaults(
   }
 );
 
-const songList = ref<any[]>([]);
+const songList = ref<any[]>([0]);
 
 const showPop = ref(false);
-const listInfo = ref<any>(null);
+const listInfo = ref<unknown>(null);
 
 const playerStore = usePlayerStore();
 const router = useRouter();
@@ -76,9 +76,9 @@ const getCurrentMv = () => {
 const handleClick = async () => {
   listInfo.value = null;
   if (props.item.type === '专辑') {
-    const res = await getAlbum(props.item.id);
-    songList.value = res.data.songs.map((song: any) => {
-      song.al.picUrl = song.al.picUrl || props.item.picUrl;
+    const res = await getAlbum((props.item as any).id);
+    songList.value = res.data.songs.map((song: unknown) => {
+      (song as any).al.picUrl = (song as any).al.picUrl || (props.item as any).picUrl;
       return song;
     });
     listInfo.value = {
@@ -91,26 +91,26 @@ const handleClick = async () => {
     };
 
     // 保存数据到store
-    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value, false);
+    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value as Record<string, unknown>, false);
 
     // 使用路由跳转
     router.push({
       name: 'musicList',
-      params: { id: props.item.id },
+      params: { id: (props.item as any).id },
       query: { type: 'album' }
     });
   } else if (props.item.type === 'playlist') {
-    const res = await getListDetail(props.item.id);
+    const res = await getListDetail((props.item as any).id);
     songList.value = res.data.playlist.tracks;
     listInfo.value = res.data.playlist;
 
     // 保存数据到store
-    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value, false);
+    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value as Record<string, unknown>, false);
 
     // 使用路由跳转
     router.push({
       name: 'musicList',
-      params: { id: props.item.id },
+      params: { id: (props.item as any).id },
       query: { type: 'playlist' }
     });
   } else if (props.item.type === 'mv') {

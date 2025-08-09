@@ -33,7 +33,15 @@ export interface SongData {
 /**
  * 支持的音乐平台类型
  */
-export type MusicPlatform = 'qq' | 'migu' | 'kugou' | 'pyncmd' | 'joox' | 'gdmusic' | 'stellar' | 'cloud';
+export type MusicPlatform =
+  | 'qq'
+  | 'migu'
+  | 'kugou'
+  | 'pyncmd'
+  | 'joox'
+  | 'gdmusic'
+  | 'stellar'
+  | 'cloud';
 
 /**
  * Electron API 接口定义

@@ -34,7 +34,7 @@ const loadLogin = async () => {
     }
 
     const qrKey = await getQrKey();
-    const key = qrKey.data.data.unikey;
+    const key = (qrKey as any).data.data.unikey;
     const { data } = await createQr(key);
     qrUrl.value = data.data.qrimg;
     qrStatus.value = 'active';
@@ -42,18 +42,18 @@ const loadLogin = async () => {
     const timer = timerIsQr(key);
     timerRef.value = timer as any;
   } catch (error) {
-    console.error(t('login.message.loadError'), error);
+    console.error(t('login._message.loadError'), error);
     qrStatus.value = 'expired';
-    message.error(t('login.message.loadError'));
+    message.error(t('login._message.loadError'));
   } finally {
     isRefreshing.value = false;
   }
 };
 
-const timerIsQr = (key: string) => {
+const timerIsQr = (_key: string) => {
   const timer = setInterval(async () => {
     try {
-      const { data } = await checkQr(key);
+      const { data } = await checkQr(_key);
 
       // 二维码过期或不存在
       if (data.code === 800) {
@@ -82,16 +82,16 @@ const timerIsQr = (key: string) => {
         qrStatus.value = 'confirmed';
         localStorage.setItem('token', data.cookie);
         const user = await getUserDetail();
-        userStore.user = user.data.profile;
-        localStorage.setItem('user', JSON.stringify(user.data.profile));
-        message.success(t('login.message.loginSuccess'));
+        userStore.user = (user as any).data.profile;
+        localStorage.setItem('user', JSON.stringify((user as any).data.profile));
+        message.success(t('login._message.loginSuccess'));
 
         clearInterval(timer);
         timerRef.value = null;
         router.push('/user');
       }
     } catch (error) {
-      console.error(t('login.message.qrCheckError'), error);
+      console.error(t('login._message.qrCheckError'), error);
       qrStatus.value = 'expired';
       clearInterval(timer);
       timerRef.value = null;

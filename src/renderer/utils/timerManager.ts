@@ -1,7 +1,7 @@
 /**
  * ⏰ 全局定时器管理器
  * 统一管理所有定时器，防止内存泄漏，提供生命周期管理
- * 
+ *
  * 功能特性:
  * - 定时器注册和自动清理
  * - 页面切换时的定时器清理
@@ -10,14 +10,14 @@
  * - 调试和监控工具
  */
 
-import { type Ref,ref } from 'vue';
+import { ref } from 'vue';
 
 // 定时器类型枚举
 export enum TimerType {
-  PLAYER = 'player',           // 播放器相关定时器
-  PRELOAD = 'preload',         // 预加载相关定时器
-  UI = 'ui',                   // UI更新相关定时器
-  OTHER = 'other'              // 其他定时器
+  PLAYER = 'player', // 播放器相关定时器
+  PRELOAD = 'preload', // 预加载相关定时器
+  UI = 'ui', // UI更新相关定时器
+  OTHER = 'other' // 其他定时器
 }
 
 // 定时器信息接口
@@ -59,13 +59,13 @@ class TimerManager {
    * @returns 定时器ID
    */
   setTimeout(
-    callback: () => void, 
-    delay: number, 
+    callback: () => void,
+    delay: number,
     type: TimerType = TimerType.OTHER,
     description?: string
   ): string {
     if (this.isDestroyed) {
-      console.warn('⚠️ TimerManager已销毁，无法创建定时器');
+      console.warn('⚠️, TimerManager已销毁，无法创建定时器');
       return '';
     }
 
@@ -93,9 +93,9 @@ class TimerManager {
     };
 
     this.timers.value.set(id, timerInfo);
-    
-    console.log(`⏰ 创建定时器 ${id} (${type}): ${description || '无描述'}, 延迟: ${delay}ms`);
-    
+
+    console.log(`⏰ 创建定时器 ${id}, (${type}): ${description || '无描述'}, 延迟: ${delay}ms`);
+
     return id;
   }
 
@@ -114,7 +114,7 @@ class TimerManager {
     description?: string
   ): string {
     if (this.isDestroyed) {
-      console.warn('⚠️ TimerManager已销毁，无法创建间隔定时器');
+      console.warn('⚠️, TimerManager已销毁，无法创建间隔定时器');
       return '';
     }
 
@@ -139,9 +139,11 @@ class TimerManager {
     };
 
     this.timers.value.set(id, timerInfo);
-    
-    console.log(`🔄 创建间隔定时器 ${id} (${type}): ${description || '无描述'}, 间隔: ${interval}ms`);
-    
+
+    console.log(
+      `🔄 创建间隔定时器 ${id}, (${type}): ${description || '无描述'}, 间隔: ${interval}ms`
+    );
+
     return id;
   }
 
@@ -155,7 +157,7 @@ class TimerManager {
       try {
         clearTimeout(timerInfo.timer);
         this.timers.value.delete(id);
-        console.log(`🗑️ 清除定时器 ${id}`);
+        console.log(`🗑️ 清除定时器, ${id}`);
       } catch (error) {
         console.error(`💥 清除定时器${id}时出错:`, error);
       }
@@ -172,7 +174,7 @@ class TimerManager {
       try {
         clearInterval(timerInfo.timer);
         this.timers.value.delete(id);
-        console.log(`🗑️ 清除间隔定时器 ${id}`);
+        console.log(`🗑️ 清除间隔定时器, ${id}`);
       } catch (error) {
         console.error(`💥 清除间隔定时器${id}时出错:`, error);
       }
@@ -184,14 +186,15 @@ class TimerManager {
    * @param type 定时器类型
    */
   clearTimersByType(type: TimerType): void {
-    const timersToRemove = Array.from(this.timers.value.values())
-      .filter(timer => timer.type === type);
+    const timersToRemove = Array.from(this.timers.value.values()).filter(
+      (timer) => timer.type === type
+    );
 
-    timersToRemove.forEach(timer => {
+    timersToRemove.forEach((timer) => {
       this.clearTimeout(timer.id);
     });
 
-    console.log(`🧹 清除${type}类型的${timersToRemove.length}个定时器`);
+    console.log(`🧹, 清除${type}类型的${timersToRemove.length}个定时器`);
   }
 
   /**
@@ -199,7 +202,7 @@ class TimerManager {
    */
   clearAllTimers(): void {
     const count = this.timers.value.size;
-    
+
     this.timers.value.forEach((timerInfo) => {
       try {
         clearTimeout(timerInfo.timer);
@@ -209,7 +212,7 @@ class TimerManager {
     });
 
     this.timers.value.clear();
-    console.log(`🧹 清除所有定时器，共${count}个`);
+    console.log(`🧹, 清除所有定时器，共${count}个`);
   }
 
   /**
@@ -219,18 +222,23 @@ class TimerManager {
     const timers = Array.from(this.timers.value.values());
     const now = Date.now();
 
-    const byType = Object.values(TimerType).reduce((acc, type) => {
-      acc[type] = timers.filter(timer => timer.type === type).length;
-      return acc;
-    }, {} as Record<TimerType, number>);
+    const byType = Object.values(TimerType).reduce(
+      (acc, type) => {
+        acc[type] = timers.filter((timer) => timer.type === type).length;
+        return acc;
+      },
+      {} as Record<TimerType, number>
+    );
 
-    const oldestTimer = timers.reduce((oldest, current) => 
-      !oldest || current.createdAt < oldest.createdAt ? current : oldest
-    , null as TimerInfo | null);
+    const oldestTimer = timers.reduce(
+      (oldest, current) => (!oldest || current.createdAt < oldest.createdAt ? current : oldest),
+      null as TimerInfo | null
+    );
 
-    const averageAge = timers.length > 0 
-      ? timers.reduce((sum, timer) => sum + (now - timer.createdAt), 0) / timers.length
-      : 0;
+    const averageAge =
+      timers.length > 0
+        ? timers.reduce((sum, timer) => sum + (now - timer.createdAt), 0) / timers.length
+        : 0;
 
     return {
       total: timers.length,
@@ -260,16 +268,18 @@ class TimerManager {
    */
   private cleanupExpiredTimers(): void {
     const now = Date.now();
-    const expiredTimers = Array.from(this.timers.value.values())
-      .filter(timer => now - timer.createdAt > this.maxTimerAge);
+    const expiredTimers = Array.from(this.timers.value.values()).filter(
+      (timer) => now - timer.createdAt,
+      this.maxTimerAge
+    );
 
-    expiredTimers.forEach(timer => {
-      console.warn(`⏰ 定时器${timer.id}已过期，自动清理`);
+    expiredTimers.forEach((timer) => {
+      console.warn(`⏰, 定时器${timer.id}已过期，自动清理`);
       this.clearTimeout(timer.id);
     });
 
     if (expiredTimers.length > 0) {
-      console.log(`🧹 清理${expiredTimers.length}个过期定时器`);
+      console.log(`🧹, 清理${expiredTimers.length}个过期定时器`);
     }
   }
 
@@ -288,7 +298,7 @@ class TimerManager {
           return `${match[1]} (${match[2]}:${match[3]})`;
         }
       }
-    } catch (error) {
+    } catch {
       // 忽略获取调用源失败的错误
     }
     return 'unknown';
@@ -298,11 +308,14 @@ class TimerManager {
    * ⏰ 启动清理监控
    */
   private startCleanupMonitor(): void {
-    this.cleanupInterval = setInterval(() => {
-      if (!this.isDestroyed) {
-        this.cleanupExpiredTimers();
-      }
-    }, 5 * 60 * 1000); // 每5分钟检查一次
+    this.cleanupInterval = setInterval(
+      () => {
+        if (!this.isDestroyed) {
+          this.cleanupExpiredTimers();
+        }
+      },
+      5 * 60 * 1000
+    ); // 每5分钟检查一次
   }
 
   /**
@@ -317,7 +330,7 @@ class TimerManager {
     // 页面隐藏时清理非关键定时器
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        console.log('🧹 页面隐藏，清理非关键定时器');
+        console.log('🧹, 页面隐藏，清理非关键定时器');
         this.clearTimersByType(TimerType.UI);
         this.clearTimersByType(TimerType.PRELOAD);
       }
@@ -330,7 +343,7 @@ class TimerManager {
   destroy(): void {
     if (this.isDestroyed) return;
 
-    console.log('💥 销毁TimerManager');
+    console.log('💥, 销毁TimerManager');
     this.isDestroyed = true;
 
     // 清理监控定时器
@@ -355,5 +368,5 @@ export { TimerManager };
 if (import.meta.env.DEV) {
   // @ts-ignore
   window.timerManager = timerManager;
-  console.log('🔧 TimerManager已挂载到window对象，可用于调试');
+  console.log('🔧, TimerManager已挂载到window对象，可用于调试');
 }

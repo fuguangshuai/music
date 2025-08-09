@@ -1,7 +1,7 @@
 /**
  * 智能性能监控服务
  * 基于现有optimization-test.js扩展，提供运行时性能监控和分析
- * 
+ *
  * 功能特性:
  * - 实时性能指标收集（页面加载、音频加载、内存使用）
  * - Web Performance API集成
@@ -10,7 +10,7 @@
  * - 实时性能报告生成
  */
 
-import { reactive,ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 import { isElectron } from '@/utils';
 
@@ -99,7 +99,7 @@ class PerformanceMonitor {
     this.startMemoryMonitoring();
     this.loadBaseline();
 
-    console.log('🔍 性能监控服务已启动');
+    console.log('🔍, 性能监控服务已启动');
   }
 
   /**
@@ -107,13 +107,13 @@ class PerformanceMonitor {
    */
   stop(): void {
     this.isMonitoring.value = false;
-    
+
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
     }
 
-    console.log('⏹️ 性能监控服务已停止');
+    console.log('⏹️, 性能监控服务已停止');
   }
 
   /**
@@ -123,22 +123,25 @@ class PerformanceMonitor {
     // 页面加载性能监控
     if ('performance' in window && 'getEntriesByType' in performance) {
       // 监控导航时间
-      const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+      const navigationEntries = performance.getEntriesByType(
+        'navigation'
+      ) as PerformanceNavigationTiming[];
       if (navigationEntries.length > 0) {
         const nav = navigationEntries[0];
-        this.metrics.pageLoad.domContentLoaded = nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart;
+        this.metrics.pageLoad.domContentLoaded =
+          nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart;
         this.metrics.pageLoad.loadComplete = nav.loadEventEnd - nav.loadEventStart;
       }
 
       // 监控绘制性能
       const paintEntries = performance.getEntriesByType('paint');
-      paintEntries.forEach(entry => {
+      paintEntries.forEach((entry) => {
         if (entry.name === 'first-contentful-paint') {
           this.metrics.pageLoad.firstContentfulPaint = entry.startTime;
         }
       });
 
-      // 监控LCP (Largest Contentful Paint)
+      // 监控LCP (Largest Contentful, Paint)
       if ('PerformanceObserver' in window) {
         try {
           const lcpObserver = new PerformanceObserver((list) => {
@@ -189,7 +192,7 @@ class PerformanceMonitor {
    */
   trackPageLoad(route: string): void {
     const startTime = performance.now();
-    
+
     // 使用requestIdleCallback在空闲时测量
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
@@ -204,10 +207,11 @@ class PerformanceMonitor {
    */
   trackAudioLoad(url: string, duration: number): void {
     this.metrics.audio.loadTime = duration;
-    
+
     // 计算缓冲健康度（简化版）
-    this.metrics.audio.bufferHealth = duration < 1000 ? 100 : Math.max(0, 100 - (duration - 1000) / 100);
-    
+    this.metrics.audio.bufferHealth =
+      duration < 1000 ? 100 : Math.max(0, 100 - (duration - 1000) / 100);
+
     console.log(`🎵 音频加载性能 [${url}]: ${duration.toFixed(2)}ms`);
   }
 
@@ -242,7 +246,8 @@ class PerformanceMonitor {
     let score = 100;
 
     // 内存使用分析
-    const memoryUsagePercent = (this.metrics.memory.usedJSHeapSize / this.metrics.memory.jsHeapSizeLimit) * 100;
+    const memoryUsagePercent =
+      (this.metrics.memory.usedJSHeapSize / this.metrics.memory.jsHeapSizeLimit) * 100;
     if (memoryUsagePercent > 80) {
       issues.push('内存使用率过高');
       recommendations.push('考虑优化内存使用或增加垃圾回收');
@@ -298,7 +303,7 @@ class PerformanceMonitor {
     try {
       localStorage.setItem('performance-baseline', JSON.stringify(baseline));
       this.baseline = baseline;
-      console.log('💾 性能基准已保存');
+      console.log('💾, 性能基准已保存');
     } catch (error) {
       console.error('保存性能基准失败:', error);
     }

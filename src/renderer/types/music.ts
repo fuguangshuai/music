@@ -10,4 +10,4 @@ export type Platform =
   | 'cloud';
 
 // 默认平台列表
-export const DEFAULT_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];
+export const _DEFAULT_PLATFORMS: Platform[] = ['migu', 'kugou', 'pyncmd'];

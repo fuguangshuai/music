@@ -6,17 +6,17 @@ const api = {
   minimize: () => ipcRenderer.send('minimize-window'),
   maximize: () => ipcRenderer.send('maximize-window'),
   close: () => ipcRenderer.send('close-window'),
-  dragStart: (data) => ipcRenderer.send('drag-start', data),
+  dragStart: (data: unknown) => ipcRenderer.send('drag-start', data),
   miniTray: () => ipcRenderer.send('mini-tray'),
   miniWindow: () => ipcRenderer.send('mini-window'),
   restore: () => ipcRenderer.send('restore-window'),
   restart: () => ipcRenderer.send('restart'),
-  resizeWindow: (width, height) => ipcRenderer.send('resize-window', width, height),
-  resizeMiniWindow: (showPlaylist) => ipcRenderer.send('resize-mini-window', showPlaylist),
+  resizeWindow: (width: number, height: number) => ipcRenderer.send('resize-window', width, height),
+  resizeMiniWindow: (showPlaylist: boolean) => ipcRenderer.send('resize-mini-window', showPlaylist),
   openLyric: () => ipcRenderer.send('open-lyric'),
-  sendLyric: (data) => ipcRenderer.send('send-lyric', data),
-  sendSong: (data) => ipcRenderer.send('update-current-song', data),
-  unblockMusic: (id, data, enabledSources) =>
+  sendLyric: (data: unknown) => ipcRenderer.send('send-lyric', data),
+  sendSong: (data: unknown) => ipcRenderer.send('update-current-song', data),
+  unblockMusic: (id: unknown, data: unknown, enabledSources: unknown) =>
     ipcRenderer.invoke('unblock-music', id, data, enabledSources),
   // 歌词窗口关闭事件
   onLyricWindowClosed: (callback: () => void) => {
@@ -102,7 +102,9 @@ const ALLOWED_CHANNELS = {
 
 // 验证通道是否在白名单中
 const isChannelAllowed = (channel: string): boolean => {
-  return Object.values(ALLOWED_CHANNELS).includes(channel as typeof ALLOWED_CHANNELS[keyof typeof ALLOWED_CHANNELS]);
+  return Object.values(ALLOWED_CHANNELS).includes(
+    channel as (typeof ALLOWED_CHANNELS)[keyof typeof ALLOWED_CHANNELS]
+  );
 };
 
 // 创建安全的IPC接口
@@ -142,7 +144,7 @@ const secureIPC = {
       throw new Error(`未授权的IPC监听通道: ${channel}`);
     }
 
-    const wrappedListener = (_, ...args) => listener(...args);
+    const wrappedListener = (_: unknown, ...args: unknown[]) => listener(...args);
     ipcRenderer.on(channel, wrappedListener);
 
     // 跟踪活跃的监听器

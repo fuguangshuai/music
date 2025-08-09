@@ -116,7 +116,7 @@
           </n-tabs>
         </template>
         <div v-else-if="!loading" class="empty-message">
-          {{ t('user.message.loadFailed') }}
+          {{ t('user._message.loadFailed') }}
         </div>
 
         <!-- 底部留白 -->
@@ -185,11 +185,11 @@ const loadUserData = async () => {
         getUserPlaylist(userId.value)
       ]);
 
-      userDetail.value = userDetailRes.data;
-      playList.value = playlistRes.data.playlist;
+      userDetail.value = (userDetailRes as any).data;
+      playList.value = (playlistRes as any).data.playlist;
     } catch (error) {
       console.error('加载用户基本信息失败:', error);
-      message.error(t('user.message.loadBasicInfoFailed'));
+      message.error(t('user._message.loadBasicInfoFailed'));
       return; // 如果基本信息加载失败，直接返回
     }
 
@@ -197,24 +197,24 @@ const loadUserData = async () => {
     try {
       const recordRes = await getUserRecord(userId.value);
 
-      if (recordRes.data && recordRes.data.allData) {
-        recordList.value = recordRes.data.allData.map((item: any) => ({
-          ...item,
-          ...item.song,
-          picUrl: item.song.al.picUrl
+      if ((recordRes as any).data && (recordRes as any).data.allData) {
+        recordList.value = (recordRes as any).data.allData.map((item: unknown) => ({
+          ...(item as any),
+          ...(item as any).song,
+          picUrl: (item as any).song.al.picUrl
         }));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('加载听歌记录失败:', error);
       // 判断是否是无权限错误
-      if (error.response?.data?.code === -2 || error.data?.code === -2) {
+      if ((error as any).response?.data?.code === -2 || (error as any).data?.code === -2) {
         hasRecordPermission.value = false;
       }
       // 不显示错误消息，因为这是预期的情况
     }
   } catch (error) {
     console.error('加载用户数据失败:', error);
-    message.error(t('user.message.loadFailed'));
+    message.error(t('user._message.loadFailed'));
   } finally {
     loading.value = false;
   }
@@ -237,18 +237,18 @@ watch(
 );
 
 // 替换显示歌单的方法
-const openPlaylist = (item: any) => {
+const openPlaylist = (item: unknown) => {
   listLoading.value = true;
 
-  getListDetail(item.id).then((res) => {
+  getListDetail((item as any).id).then((res) => {
     currentList.value = res.data.playlist;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: item.id,
+      id: (item as any).id,
       type: 'playlist',
-      name: item.name,
-      songList: res.data.playlist.tracks || [],
+      name: (item as any).name,
+      songList: res.data.playlist.tracks as any || [],
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -290,8 +290,8 @@ const showFollowerList = () => {
 };
 
 // 判断是否为歌手
-const isArtist = (profile: any) => {
-  return profile.userType === 4 || profile.userType === 2 || profile.accountType === 2;
+const isArtist = (profile: unknown) => {
+  return (profile as any).userType === 4 || (profile as any).userType === 2 || (profile as any).accountType === 2;
 };
 </script>
 

@@ -23,7 +23,7 @@
           "
           :style="getAnimationDelay(index)"
           @click="handleClickPlaylistType(item.name)"
-          >{{ item.name }}</span
+          >{{ item?.name }}</span
         >
       </template>
       <div

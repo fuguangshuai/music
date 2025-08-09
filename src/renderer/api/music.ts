@@ -51,7 +51,7 @@ export const getMusicUrl = async (id: number, isDownloaded: boolean = false) => 
 
 // 获取歌曲详情
 export const getMusicDetail = (ids: Array<number>) => {
-  return request.get('/song/detail', { params: { ids: ids.join(',') } });
+  return request.get('/song/detail', { params: { ids: ids.join(', ') } });
 };
 
 // 根据音乐Id获取音乐歌词
@@ -127,7 +127,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
 
   // 如果禁用了音乐解析功能，则直接返回空结果
   if (!settingStore.setData.enableMusicUnblock) {
-    return Promise.resolve({ data: { code: 404, message: '音乐解析功能已禁用' } });
+    return Promise.resolve({ data: { code: 404, _message: '音乐解析功能已禁用' } });
   }
 
   // 1. 确定使用的音源列表(自定义或全局)
@@ -156,8 +156,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
   // 2. 按优先级解析：UnblockMusic → 星辰音乐 → 云端音乐 → GD音乐台
   // 2.1 UnblockMusic解析（优先级最高）
   if (isElectron && musicSources.length > 0) {
-    // const unblockSources = musicSources.filter(
-    //   source => ['migu', 'kugou', 'pyncmd'].includes(source)
+    // const unblockSources = musicSources.filter(//   source => ['migu', 'kugou', 'pyncmd'].includes(source)
     // );
     console.log('🎵 使用UnblockMusic解析，音源:', musicSources);
     try {
@@ -166,7 +165,7 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
         console.log(`🎵 UnblockMusic解析成功 - 歌曲ID: ${id}, 歌曲: ${data.name || '未知'}`);
         return result;
       } else {
-        console.log('❌ UnblockMusic解析失败');
+        console.log('❌, UnblockMusic解析失败');
       }
     } catch (error) {
       console.log('❌ UnblockMusic解析失败:', error);
@@ -185,24 +184,25 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
     console.log(`🎵 使用${apiName}音乐解析 (API索引: ${apiIndex})`);
     try {
       // 使用指定的API索引，不进行自动切换
-      const result = apiIndex === 0
-      ? await requestMusic(apiIndex).get<any>(`?songs=${encodeURIComponent(songId)}`)
-      : await requestMusic(apiIndex).get<any>('/music', { params: { id } });
-      if (apiIndex === 0 && result.data.解锁成功 > 0) {
-          result.data = {
-            params: {},
-            data: {
-              size: result.data.成功列表.文件大小 || 0,
-              br: result.data.成功列表.音质 || 320000,
-              url: result.data.成功列表.播放链接 || '',
-              md5: '',
-              source: result.data.成功列表.音源ID || result.data.成功列表.音源名称 || apiName
-            }
-          };
+      const result =
+        apiIndex === 0
+          ? await requestMusic(apiIndex).get<unknown>(`?songs=${encodeURIComponent(songId)}`)
+          : await requestMusic(apiIndex).get<unknown>('/music', { params: { id } });
+      if (apiIndex === 0 && (result.data as any).解锁成功 > 0) {
+        result.data = {
+          params: {},
+          data: {
+            size: (result.data as any).成功列表.文件大小 || 0,
+            br: (result.data as any).成功列表.音质 || 320000,
+            url: (result.data as any).成功列表.播放链接 || '',
+            md5: '',
+            source: (result.data as any).成功列表.音源ID || (result.data as any).成功列表.音源名称 || apiName
+          }
+        };
       }
       if (result?.data) {
         console.log(
-          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${data.name || '未知'}, 音源: ${result.data.data?.source || apiName}`
+          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${(data as any).name || '未知'}, 音源: ${(result as any).data.data?.source || apiName}`
         );
         return result;
       } else {
@@ -229,14 +229,14 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
   }
   // 2.4 GD音乐台解析（优先级最低）
   if (musicSources.includes('gdmusic')) {
-    console.log('🎵 使用GD音乐台解析');
+    console.log('🎵, 使用GD音乐台解析');
     try {
       const gdResult = await getGDMusicAudio(id, data);
       if (gdResult) {
         console.log(`🎵 GD音乐台解析成功 - 歌曲ID: ${id}, 歌曲: ${data.name || '未知'}`);
         return gdResult;
       } else {
-        console.log('❌ GD音乐台解析失败');
+        console.log('❌, GD音乐台解析失败');
       }
     } catch (error) {
       console.log('❌ GD音乐台解析失败:', error);

@@ -12,7 +12,7 @@
             :style="getAnimationDelay(index)"
             @click="handleClickPlaylistType(item.name)"
           >
-            {{ item.name }}
+            {{ item?.name }}
           </span>
         </div>
       </n-scrollbar>
@@ -47,7 +47,7 @@
               <i class="iconfont icon-videofill"></i>
             </div>
           </div>
-          <div class="recommend-item-title">{{ item.name }}</div>
+          <div class="recommend-item-title">{{ item?.name }}</div>
         </div>
       </div>
       <!-- 加载状态 -->
@@ -98,19 +98,26 @@ const listLoading = ref(true);
 
 const router = useRouter();
 
-const openPlaylist = (item: any) => {
-  recommendItem.value = item;
+const openPlaylist = (item: unknown) => {
+  recommendItem.value = item as IRecommendItem;
   listLoading.value = true;
 
-  getListDetail(item.id).then((res) => {
+  getListDetail((item as any).id).then((res) => {
     listDetail.value = res.data;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: item.id,
+      id: (item as any).id,
       type: 'playlist',
-      name: item.name,
-      songList: res.data.playlist.tracks || [],
+      name: (item as any).name,
+      songList: (res.data.playlist.tracks || []).map((track: any) => ({
+        ...track,
+        id: track.id,
+        name: track.name,
+        artist: track.ar?.[0]?.name || '',
+        album: track.al?.name || '',
+        duration: track.dt || 0
+      })),
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -154,8 +161,8 @@ const loadList = async (type: string, isLoadMore = false) => {
 };
 
 // 监听滚动事件
-const handleScroll = (e: any) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+const handleScroll = (e: unknown) => {
+  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
   // 距离底部100px时加载更多
   if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoadingMore.value && hasMore.value) {
     loadList(currentType.value, true);

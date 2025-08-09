@@ -103,12 +103,7 @@ class SmartCacheManager {
   /**
    * 💾 通用缓存数据方法
    */
-  async cacheData<T>(
-    type: CacheType,
-    key: string,
-    data: T,
-    ttl?: number
-  ): Promise<boolean> {
+  async cacheData<T>(type: CacheType, key: string, data: T, ttl?: number): Promise<boolean> {
     try {
       // 检查内存压力
       await this.handleMemoryPressure();
@@ -170,7 +165,7 @@ class SmartCacheManager {
       const now = Date.now();
 
       // 检查TTL过期
-      if (result.ttl && (now - result.timestamp > result.ttl)) {
+      if ((result.ttl && now - result.timestamp, result.ttl)) {
         await this.removeFromCache(type, key);
         this.updateStats(type, 'miss');
         console.log(`⏰ 缓存过期 [${type}:${key}]`);
@@ -321,7 +316,7 @@ class SmartCacheManager {
       const size = await this.removeFromCache(type as CacheType, id);
       cleanedSize += size;
 
-      if (cleanedSize > this.maxMemorySize * 0.2) break; // 最多清理20%
+      if (cleanedSize >= this.maxMemorySize * 0.2) break; // 最多清理20%
     }
 
     console.log(`🧹 内存清理完成，释放: ${cleanedSize}字节`);
@@ -392,16 +387,18 @@ class SmartCacheManager {
    */
   getCacheStats(type?: CacheType): CacheStats | Map<string, CacheStats> {
     if (type) {
-      return this.stats.get(type) || {
-        totalItems: 0,
-        totalSize: 0,
-        hitCount: 0,
-        missCount: 0,
-        hitRate: 0,
-        oldestItem: 0,
-        newestItem: 0,
-        memoryUsage: 0
-      };
+      return (
+        this.stats.get(type) || {
+          totalItems: 0,
+          totalSize: 0,
+          hitCount: 0,
+          missCount: 0,
+          hitRate: 0,
+          oldestItem: 0,
+          newestItem: 0,
+          memoryUsage: 0
+        }
+      );
     }
     return this.stats;
   }
@@ -421,7 +418,7 @@ class SmartCacheManager {
    * 🔧 初始化统计数据
    */
   private initializeStats(): void {
-    Object.values(CacheType).forEach(type => {
+    Object.values(CacheType).forEach((type) => {
       this.stats.set(type, {
         totalItems: 0,
         totalSize: 0,
@@ -439,9 +436,12 @@ class SmartCacheManager {
    * ⏰ 启动定期清理
    */
   private startPeriodicCleanup(): void {
-    setInterval(() => {
-      this.cleanupExpiredItems();
-    }, 60 * 60 * 1000); // 每小时清理一次过期项
+    setInterval(
+      () => {
+        this.cleanupExpiredItems();
+      },
+      60 * 60 * 1000
+    ); // 每小时清理一次过期项
   }
 
   /**
@@ -451,17 +451,17 @@ class SmartCacheManager {
     const now = Date.now();
     let cleanedCount = 0;
 
-    Object.values(CacheType).forEach(type => {
+    Object.values(CacheType).forEach((type) => {
       const typeCache = this.store.get(type);
       const toDelete: string[] = [];
 
       Object.entries(typeCache).forEach(([key, item]) => {
-        if (item.ttl && (now - item.timestamp > item.ttl)) {
+        if ((item.ttl && now - item.timestamp, item.ttl)) {
           toDelete.push(key);
         }
       });
 
-      toDelete.forEach(key => {
+      toDelete.forEach((key) => {
         this.removeFromCache(type, key);
         cleanedCount++;
       });
@@ -497,9 +497,12 @@ export function initializeCacheManager(): void {
   });
 
   // 新增通用缓存IPC处理
-  ipcMain.handle('cache-data', async (_, type: CacheType, key: string, data: unknown, ttl?: number) => {
-    return await smartCacheManager.cacheData(type, key, data, ttl);
-  });
+  ipcMain.handle(
+    'cache-data',
+    async (_, type: CacheType, key: string, data: unknown, ttl?: number) => {
+      return await smartCacheManager.cacheData(type, key, data, ttl);
+    }
+  );
 
   ipcMain.handle('get-cached-data', async (_, type: CacheType, key: string) => {
     return await smartCacheManager.getCachedData(type, key);

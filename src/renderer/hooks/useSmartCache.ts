@@ -3,11 +3,12 @@
  * 提供Vue组件中使用智能缓存的便捷接口
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { smartCacheService, CacheType, type CacheStats } from '@/services/cacheService';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+
+import { type CacheStats, CacheType, smartCacheService } from '@/services/cacheService';
 import { CacheUtils } from '@/utils/cacheUtils';
 
-export function useSmartCache() {
+export function useSmartCache(): unknown {
   const cacheStats = ref<Map<string, CacheStats> | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -17,21 +18,21 @@ export function useSmartCache() {
    * 💾 缓存数据
    */
   const cacheData = async <T>(
-    type: CacheType, 
-    key: string, 
-    data: T, 
+    type: CacheType,
+    _key: string,
+    data: T,
     ttl?: number
   ): Promise<boolean> => {
     try {
       isLoading.value = true;
       error.value = null;
-      
-      const result = await smartCacheService.cacheData(type, key, data, ttl);
-      
+
+      const result = await smartCacheService.cacheData(type, _key, data, ttl);
+
       if (result) {
         await refreshStats();
       }
-      
+
       return result;
     } catch (err) {
       error.value = `缓存数据失败: ${err}`;
@@ -44,14 +45,14 @@ export function useSmartCache() {
   /**
    * 🔍 获取缓存数据
    */
-  const getCachedData = async <T>(type: CacheType, key: string): Promise<T | undefined> => {
+  const getCachedData = async <T>(type: CacheType, _key: string): Promise<T | undefined> => {
     try {
       isLoading.value = true;
       error.value = null;
-      
-      const result = await smartCacheService.getCachedData<T>(type, key);
+
+      const result = await smartCacheService.getCachedData<T>(type, _key);
       await refreshStats();
-      
+
       return result;
     } catch (err) {
       error.value = `获取缓存数据失败: ${err}`;
@@ -68,13 +69,13 @@ export function useSmartCache() {
     try {
       isLoading.value = true;
       error.value = null;
-      
+
       const result = await smartCacheService.clearCache(type);
-      
+
       if (result) {
         await refreshStats();
       }
-      
+
       return result;
     } catch (err) {
       error.value = `清理缓存失败: ${err}`;
@@ -103,7 +104,7 @@ export function useSmartCache() {
     try {
       isLoading.value = true;
       error.value = null;
-      
+
       return await CacheUtils.analyzeCachePerformance();
     } catch (err) {
       error.value = `缓存性能分析失败: ${err}`;
@@ -120,10 +121,10 @@ export function useSmartCache() {
     try {
       isLoading.value = true;
       error.value = null;
-      
+
       const result = await CacheUtils.smartCleanup();
       await refreshStats();
-      
+
       return result;
     } catch (err) {
       error.value = `智能清理失败: ${err}`;
@@ -143,7 +144,7 @@ export function useSmartCache() {
       refreshStats();
     }, intervalMs);
 
-    console.log('📊 缓存统计自动刷新已启动');
+    console.log('📊, 缓存统计自动刷新已启动');
   };
 
   /**
@@ -153,14 +154,14 @@ export function useSmartCache() {
     if (refreshInterval.value) {
       clearInterval(refreshInterval.value);
       refreshInterval.value = null;
-      console.log('⏹️ 缓存统计自动刷新已停止');
+      console.log('⏹️, 缓存统计自动刷新已停止');
     }
   };
 
   // 计算属性
   const totalCacheSize = computed(() => {
     if (!cacheStats.value) return 0;
-    
+
     let total = 0;
     if (cacheStats.value instanceof Map) {
       for (const stats of cacheStats.value.values()) {
@@ -172,23 +173,23 @@ export function useSmartCache() {
 
   const averageHitRate = computed(() => {
     if (!cacheStats.value) return 0;
-    
+
     let totalHitRate = 0;
     let count = 0;
-    
+
     if (cacheStats.value instanceof Map) {
       for (const stats of cacheStats.value.values()) {
         totalHitRate += stats.hitRate;
         count++;
       }
     }
-    
+
     return count > 0 ? totalHitRate / count : 0;
   });
 
   const totalCacheItems = computed(() => {
     if (!cacheStats.value) return 0;
-    
+
     let total = 0;
     if (cacheStats.value instanceof Map) {
       for (const stats of cacheStats.value.values()) {
@@ -212,12 +213,12 @@ export function useSmartCache() {
     cacheStats,
     isLoading,
     error,
-    
+
     // 计算属性
     totalCacheSize,
     averageHitRate,
     totalCacheItems,
-    
+
     // 方法
     cacheData,
     getCachedData,
@@ -233,8 +234,8 @@ export function useSmartCache() {
 /**
  * 特定类型缓存的组合式函数
  */
-export function useImageCache() {
-  const { clearCache } = useSmartCache();
+export function useImageCache(): unknown {
+  const { clearCache } = useSmartCache() as any;
 
   const cacheImage = async (url: string, imageData: string | Blob, ttl?: number) => {
     return await CacheUtils.cacheImage(url, imageData, ttl);
@@ -255,13 +256,13 @@ export function useImageCache() {
   };
 }
 
-export function useApiCache() {
-  const { clearCache } = useSmartCache();
+export function useApiCache(): unknown {
+  const { clearCache } = useSmartCache() as any;
 
   const cacheApiResponse = async (
-    endpoint: string, 
-    params: Record<string, unknown>, 
-    response: unknown, 
+    endpoint: string,
+    params: Record<string, unknown>,
+    response: unknown,
     ttl?: number
   ) => {
     return await CacheUtils.cacheApiResponse(endpoint, params, response, ttl);
@@ -282,14 +283,10 @@ export function useApiCache() {
   };
 }
 
-export function useUserDataCache() {
-  const { clearCache } = useSmartCache();
+export function useUserDataCache(): unknown {
+  const { clearCache } = useSmartCache() as any;
 
-  const cacheUserData = async (
-    userId: string, 
-    data: Record<string, unknown>, 
-    ttl?: number
-  ) => {
+  const cacheUserData = async (userId: string, data: Record<string, unknown>, ttl?: number) => {
     return await CacheUtils.cacheUserData(userId, data, ttl);
   };
 

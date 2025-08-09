@@ -3,12 +3,16 @@
  * 提供Vue组件中使用智能预加载的便捷接口
  */
 
-import { computed, onMounted, onUnmounted,ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
-import { type NetworkCondition,smartPreloadService, type UserBehaviorPattern } from '@/services/audioPreloadService';
+import {
+  type NetworkCondition,
+  smartPreloadService,
+  type UserBehaviorPattern
+} from '@/services/audioPreloadService';
 import type { SongResult } from '@/type/music';
 
-export function useSmartPreload() {
+export function useSmartPreload(): unknown {
   const isEnabled = ref(true);
   const networkCondition = ref<NetworkCondition | null>(null);
   const userBehavior = ref<UserBehaviorPattern | null>(null);
@@ -24,19 +28,19 @@ export function useSmartPreload() {
    * 智能预加载单首歌曲
    */
   const smartPreload = async (
-    url: string, 
-    songInfo?: SongResult, 
+    url: string,
+    songInfo?: SongResult,
     priority: 'high' | 'medium' | 'low' = 'medium'
   ) => {
     if (!isEnabled.value) {
-      console.log('🚫 智能预加载已禁用');
+      console.log('🚫, 智能预加载已禁用');
       return null;
     }
 
     try {
       preloadStats.value.totalPreloaded++;
       const sound = await smartPreloadService.smartPreloadAudio(url, songInfo, priority);
-      
+
       if (sound) {
         preloadStats.value.successfulPreloads++;
         console.log('✅ 智能预加载成功:', url);
@@ -44,7 +48,7 @@ export function useSmartPreload() {
         preloadStats.value.failedPreloads++;
         console.log('⚠️ 智能预加载失败或跳过:', url);
       }
-      
+
       return sound;
     } catch (error) {
       preloadStats.value.failedPreloads++;
@@ -63,9 +67,9 @@ export function useSmartPreload() {
       // 获取预测结果
       const predicted = smartPreloadService.predictNextSongs(currentSong, playHistory);
       predictions.value = predicted;
-      
+
       console.log('🔮 预测到', predicted.length, '首可能的下一首歌曲');
-      
+
       // 预加载预测的歌曲
       for (let i = 0; i < predicted.length; i++) {
         const song = predicted[i];
@@ -74,10 +78,9 @@ export function useSmartPreload() {
           await smartPreload(song.playMusicUrl, song, priority);
         }
       }
-      
+
       // 更新用户行为分析
       updateUserBehavior(playHistory);
-      
     } catch (error) {
       console.error('💥 预测和预加载异常:', error);
     }
@@ -90,7 +93,7 @@ export function useSmartPreload() {
     try {
       const behavior = smartPreloadService.analyzeUserBehavior(playHistory);
       userBehavior.value = behavior;
-      console.log('🧠 用户行为分析已更新');
+      console.log('🧠, 用户行为分析已更新');
     } catch (error) {
       console.error('💥 用户行为分析异常:', error);
     }
@@ -116,7 +119,7 @@ export function useSmartPreload() {
   const optimizeMemory = () => {
     try {
       smartPreloadService.optimizeMemoryUsage();
-      console.log('💾 内存使用已优化');
+      console.log('💾, 内存使用已优化');
     } catch (error) {
       console.error('💥 内存优化异常:', error);
     }
@@ -140,7 +143,7 @@ export function useSmartPreload() {
   const toggleSmartPreload = (enabled: boolean) => {
     isEnabled.value = enabled;
     localStorage.setItem('smart-preload-enabled', enabled.toString());
-    console.log(enabled ? '✅ 智能预加载已启用' : '🚫 智能预加载已禁用');
+    console.log(enabled ? '✅ 智能预加载已启用' : '🚫, 智能预加载已禁用');
   };
 
   /**
@@ -155,7 +158,7 @@ export function useSmartPreload() {
         failedPreloads: 0,
         cacheHits: 0
       };
-      console.log('🗑️ 预加载缓存已清理');
+      console.log('🗑️, 预加载缓存已清理');
     } catch (error) {
       console.error('💥 清理缓存异常:', error);
     }
@@ -164,7 +167,7 @@ export function useSmartPreload() {
   // 计算属性
   const preloadSuccessRate = computed(() => {
     const total = preloadStats.value.totalPreloaded;
-    return total > 0 ? (preloadStats.value.successfulPreloads / total * 100).toFixed(1) : '0';
+    return total > 0 ? ((preloadStats.value.successfulPreloads / total) * 100).toFixed(1) : '0';
   });
 
   const isNetworkSlow = computed(() => {
@@ -204,12 +207,12 @@ export function useSmartPreload() {
     userBehavior,
     predictions,
     preloadStats,
-    
+
     // 计算属性
     preloadSuccessRate,
     isNetworkSlow,
     isNetworkMetered,
-    
+
     // 方法
     smartPreload,
     predictAndPreload,
@@ -225,22 +228,22 @@ export function useSmartPreload() {
 /**
  * 智能预加载监控组合式函数
  */
-export function useSmartPreloadMonitor() {
-  const { getSmartStatus } = useSmartPreload();
-  const monitorData = ref<any>(null);
+export function useSmartPreloadMonitor(): unknown {
+  const { getSmartStatus } = useSmartPreload() as any;
+  const monitorData = ref<unknown>(null);
   const monitorInterval = ref<number | null>(null);
 
   /**
    * 开始监控
    */
-  const startMonitoring = (intervalMs: number = 10000) => {
+  const startMonitoring = (_intervalMs: number = 10000) => {
     if (monitorInterval.value) return;
 
     monitorInterval.value = window.setInterval(() => {
       monitorData.value = getSmartStatus();
-    }, intervalMs);
+    }, _intervalMs);
 
-    console.log('📊 智能预加载监控已启动');
+    console.log('📊, 智能预加载监控已启动');
   };
 
   /**
@@ -250,7 +253,7 @@ export function useSmartPreloadMonitor() {
     if (monitorInterval.value) {
       clearInterval(monitorInterval.value);
       monitorInterval.value = null;
-      console.log('⏹️ 智能预加载监控已停止');
+      console.log('⏹️, 智能预加载监控已停止');
     }
   };
 

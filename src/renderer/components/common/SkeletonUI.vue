@@ -52,7 +52,12 @@
     <!-- 歌词骨架屏 -->
     <template v-else-if="type === 'lyrics'">
       <div class="skeleton-lyrics">
-        <div v-for="i in count" :key="i" class="skeleton-lyric-line" :style="getLyricLineStyle(i)"></div>
+        <div
+          v-for="i in count"
+          :key="i"
+          class="skeleton-lyric-line"
+          :style="getLyricLineStyle(i)"
+        ></div>
       </div>
     </template>
 
@@ -221,21 +226,23 @@ const getTextLineStyle = (index: number) => {
   .skeleton-card-image,
   .skeleton-player-cover,
   .skeleton-control-button {
-    @apply bg-gray-200 dark:bg-gray-700;
-    background: linear-gradient(90deg, 
-      theme('colors.gray.200') 25%, 
-      theme('colors.gray.300') 50%, 
+    @apply bg-gray-200 dark: bg-gray-700;
+    background: linear-gradient(
+      ; 90deg,
+      theme('colors.gray.200') 25%,
+      theme('colors.gray.300') 50%,
       theme('colors.gray.200') 75%
     );
-    
+
     @media (prefers-color-scheme: dark) {
-      background: linear-gradient(90deg, 
-        theme('colors.gray.700') 25%, 
-        theme('colors.gray.600') 50%, 
+      background: linear-gradient(
+        ; 90deg,
+        theme('colors.gray.700') 25%,
+        theme('colors.gray.600') 50%,
         theme('colors.gray.700') 75%
       );
     }
-    
+
     background-size: 200% 100%;
   }
 }
@@ -243,21 +250,21 @@ const getTextLineStyle = (index: number) => {
 /* 歌曲列表骨架屏 */
 .skeleton-song-item {
   @apply flex items-center p-3 mb-2;
-  
+
   .skeleton-content {
     @apply flex-1 ml-3;
-    
+
     .skeleton-title {
       @apply h-5 mb-2;
       width: 60%;
     }
-    
+
     .skeleton-subtitle {
       @apply h-4;
       width: 40%;
     }
   }
-  
+
   .skeleton-actions {
     @apply flex items-center;
   }
@@ -270,19 +277,19 @@ const getTextLineStyle = (index: number) => {
 
 .skeleton-card {
   @apply flex flex-col;
-  
+
   .skeleton-card-image {
     @apply w-full aspect-square rounded-lg mb-3;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
   }
-  
+
   .skeleton-card-content {
     .skeleton-card-title {
       @apply h-4 mb-2;
       width: 80%;
     }
-    
+
     .skeleton-card-subtitle {
       @apply h-3;
       width: 60%;
@@ -294,31 +301,31 @@ const getTextLineStyle = (index: number) => {
 .skeleton-profile {
   .skeleton-profile-header {
     @apply flex items-center mb-6;
-    
+
     .skeleton-profile-info {
       @apply ml-4 flex-1;
-      
+
       .skeleton-username {
         @apply h-6 mb-2;
         width: 40%;
       }
-      
+
       .skeleton-user-desc {
         @apply h-4 mb-2;
         width: 60%;
       }
-      
+
       .skeleton-user-stats {
         @apply h-4;
         width: 50%;
       }
     }
   }
-  
+
   .skeleton-profile-content {
     .skeleton-content-line {
       @apply h-4 mb-3;
-      
+
       &:last-child {
         width: 70%;
       }
@@ -329,7 +336,7 @@ const getTextLineStyle = (index: number) => {
 /* 歌词骨架屏 */
 .skeleton-lyrics {
   @apply text-center py-8;
-  
+
   .skeleton-lyric-line {
     @apply h-6 mx-auto mb-4 rounded;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -340,30 +347,30 @@ const getTextLineStyle = (index: number) => {
 /* 播放器骨架屏 */
 .skeleton-player {
   @apply flex items-center p-4;
-  
+
   .skeleton-player-cover {
     @apply w-16 h-16 rounded-lg;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
   }
-  
+
   .skeleton-player-info {
     @apply flex-1 ml-4;
-    
+
     .skeleton-song-name {
       @apply h-5 mb-2;
       width: 70%;
     }
-    
+
     .skeleton-artist-name {
       @apply h-4;
       width: 50%;
     }
   }
-  
+
   .skeleton-player-controls {
     @apply flex items-center;
-    
+
     .skeleton-control-button {
       @apply w-10 h-10 rounded-full ml-2;
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -378,7 +385,7 @@ const getTextLineStyle = (index: number) => {
   .skeleton-button {
     @apply rounded-lg;
   }
-  
+
   .skeleton-card-image {
     @apply rounded-xl;
   }

@@ -46,7 +46,7 @@ const emits = defineEmits([
   'remove'
 ]);
 
-const openPlaylistDrawer = inject<(songId: number | string) => void>('openPlaylistDrawer');
+const openPlaylistDrawer = inject<(string) => void>('openPlaylistDrawer');
 
 // 渲染歌曲预览
 const renderSongPreview = () => {
@@ -177,7 +177,7 @@ const dropdownOptions = computed<MenuOption[]>(() => {
     options.push(
       {
         type: 'divider',
-        key: 'd2'
+        _key: 'd2'
       },
       {
         label: t('songItem.menu.removeFromPlaylist'),
@@ -191,10 +191,10 @@ const dropdownOptions = computed<MenuOption[]>(() => {
 });
 
 // 处理选择
-const handleSelect = (key: string | number) => {
+const handleSelect = (_key: string | number) => {
   emits('update:show', false);
 
-  switch (key) {
+  switch (_key) {
     case 'download':
       emits('download');
       break;

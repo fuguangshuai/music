@@ -79,7 +79,7 @@ export const useSettingsStore = defineStore('settings', () => {
     if (mergedSettings.enabledMusicSources) {
       if (isElectron) {
         // Win端：支持所有音源，不做处理
-        console.log('🔧 Win端支持所有音源，保持原配置');
+        console.log('🔧, Win端支持所有音源，保持原配置');
       } else {
         // Web端：只保留Web端支持的音源
         const webSupportedSources = ['gdmusic', 'stellar', 'cloud'];

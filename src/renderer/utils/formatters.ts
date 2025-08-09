@@ -49,15 +49,15 @@ export const formatDuration = (ms: number, format: 'mm:ss' | 'hh:mm:ss' = 'mm:ss
  */
 export const formatFileSize = (bytes: number, precision: number = 1): string => {
   if (!bytes || bytes === 0) return '0 B';
-  
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   if (i >= sizes.length) {
     return `${(bytes / Math.pow(k, sizes.length - 1)).toFixed(precision)} ${sizes[sizes.length - 1]}`;
   }
-  
+
   return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`;
 };
 
@@ -70,7 +70,7 @@ export const formatFileSize = (bytes: number, precision: number = 1): string => 
 export const formatNumber = (num: string | number): string => {
   const numValue = Number(num);
   if (isNaN(numValue)) return '0';
-  
+
   const units = [
     { value: 1e8, symbol: '亿' },
     { value: 1e4, symbol: '万' }
@@ -107,16 +107,19 @@ export const formatNumberEn = (num: number): string => {
  * @param format 格式，默认 'YYYY-MM-DD'
  * @returns 格式化后的日期字符串
  */
-export const formatPublishTime = (time: number | string | Date, format: string = 'YYYY-MM-DD'): string => {
+export const formatPublishTime = (
+  time: number | string | Date,
+  format: string = 'YYYY-MM-DD'
+): string => {
   if (!time) return '';
-  
+
   const date = new Date(time);
   if (isNaN(date.getTime())) return '';
-  
+
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
-  
+
   switch (format) {
     case 'YYYY-MM-DD':
       return `${year}-${month}-${day}`;
@@ -136,7 +139,10 @@ export const formatPublishTime = (time: number | string | Date, format: string =
  * @param nameFormat 格式模板
  * @returns 格式化后的歌曲名称
  */
-export const formatSongName = (songInfo: unknown, nameFormat: string = '{songName} - {artistName}'): string => {
+export const formatSongName = (
+  songInfo: unknown,
+  nameFormat: string = '{songName} - {artistName}'
+): string => {
   if (!songInfo || typeof songInfo !== 'object') return '';
 
   const song = songInfo as Record<string, unknown>;

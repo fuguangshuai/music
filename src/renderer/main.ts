@@ -14,8 +14,8 @@ import { initAppShortcuts } from './utils/appShortcuts';
 
 const app = createApp(App);
 
-Object.keys(directives).forEach((key: string) => {
-  app.directive(key, directives[key as keyof typeof directives]);
+Object.keys(directives).forEach((_key: string) => {
+  app.directive(_key, directives[_key as keyof typeof directives]);
 });
 
 app.use(pinia);

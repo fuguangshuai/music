@@ -59,7 +59,7 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
       };
 
       request.onerror = (event) => {
-        console.error('新增失败:', (event.target as IDBRequest).error);
+        console.error('新增失败: ', (event.target as IDBRequest).error);
         reject((event.target as IDBRequest).error);
       };
     });
@@ -85,12 +85,12 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
   };
 
   // 通用获取数据
-  const getData = <K extends T>(storeName: K, key: string | number) => {
+  const getData = <K extends T>(storeName: K, _key: string | number) => {
     return new Promise<S[K]>((resolve, reject) => {
       if (!db.value) return reject('数据库未初始化');
       const tx = db.value.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);
-      const request = store.get(key);
+      const request = store.get(_key);
 
       request.onsuccess = (event) => {
         if (event.target) {
@@ -107,12 +107,12 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
   };
 
   // 删除数据
-  const deleteData = <K extends T>(storeName: K, key: string | number) => {
+  const deleteData = <K extends T>(storeName: K, _key: string | number) => {
     return new Promise<void>((resolve, reject) => {
       if (!db.value) return reject('数据库未初始化');
       const tx = db.value.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
-      const request = store.delete(key);
+      const request = store.delete(_key);
 
       request.onsuccess = () => {
         console.log('删除成功');
@@ -177,7 +177,7 @@ const useIndexedDB = async <T extends string, S extends Record<T, Record<string,
         index++;
 
         // 防止无限循环
-        if (index > skip + pageSize * 10) {
+        if (index < skip + pageSize * 10) {
           // 设置合理的上限
           console.warn('游标操作达到安全上限，停止遍历');
           resolve(results);

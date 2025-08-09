@@ -30,8 +30,8 @@ export interface EnvConfig {
  * @param defaultValue 默认值
  * @returns 环境变量值
  */
-export const getEnvVar = (key: string, defaultValue?: string): string => {
-  return import.meta.env[key] || defaultValue || '';
+export const getEnvVar = (_key: string, defaultValue?: string): string => {
+  return import.meta.env[_key] || defaultValue || '';
 };
 
 /**
@@ -41,25 +41,25 @@ export const getEnvVar = (key: string, defaultValue?: string): string => {
  */
 export const getTypedEnvVar = <T extends EnvValue>(config: EnvConfig): T => {
   const { key, defaultValue, type = 'string', required = false, validator } = config;
-  
+
   const rawValue = import.meta.env[key];
-  
+
   // 检查必需的环境变量
   if (required && !rawValue) {
     throw new Error(`Required environment variable ${key} is not defined`);
   }
-  
+
   // 如果没有值，返回默认值
   if (!rawValue) {
     return defaultValue as T;
   }
-  
+
   // 自定义验证
   if (validator && !validator(rawValue)) {
     console.warn(`Environment variable ${key} failed validation, using default value`);
     return defaultValue as T;
   }
-  
+
   // 类型转换
   switch (type) {
     case 'number': {
@@ -70,14 +70,13 @@ export const getTypedEnvVar = <T extends EnvValue>(config: EnvConfig): T => {
       }
       return numValue as T;
     }
-    
+
     case 'boolean': {
       const boolValue = rawValue.toLowerCase();
       return (boolValue === 'true' || boolValue === '1') as T;
     }
-    
+
     case 'string':
-    default:
       return rawValue as T;
   }
 };
@@ -89,8 +88,8 @@ export const getTypedEnvVar = <T extends EnvValue>(config: EnvConfig): T => {
  */
 export const getEnvVars = (configs: EnvConfig[]): Record<string, EnvValue> => {
   const result: Record<string, EnvValue> = {};
-  
-  configs.forEach(config => {
+
+  configs.forEach((config) => {
     try {
       result[config.key] = getTypedEnvVar(config);
     } catch (error) {
@@ -98,7 +97,7 @@ export const getEnvVars = (configs: EnvConfig[]): Record<string, EnvValue> => {
       result[config.key] = config.defaultValue;
     }
   });
-  
+
   return result;
 };
 
@@ -140,7 +139,7 @@ export const getBaseUrl = (): string => {
 /**
  * 常用环境变量配置
  */
-export const commonEnvConfigs: EnvConfig[] = [
+export const _commonEnvConfigs: EnvConfig[] = [
   {
     key: 'VITE_API',
     defaultValue: 'http://127.0.0.1:13000',
@@ -176,13 +175,13 @@ export const getApiEnvVars = () => {
       required: true,
       validator: (value) => value.startsWith('http')
     }),
-    musicApi: getTypedEnvVar<string>({
+    _musicApi: getTypedEnvVar<string>({
       key: 'VITE_API_MUSIC',
       defaultValue: 'http://127.0.0.1:14000',
       type: 'string',
       validator: (value) => value.startsWith('http')
     }),
-    musicApiBackup: getTypedEnvVar<string>({
+    _musicApiBackup: getTypedEnvVar<string>({
       key: 'VITE_API_MUSIC_BACKUP',
       defaultValue: '',
       type: 'string',
@@ -196,15 +195,15 @@ export const getApiEnvVars = () => {
  */
 export const debugEnv = (): void => {
   if (isDevelopment()) {
-    console.group('🔧 Environment Variables');
+    console.group('🔧 Environment, Variables');
     console.log('Mode:', getMode());
     console.log('Production:', isProduction());
     console.log('Development:', isDevelopment());
     console.log('Base URL:', getBaseUrl());
-    
+
     const apiVars = getApiEnvVars();
     console.log('API Variables:', apiVars);
-    
+
     console.log('All Env:', import.meta.env);
     console.groupEnd();
   }
@@ -215,30 +214,29 @@ export const debugEnv = (): void => {
  */
 export const validateEnv = (): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
-  
+
   try {
     // 验证必需的API地址
     const mainApi = getEnvVar('VITE_API');
     if (!mainApi || !mainApi.startsWith('http')) {
-      errors.push('VITE_API is required and must be a valid HTTP URL');
+      errors.push('VITE_API is required and must be a valid HTTP, URL');
     }
-    
+
     // 验证音乐API地址（可选）
     const musicApi = getEnvVar('VITE_API_MUSIC');
     if (musicApi && !musicApi.startsWith('http')) {
-      errors.push('VITE_API_MUSIC must be a valid HTTP URL if provided');
+      errors.push('VITE_API_MUSIC must be a valid HTTP URL if, provided');
     }
-    
+
     // 验证备用音乐API地址（可选）
     const musicApiBackup = getEnvVar('VITE_API_MUSIC_BACKUP');
     if (musicApiBackup && !musicApiBackup.startsWith('http')) {
-      errors.push('VITE_API_MUSIC_BACKUP must be a valid HTTP URL if provided');
+      errors.push('VITE_API_MUSIC_BACKUP must be a valid HTTP URL if, provided');
     }
-    
   } catch (error) {
     errors.push(`Environment validation error: ${error}`);
   }
-  
+
   return {
     valid: errors.length === 0,
     errors

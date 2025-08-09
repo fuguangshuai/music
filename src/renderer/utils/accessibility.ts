@@ -24,7 +24,7 @@ export const AriaRoles = {
   MAIN: 'main',
   NAVIGATION: 'navigation',
   BANNER: 'banner',
-  CONTENTINFO: 'contentinfo'
+  CONTENTINFO: 'contentinfo',
 } as const;
 
 // 键盘导航键码
@@ -40,16 +40,17 @@ export const KeyCodes = {
   HOME: 'Home',
   END: 'End',
   PAGE_UP: 'PageUp',
-  PAGE_DOWN: 'PageDown'
+  PAGE_DOWN: 'PageDown',
 } as const;
 
 // 无障碍访问配置接口
 export interface AccessibilityConfig {
-  enableKeyboardNavigation: boolean;
+enableKeyboardNavigation: boolean;
   enableScreenReader: boolean;
   enableHighContrast: boolean;
   enableReducedMotion: boolean;
   fontSize: 'small' | 'medium' | 'large' | 'extra-large';
+
 }
 
 /**
@@ -57,22 +58,16 @@ export interface AccessibilityConfig {
  */
 class AccessibilityManager {
   private config: AccessibilityConfig = {
-    enableKeyboardNavigation: true,
-    enableScreenReader: true,
-    enableHighContrast: false,
-    enableReducedMotion: false,
-    fontSize: 'medium'
-  };
+  enableKeyboardNavigation: true, enableScreenReader: true, enableHighContrast: false, enableReducedMotion: false, fontSize: 'medium',
+  }
 
   private focusableElements: string[] = [
-    'a[href]',
-    'button:not([disabled])',
+    'a[href]', 'button:not([disabled])',
     'input:not([disabled])',
     'select:not([disabled])',
-    'textarea:not([disabled])',
-    '[tabindex]:not([tabindex="-1"])',
-    '[contenteditable="true"]'
-  ];
+    'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable="true"]',
+  ]
 
   constructor() {
     this.loadConfig();
@@ -83,9 +78,10 @@ class AccessibilityManager {
   /**
    * 🔧 设置ARIA属性
    */
-  setAriaAttributes(element: HTMLElement, attributes: Record<string, string | boolean | number>): void {
-    Object.entries(attributes).forEach(([key, value]) => {
-      const ariaKey = key.startsWith('aria-') ? key : `aria-${key}`;
+  setAriaAttributes(element: HTMLElement, attributes: Record<string, string | boolean | number>
+  ): void {
+    Object.entries(attributes).forEach(([_key, value]) => {
+      const ariaKey = _key.startsWith('aria-') ? _key : `aria-${_key}`;
       element.setAttribute(ariaKey, String(value));
     });
   }
@@ -93,13 +89,13 @@ class AccessibilityManager {
   /**
    * 🎯 管理焦点
    */
-  manageFocus(element: HTMLElement, options?: { preventScroll?: boolean }): void {
+  manageFocus(element: HTMLElement, _options?: { preventScroll?: boolean }): void {
     if (!this.config.enableKeyboardNavigation) return;
 
-    element.focus(options);
-    
+    element.focus(_options);
+
     // 确保元素可见
-    if (!options?.preventScroll) {
+    if (!_options?.preventScroll) {
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
@@ -109,28 +105,26 @@ class AccessibilityManager {
    */
   getFocusableElements(container: HTMLElement = document.body): HTMLElement[] {
     const selector = this.focusableElements.join(', ');
-    return Array.from(container.querySelectorAll(selector)) as HTMLElement[];
+    return Array.from(container.querySelectorAll(selector)) as HTMLElement[]
   }
 
   /**
    * ⌨️ 设置键盘导航
    */
-  setupKeyboardNavigation(
-    container: HTMLElement,
-    options: {
+  setupKeyboardNavigation(container: HTMLElement, _options: {
       circular?: boolean;
       orientation?: 'horizontal' | 'vertical' | 'both';
       onActivate?: (element: HTMLElement) => void;
     } = {}
   ): () => void {
-    if (!this.config.enableKeyboardNavigation) return () => {};
+    if (!this.config.enableKeyboardNavigation) return () => {}
 
-    const { circular = true, orientation = 'both', onActivate } = options;
-    
+    const { circular = true, orientation = 'both', onActivate } = _options;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const focusableElements = this.getFocusableElements(container);
       const currentIndex = focusableElements.indexOf(event.target as HTMLElement);
-      
+
       if (currentIndex === -1) return;
 
       let nextIndex = currentIndex;
@@ -139,7 +133,7 @@ class AccessibilityManager {
       switch (event.key) {
         case KeyCodes.ARROW_DOWN:
           if (orientation === 'vertical' || orientation === 'both') {
-            nextIndex = circular 
+            nextIndex = circular
               ? (currentIndex + 1) % focusableElements.length
               : Math.min(currentIndex + 1, focusableElements.length - 1);
             handled = true;
@@ -198,27 +192,27 @@ class AccessibilityManager {
           this.manageFocus(focusableElements[nextIndex]);
         }
       }
-    };
+    }
 
     container.addEventListener('keydown', handleKeyDown);
-    
+
     // 返回清理函数
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
-    };
+    }
   }
 
   /**
    * 📢 屏幕阅读器公告
    */
-  announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite'): void {
+  announceToScreenReader(_message: string, priority: 'polite' | 'assertive' = 'polite'): void {
     if (!this.config.enableScreenReader) return;
 
     const announcement = document.createElement('div');
     announcement.setAttribute('aria-live', priority);
     announcement.setAttribute('aria-atomic', 'true');
     announcement.className = 'sr-only';
-    announcement.textContent = message;
+    announcement.textContent = _message;
 
     document.body.appendChild(announcement);
 
@@ -238,9 +232,7 @@ class AccessibilityManager {
     document.documentElement.classList.toggle('high-contrast', shouldEnable);
     this.saveConfig();
 
-    this.announceToScreenReader(
-      shouldEnable ? '高对比度模式已启用' : '高对比度模式已禁用'
-    );
+    this.announceToScreenReader(shouldEnable ? '高对比度模式已启用' : '高对比度模式已禁用');
   }
 
   /**
@@ -253,27 +245,24 @@ class AccessibilityManager {
     document.documentElement.classList.toggle('reduce-motion', shouldEnable);
     this.saveConfig();
 
-    this.announceToScreenReader(
-      shouldEnable ? '减少动画模式已启用' : '减少动画模式已禁用'
-    );
+    this.announceToScreenReader(shouldEnable ? '减少动画模式已启用' : '减少动画模式已禁用');
   }
 
   /**
    * 📏 设置字体大小
    */
-  setFontSize(size: AccessibilityConfig['fontSize']): void {
+  setFontSize(_size: AccessibilityConfig['fontSize']): void {
     // 移除旧的字体大小类
-    document.documentElement.classList.remove(
-      'font-size-small', 'font-size-medium', 'font-size-large', 'font-size-extra-large'
-    );
+    document.documentElement.classList.remove('font-size-small', 'font-size-medium',
+      'font-_size-large', 'font-_size-extra-large');
 
     // 添加新的字体大小类
-    document.documentElement.classList.add(`font-size-${size}`);
-    
-    this.config.fontSize = size;
+    document.documentElement.classList.add(`font-_size-${_size}`);
+
+    this.config.fontSize = _size;
     this.saveConfig();
 
-    this.announceToScreenReader(`字体大小已设置为${size}`);
+    this.announceToScreenReader(`字体大小已设置为${_size}`);
   }
 
   /**
@@ -296,23 +285,23 @@ class AccessibilityManager {
    */
   private setupEventListeners(): void {
     // 监听系统偏好设置变化
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
       this.toggleReducedMotion(e.matches);
     });
 
-    window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
+    window.matchMedia('(prefers-contrast: high)').addEventListener('change', e => {
       this.toggleHighContrast(e.matches);
     });
 
     // 监听键盘快捷键
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', event => {
       // Alt + H: 切换高对比度
       if (event.altKey && event.key === 'h') {
         event.preventDefault();
         this.toggleHighContrast();
       }
 
-      // Alt + M: 切换减少动画
+      // Alt + _M: 切换减少动画
       if (event.altKey && event.key === 'm') {
         event.preventDefault();
         this.toggleReducedMotion();
@@ -338,7 +327,7 @@ class AccessibilityManager {
     try {
       const stored = localStorage.getItem('accessibility-config');
       if (stored) {
-        this.config = { ...this.config, ...JSON.parse(stored) };
+        this.config = { ...this.config, ...JSON.parse(stored) }
       }
     } catch (error) {
       console.warn('无法加载无障碍访问配置:', error);
@@ -349,14 +338,14 @@ class AccessibilityManager {
    * 📊 获取当前配置
    */
   getConfig(): AccessibilityConfig {
-    return { ...this.config };
+    return { ...this.config }
   }
 
   /**
    * ⚙️ 更新配置
    */
   updateConfig(newConfig: Partial<AccessibilityConfig>): void {
-    this.config = { ...this.config, ...newConfig };
+    this.config = { ...this.config, ...newConfig }
     this.saveConfig();
   }
 }
@@ -366,27 +355,24 @@ export const accessibilityManager = new AccessibilityManager();
 
 // 便捷的工具函数
 export const a11y = {
-  setAriaAttributes: (element: HTMLElement, attributes: Record<string, string | boolean | number>) =>
-    accessibilityManager.setAriaAttributes(element, attributes),
-  
-  manageFocus: (element: HTMLElement, options?: { preventScroll?: boolean }) =>
-    accessibilityManager.manageFocus(element, options),
-  
-  setupKeyboardNavigation: (container: HTMLElement, options?: any) =>
-    accessibilityManager.setupKeyboardNavigation(container, options),
-  
-  announce: (message: string, priority?: 'polite' | 'assertive') =>
-    accessibilityManager.announceToScreenReader(message, priority),
-  
-  toggleHighContrast: (enable?: boolean) =>
-    accessibilityManager.toggleHighContrast(enable),
-  
-  toggleReducedMotion: (enable?: boolean) =>
-    accessibilityManager.toggleReducedMotion(enable),
-  
-  setFontSize: (size: AccessibilityConfig['fontSize']) =>
-    accessibilityManager.setFontSize(size)
-};
+  setAriaAttributes: (element: HTMLElement, attributes: Record<string, string | boolean | number>
+  ) => accessibilityManager.setAriaAttributes(element, attributes),
+
+  manageFocus: (element: HTMLElement, _options?: { preventScroll?: boolean }) =>
+    accessibilityManager.manageFocus(element, _options),
+
+  _setupKeyboardNavigation: (container: HTMLElement, _options?: unknown) =>
+    accessibilityManager.setupKeyboardNavigation(container, _options as any),
+
+  _announce: (_message: string, priority?: 'polite' | 'assertive') =>
+    accessibilityManager.announceToScreenReader(_message, priority),
+
+  toggleHighContrast: (enable?: boolean) => accessibilityManager.toggleHighContrast(enable),
+
+  toggleReducedMotion: (enable?: boolean) => accessibilityManager.toggleReducedMotion(enable),
+
+  _setFontSize: (_size: AccessibilityConfig['fontSize']) => accessibilityManager.setFontSize(_size),
+}
 
 // AccessibilityConfig已经在第47行作为interface导出了
 
@@ -396,5 +382,5 @@ if (import.meta.env.DEV) {
   window.accessibilityManager = accessibilityManager;
   // @ts-ignore
   window.a11y = a11y;
-  console.log('🌐 AccessibilityManager已挂载到window对象，可用于调试');
+  console.log('🌐, AccessibilityManager已挂载到window对象，可用于调试');
 }

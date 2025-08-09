@@ -9,20 +9,27 @@ import { useMusicStore } from '@/store/modules/music';
  */
 export function navigateToMusicList(
   router: Router,
-  options: {
+  _options: {
     id?: string | number;
     type?: 'album' | 'playlist' | 'dailyRecommend' | string;
     name: string;
-    songList: Array<any>;
-    listInfo?: any;
+    songList: Array<{
+      id: string | number;
+      name: string;
+      artist?: string;
+      album?: string;
+      duration?: number;
+      [key: string]: unknown;
+    }>;
+    listInfo?: unknown;
     canRemove?: boolean;
   }
 ) {
   const musicStore = useMusicStore();
-  const { id, type, name, songList, listInfo, canRemove = false } = options;
+  const { id, type, name, songList, listInfo, canRemove = false } = _options;
 
   // 保存数据到状态管理
-  musicStore.setCurrentMusicList(songList, name, listInfo, canRemove);
+  musicStore.setCurrentMusicList(songList, name, listInfo as Record<string, unknown>, canRemove);
 
   // 路由跳转
   if (id) {

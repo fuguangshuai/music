@@ -31,7 +31,7 @@
               </div>
               <div class="follow-info">
                 <div class="follow-name" :class="{ 'is-artist': isArtist(item) }">
-                  {{ item.nickname }}
+                  {{ item?.nickname }}
                   <n-tooltip v-if="isArtist(item)" trigger="hover">
                     <template #trigger>
                       <i class="ri-verified-badge-fill artist-icon"></i>
@@ -139,7 +139,7 @@ const loadFollowList = async () => {
 
   try {
     followListLoading.value = true;
-    const { data } = await getUserFollows(userId, followLimit.value, followOffset.value);
+    const { data } = await getUserFollows(userId, followLimit.value, followOffset.value) as any;
 
     if (!data || !data.follow) {
       hasMoreFollows.value = false;

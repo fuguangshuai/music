@@ -122,7 +122,7 @@ if (!isSingleInstance) {
   // 监听当前歌曲变化
   ipcMain.on('update-current-song', (_, song: Song) => {
     // 转换Song类型到SongInfo类型
-    const artists = (song.artists || (song as any).ar || []).map((artist: any) => ({
+    const artists = (song.artists || (song as any).ar || [0]).map((artist: any) => ({
       name: artist.name || '',
       ...artist
     }));

@@ -36,7 +36,9 @@ export interface RequestConfig {
   /** 拦截器配置 */
   interceptors?: {
     /** 请求拦截器 */
-    request?: (config: ExtendedAxiosRequestConfig) => ExtendedAxiosRequestConfig | Promise<ExtendedAxiosRequestConfig>;
+    request?: (
+      config: ExtendedAxiosRequestConfig
+    ) => ExtendedAxiosRequestConfig | Promise<ExtendedAxiosRequestConfig>;
     /** 响应拦截器 */
     response?: (response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
     /** 错误拦截器 */
@@ -85,7 +87,7 @@ const injectCommonParams = (config: ExtendedAxiosRequestConfig): ExtendedAxiosRe
  */
 const handleToken = (config: ExtendedAxiosRequestConfig): ExtendedAxiosRequestConfig => {
   const token = localStorage.getItem('token');
-  
+
   if (token) {
     if (config.method !== 'post') {
       config.params = {
@@ -110,14 +112,14 @@ const handleProxyConfig = (config: ExtendedAxiosRequestConfig): ExtendedAxiosReq
   if (isElectron) {
     const setData = getSetData() as AppConfig;
     const proxyConfig = setData?.proxyConfig;
-    
+
     if (proxyConfig?.enable && ['http', 'https'].includes(proxyConfig?.protocol || '')) {
       config.params = {
         ...config.params,
         proxy: `${proxyConfig.protocol}://${proxyConfig.host}:${proxyConfig.port}`
       };
     }
-    
+
     if (setData?.enableRealIP && setData?.realIP) {
       config.params = {
         ...config.params,
@@ -135,7 +137,7 @@ const handleProxyConfig = (config: ExtendedAxiosRequestConfig): ExtendedAxiosReq
 export const createRequest = (userConfig: RequestConfig = {}): AxiosInstance => {
   // 合并配置
   const config = { ...DEFAULT_CONFIG, ...userConfig };
-  
+
   // 创建axios实例
   const instance = axios.create({
     baseURL: config.baseURL,
@@ -213,7 +215,7 @@ export const createRequest = (userConfig: RequestConfig = {}): AxiosInstance => 
 
       // 重试逻辑
       const retryConfig = config.retryConfig!;
-      const shouldRetry = 
+      const shouldRetry =
         requestConfig.retryCount !== undefined &&
         requestConfig.retryCount < retryConfig.maxRetries! &&
         !retryConfig.noRetryUrls?.includes(requestConfig.url as string) &&
@@ -221,12 +223,11 @@ export const createRequest = (userConfig: RequestConfig = {}): AxiosInstance => 
 
       if (shouldRetry) {
         requestConfig.retryCount = (requestConfig.retryCount || 0) + 1;
-        console.error(`请求重试第 ${requestConfig.retryCount} 次`);
+        console.error(`请求重试第 ${requestConfig.retryCount}, 次`);
 
         // 指数退避延迟
         const delay = Math.min(
-          retryConfig.delay! * Math.pow(2, requestConfig.retryCount - 1),
-          10000
+          Math.min(retryConfig.delay! * Math.pow(2, requestConfig.retryCount - 1), 10000)
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
 

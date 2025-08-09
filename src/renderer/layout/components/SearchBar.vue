@@ -130,7 +130,7 @@ const userSetOptions = ref(USER_SET_OPTIONS);
 const { t, locale } = useI18n();
 
 // 使用缩放hook
-const { zoomFactor, initZoomFactor, increaseZoom, decreaseZoom, resetZoom, isZoom100 } = useZoom();
+const { zoomFactor, initZoomFactor, increaseZoom, decreaseZoom, resetZoom, isZoom100 } = useZoom() as any;
 
 // 显示返回按钮
 const showBackButton = computed(() => {
@@ -154,7 +154,7 @@ const loadHotSearchKeyword = async () => {
 const loadPage = async () => {
   const token = localStorage.getItem('token');
   if (!token) return;
-  const { data } = await getUserDetail();
+  const { data } = await getUserDetail() as any;
   console.log('data', data);
   userStore.user =
     data.profile || userStore.user || JSON.parse(localStorage.getItem('user') || '{}');
@@ -226,8 +226,8 @@ const search = () => {
   });
 };
 
-const selectSearchType = (key: number) => {
-  searchStore.searchType = key;
+const selectSearchType = (_key: number) => {
+  searchStore.searchType = _key;
   if (searchValue.value) {
     if (router.currentRoute.value.path === '/search') {
       search();
@@ -236,7 +236,7 @@ const selectSearchType = (key: number) => {
         path: '/search',
         query: {
           keyword: searchValue.value,
-          type: key
+          type: _key
         }
       });
     }
@@ -253,9 +253,9 @@ const searchTypeOptions = computed(() => {
   }));
 });
 
-const selectItem = async (key: string) => {
+const selectItem = async (_key: string) => {
   // switch 判断
-  switch (key) {
+  switch (_key) {
     case 'logout':
       userStore.handleLogout();
       break;

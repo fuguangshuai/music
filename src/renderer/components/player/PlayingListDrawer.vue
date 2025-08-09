@@ -114,7 +114,7 @@ watch(
 const playList = computed(() => playerStore.playList as SongResult[]);
 
 // 播放列表引用
-const playListRef = ref<any>(null);
+const playListRef = ref<unknown>(null);
 
 // 关闭面板
 const closePanel = () => {
@@ -169,7 +169,7 @@ const scrollToCurrentSong = () => {
     if (playListRef.value && playList.value.length > 0) {
       const index = playerStore.playListIndex;
       console.log('滚动到歌曲索引:', index);
-      playListRef.value.scrollTo({
+      (playListRef.value as any).scrollTo({
         top: (index > 3 ? index - 3 : 0) * 62
       });
     }

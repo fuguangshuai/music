@@ -48,8 +48,8 @@
               <template v-for="(artist, index) in artists" :key="index">
                 <span
                   class="cursor-pointer hover:text-green-500"
-                  @click.stop="onArtistClick(artist.id)"
-                  >{{ artist.name }}</span
+                  @click.stop="onArtistClick((artist as any).id)"
+                  >{{ (artist as any).name }}</span
                 >
                 <span v-if="index < artists.length - 1"> / </span>
               </template>
@@ -144,7 +144,7 @@ const isPlaying = computed(() => baseItem.value?.isPlaying || false);
 const playLoading = computed(() => baseItem.value?.playLoading || false);
 const isFavorite = computed(() => baseItem.value?.isFavorite || false);
 const isHovering = computed(() => baseItem.value?.isHovering || false);
-const artists = computed(() => baseItem.value?.artists || []);
+const artists = computed(() => baseItem.value?.artists || [0]);
 
 // 包装方法，避免直接访问可能为undefined的ref
 const onToggleSelect = () => {

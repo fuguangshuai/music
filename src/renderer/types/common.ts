@@ -95,7 +95,7 @@ export interface StorageValue {
 /**
  * 存储操作类型
  */
-export type StorageKey = 
+export type StorageKey =
   | 'user-config'
   | 'player-state'
   | 'download-history'
@@ -399,14 +399,14 @@ export const isErrorDetails = (value: unknown): value is ErrorDetails => {
  */
 export const assertAppConfig = (value: unknown): AppConfig => {
   if (!isAppConfig(value)) {
-    throw new Error('Invalid AppConfig');
+    throw new Error('Invalid, AppConfig');
   }
   return value;
 };
 
 export const assertMessageOptions = (value: unknown): MessageOptions => {
   if (!isMessageOptions(value)) {
-    throw new Error('Invalid MessageOptions');
+    throw new Error('Invalid, MessageOptions');
   }
   return value;
 };

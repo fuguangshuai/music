@@ -7,7 +7,7 @@
       :style="{ backgroundImage: `url(${getImgUrl((user as any)?.backgroundUrl)})` }"
     >
       <div class="page">
-        <div class="user-name">{{ user.nickname }}</div>
+        <div class="user-name">{{ user?.nickname }}</div>
         <div class="user-info">
           <n-avatar round :size="50" :src="getImgUrl((user as any)?.avatarUrl, '50y50')" />
           <div class="user-info-list">
@@ -20,7 +20,7 @@
               <div>{{ t('user.profile.following') }}</div>
             </div>
             <div class="user-info-item">
-              <div class="label">{{ userDetail.level }}</div>
+              <div class="label">{{ userDetail?.level }}</div>
               <div>{{ t('user.profile.level') }}</div>
             </div>
           </div>
@@ -49,7 +49,7 @@
               />
               <div class="play-list-item-info">
                 <div class="play-list-item-name">
-                  <n-ellipsis :line-clamp="1">{{ item.name }}</n-ellipsis>
+                  <n-ellipsis :line-clamp="1">{{ item?.name }}</n-ellipsis>
                   <div v-if="item.creator.userId === user.userId" class="playlist-creator-tag">
                     {{ t('user.playlist.mine') }}
                   </div>
@@ -194,21 +194,21 @@ const loadData = async () => {
 
     if (!mounted.value) return;
 
-    userDetail.value = userDetailRes.data;
-    playList.value = playlistRes.data.playlist;
-    recordList.value = recordRes.data.allData.map((item: any) => ({
-      ...item,
-      ...item.song,
-      picUrl: item.song.al.picUrl
+    userDetail.value = (userDetailRes as any).data;
+    playList.value = (playlistRes as any).data.playlist;
+    recordList.value = (recordRes as any).data.allData.map((item: unknown) => ({
+      ...(item as any),
+      ...(item as any).song,
+      picUrl: (item as any).song.al.picUrl
     }));
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('加载用户页面失败:', error);
-    if (error.response?.status === 401) {
+    if ((error as any).response?.status === 401) {
       userStore.handleLogout();
       router.push('/login');
     } else {
       // 添加更多错误处理和重试逻辑
-      message.error(t('user.message.loadFailed'));
+      message.error(t('user._message.loadFailed'));
     }
   } finally {
     if (mounted.value) {
@@ -247,18 +247,18 @@ onMounted(() => {
 });
 
 // 替换显示歌单的方法
-const openPlaylist = (item: any) => {
+const openPlaylist = (item: unknown) => {
   listLoading.value = true;
 
-  getListDetail(item.id).then((res) => {
+  getListDetail((item as any).id).then((res) => {
     list.value = res.data.playlist;
     listLoading.value = false;
 
     navigateToMusicList(router, {
-      id: item.id,
+      id: (item as any).id,
       type: 'playlist',
-      name: item.name,
-      songList: res.data.playlist.tracks || [],
+      name: (item as any).name,
+      songList: res.data.playlist.tracks as any || [],
       listInfo: res.data.playlist,
       canRemove: true // 保留可移除功能
     });
@@ -280,7 +280,7 @@ const showFollowList = () => {
 // const showFollowerList = () => {
 //   if (!user.value) return;
 //   router.push('/user/followers');
-// };
+// }
 
 const handleLoginSuccess = () => {
   // 处理登录成功后的逻辑

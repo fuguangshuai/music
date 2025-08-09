@@ -78,7 +78,7 @@ export default {
     autoPlayDesc: 'Auto resume playback when reopening the app',
     showStatusBar: 'Show Status Bar',
     showStatusBarContent:
-      'You can display the music control function in your mac status bar (effective after a restart)'
+      'You can display the music control function in your mac status bar (effective __after a, restart)'
   },
   application: {
     closeAction: 'Close Action',
@@ -126,7 +126,7 @@ export default {
       },
       favorite: {
         label: 'Favorites',
-        description: 'Clear local favorite songs (cloud favorites not affected)'
+        description: 'Clear local favorite songs (cloud favorites not, affected)'
       },
       user: {
         label: 'User Data',
@@ -138,7 +138,7 @@ export default {
       },
       downloads: {
         label: 'Download History',
-        description: 'Clear download history (downloaded files not affected)'
+        description: 'Clear download history (downloaded files not, affected)'
       },
       resources: {
         label: 'Music Resources',

@@ -111,8 +111,6 @@ export function useSongItem(props: { item: SongResult; canRemove?: boolean }) {
     return 0;
   };
 
-
-
   // 处理右键菜单
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();

@@ -48,7 +48,7 @@
           <i class="ri-pushpin-line" :class="{ active: lyricSetting.isTop }"></i>
         </div> -->
         <div id="lyric-lock" class="control-button" @click="handleLock">
-          <i v-if="lyricSetting.isLock" class="ri-lock-line"></i>
+          <i v-if="lyricSetting?.isLock" class="ri-lock-line"></i>
           <i v-else class="ri-lock-unlock-line"></i>
         </div>
         <div class="control-button" @click="handleClose">
@@ -88,11 +88,11 @@
                 </span>
               </div>
               <div
-                v-if="line.trText"
+                v-if="line?.trText"
                 class="lyric-translation"
                 :style="{ fontSize: `${fontSize * 0.6}px` }"
               >
-                {{ line.trText }}
+                {{ line?.trText }}
               </div>
             </div>
           </template>
@@ -359,7 +359,7 @@ const updateContainerHeight = () => {
   // 计算最大允许行高(容器高度的1/4)
   const maxAllowedHeight = containerHeight.value / 3;
 
-  // 设置行高(不小于40px,不大于最大允许高度)
+  // 设置行高(不小于40px, 不大于最大允许高度)
   lineHeight.value = Math.min(maxAllowedHeight, Math.max(40, baseLineHeight));
 };
 
@@ -428,7 +428,7 @@ const getLyricStyle = (index: number) => {
 
   // 使用更清晰的渐变实现
   return {
-    background: `linear-gradient(to right, var(--highlight-color) ${progress}%, var(--text-color) ${progress}%)`,
+    background: `linear-gradient(to right, var(--highlight-color) ${progress}% var(--text-color) ${progress}%)`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     // 优化字体渲染，减少发虚
@@ -471,15 +471,15 @@ const watchStopFunctions: Array<() => void> = [];
 // 监听据更新
 const stopDynamicDataWatch = watch(
   () => dynamicData.value,
-  (newData: any) => {
+  (newData: unknown) => {
     // 更新最后更新时间
     lastUpdateTime.value = performance.now();
 
     // 更新实际时间，包含偏移量
-    actualTime.value = newData.nowTime + TIME_OFFSET / 1000;
+    actualTime.value = (newData as any).nowTime + TIME_OFFSET / 1000;
 
     // 如果正在播放且没有动画，启动动画
-    if (newData.isPlay && !animationFrameId.value) {
+    if ((newData as any).isPlay && !animationFrameId.value) {
       updateProgress();
     }
   },
@@ -754,7 +754,7 @@ const initializeThemeColor = () => {
 // const handleTop = () => {
 //   lyricSetting.value.isTop = !lyricSetting.value.isTop;
 //   windowData.electron.ipcRenderer.send('top-lyric', lyricSetting.value.isTop);
-// };
+// }
 
 const handleLock = () => {
   lyricSetting.value.isLock = !lyricSetting.value.isLock;
@@ -806,7 +806,7 @@ const handleMouseDown = (e: MouseEvent) => {
   if (
     lyricSetting.value.isLock ||
     (e.target as HTMLElement).closest('.control-buttons') ||
-    (e.target as HTMLElement).closest('.font-size-controls') ||
+    (e.target as HTMLElement).closest('.font-_size-controls') ||
     (e.target as HTMLElement).closest('.play-controls')
   ) {
     return;
@@ -1074,7 +1074,7 @@ body,
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0% black 20% black 80% transparent 100%);
 }
 
 .lyric-wrapper {

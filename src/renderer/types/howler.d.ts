@@ -55,11 +55,11 @@ export interface OperationLockState {
  */
 export class AudioServiceError extends Error {
   constructor(
-    message: string,
+    _message: string,
     public code: string,
-    public details?: any
+    public _details?: unknown
   ) {
-    super(message);
+    super(_message);
     this.name = 'AudioServiceError';
   }
 }

@@ -52,10 +52,16 @@
             />
           </div>
           <div v-if="listInfo?.creator" class="creator-info">
-            <n-avatar round :size="24" :src="getImgUrl((listInfo.creator as any)?.avatarUrl, '50y50')" />
+            <n-avatar
+              round
+              :size="24"
+              :src="getImgUrl((listInfo.creator as any)?.avatarUrl, '50y50')"
+            />
             <span class="creator-name">{{ (listInfo.creator as any)?.nickname }}</span>
           </div>
-          <div v-if="total" class="music-total">{{ t('player.songNum', { num: total }) }}</div>
+          <div v-if="total" class="music-total">
+            {{ t('player.songNum', { num: total }) }}
+          </div>
 
           <n-scrollbar style="max-height: 200px">
             <div v-if="listInfo?.description" class="music-desc">
@@ -87,7 +93,7 @@
                   <template #default="{ item }">
                     <div class="double-item">
                       <song-item
-                        :item="formatSong(item)"
+                        :item="formatSong(item) || item"
                         :can-remove="canRemove"
                         @play="handlePlay"
                         @remove-song="(id) => emit('remove-song', id)"
@@ -109,6 +115,13 @@
 import PinyinMatch from 'pinyin-match';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { formatSongData } from '@/utils/musicDataFormatter';
+
+
+const emit = defineEmits<{
+  'remove-song': [id: string];
+  'update:show': [show: boolean];
+}>();
 
 import { getMusicDetail } from '@/api/music';
 import SongItem from '@/components/common/SongItem.vue';
@@ -129,7 +142,7 @@ const props = withDefaults(
     loading?: boolean;
     listInfo?: {
       trackIds: { id: number }[];
-      [key: string]: unknown;
+      [_key: string]: unknown;
     };
     cover?: boolean;
     canRemove?: boolean;
@@ -141,8 +154,6 @@ const props = withDefaults(
     canRemove: false
   }
 );
-
-const emit = defineEmits(['update:show', 'update:loading', 'remove-song']);
 
 const page = ref(0);
 const pageSize = 40;
@@ -197,15 +208,15 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: any) => {
-      return artist.name?.toLowerCase().includes(keyword);
+    const artistsMatch = artists.some((artist: unknown) => {
+      return (artist as any).name?.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: any) => {
-      return artist.name && PinyinMatch.match(artist.name, keyword);
+    const artistsPinyinMatch = artists.some((artist: unknown) => {
+      return (artist as any).name && PinyinMatch.match((artist as any).name, keyword);
     });
 
     return (
@@ -220,19 +231,11 @@ const filteredSongs = computed(() => {
 });
 
 // 格式化歌曲数据
-const formatSong = (item: any) => {
+const formatSong = (item: unknown) => {
   if (!item) {
     return null;
   }
-  return {
-    ...item,
-    picUrl: item.al?.picUrl || item.picUrl,
-    song: {
-      artists: item.ar || item.artists,
-      name: item.al?.name || item.name,
-      id: item.al?.id || item.id
-    }
-  };
+  return formatSongData(item);
 };
 
 /**
@@ -259,13 +262,13 @@ const loadSongs = async (ids: number[], appendToList = true, updateComplete = fa
       let newSongs = songs;
       if (!updateComplete) {
         // 在普通加载模式下继续过滤已加载的歌曲，避免重复
-        newSongs = songs.filter((song: any) => !loadedIds.value.has(song.id));
+        newSongs = songs.filter((song: unknown) => !loadedIds.value.has((song as any).id));
         console.log(`过滤已加载ID后剩余歌曲数量: ${newSongs.length}`);
       }
 
       // 更新已加载ID集合
-      songs.forEach((song: any) => {
-        loadedIds.value.add(song.id);
+      songs.forEach((song: unknown) => {
+        loadedIds.value.add((song as any).id);
       });
 
       // 追加到显示列表 - 仅当appendToList=true时添加到displayedSongs
@@ -374,7 +377,7 @@ const loadFullPlaylist = async () => {
           const currentPlaylist = playerStore.playList;
           if (currentPlaylist.length > 0 && currentPlaylist[0].id === displayedSongs.value[0]?.id) {
             console.log('实时更新当前播放列表');
-            playerStore.setPlayList(displayedSongs.value.map(formatSong));
+            playerStore.setPlayList(displayedSongs.value.map(formatSong).filter(Boolean) as SongResult[]);
           }
         }
       }
@@ -424,18 +427,18 @@ const loadFullPlaylist = async () => {
 const handlePlay = async () => {
   // 当搜索状态下播放时，只播放过滤后的歌曲
   if (searchKeyword.value) {
-    playerStore.setPlayList(filteredSongs.value.map(formatSong));
+    playerStore.setPlayList(filteredSongs.value.map(formatSong).filter(Boolean) as SongResult[]);
     return;
   }
 
   // 如果完整播放列表已加载完成
   if (isFullPlaylistLoaded.value && completePlaylist.value.length > 0) {
-    playerStore.setPlayList(completePlaylist.value.map(formatSong));
+    playerStore.setPlayList(completePlaylist.value.map(formatSong).filter(Boolean) as SongResult[]);
     return;
   }
 
   // 如果完整播放列表未加载完成，先使用当前已加载的歌曲开始播放
-  playerStore.setPlayList(displayedSongs.value.map(formatSong));
+  playerStore.setPlayList(displayedSongs.value.map(formatSong).filter(Boolean) as SongResult[]);
 
   // 如果完整播放列表正在加载中，不需要重新触发加载
   if (isPlaylistLoading.value) {
@@ -486,9 +489,9 @@ const loadMoreSongs = async () => {
       }
     } else if (start < props.songList.length) {
       const newSongs = props.songList.slice(start, end);
-      newSongs.forEach((song: any) => {
-        if (!loadedIds.value.has(song.id as number)) {
-          loadedIds.value.add(song.id as number);
+      newSongs.forEach((song: unknown) => {
+        if (!loadedIds.value.has((song as any).id as number)) {
+          loadedIds.value.add((song as any).id as number);
           displayedSongs.value.push(song as any);
         }
       });
@@ -504,10 +507,10 @@ const loadMoreSongs = async () => {
 };
 
 // 处理虚拟列表滚动事件
-const handleVirtualScroll = (e: any) => {
-  if (!e || !e.target) return;
+const handleVirtualScroll = (e: unknown) => {
+  if (!e || !(e as any).target) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
   const threshold = 200;
 
   if (
@@ -533,10 +536,10 @@ const resetListState = () => {
 };
 
 // 初始化歌曲列表
-const initSongList = (songs: any[]) => {
+const initSongList = (songs: unknown[]) => {
   if (songs.length > 0) {
-    displayedSongs.value = [...songs];
-    songs.forEach((song) => loadedIds.value.add(song.id));
+    displayedSongs.value = [...songs] as SongResult[];
+    songs.forEach((song) => loadedIds.value.add((song as any).id));
     page.value = Math.ceil(songs.length / pageSize);
   }
 
@@ -558,7 +561,7 @@ watch(
   () => props.songList,
   (newSongs) => {
     // 重置所有状态
-    resetListState();
+    resetListState;
 
     // 初始化歌曲列表
     initSongList(newSongs);
@@ -617,8 +620,8 @@ onUnmounted(() => {
     @apply w-[25%] flex-shrink-0 pr-8 flex flex-col;
 
     .music-cover {
-      @apply w-full aspect-square rounded-2xl overflow-hidden mb-4 min-h-[250px];
-      .cover-img {
+      @apply w-full aspect-square rounded-2xl overflow-hidden mb-4 min-h-[250px]
+        .cover-img {
         @apply w-full h-full object-cover;
       }
     }

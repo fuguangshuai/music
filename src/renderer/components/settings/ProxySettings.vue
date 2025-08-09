@@ -85,26 +85,46 @@ const proxyRules: FormRules = {
     message: t('settings.validation.selectProxyProtocol'),
     trigger: ['blur', 'change']
   },
-  host: {
-    required: true,
-    message: t('settings.validation.proxyHost'),
-    trigger: ['blur', 'change'],
-    validator: (_rule, value) => {
-      if (!value) return false;
-      // 简单的IP或域名验证
-      const ipRegex =
-        /^(\d{1,3}\.){3}\d{1,3}$|^localhost$|^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
-      return ipRegex.test(value);
+  host: [
+    {
+      required: true,
+      message: t('settings.validation.proxyHost'),
+      trigger: ['blur', 'change']
+    },
+    {
+      validator: (_rule: any, value: any) => {
+        if (!value) {
+          return new Error('请输入代理主机地址');
+        }
+        // 简单的IP或域名验证
+        const ipRegex =
+          /^(\d{1,3}\.){3}\d{1,3}$|^localhost$|^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+        if (ipRegex.test(value)) {
+          return true;
+        } else {
+          return new Error('请输入有效的IP地址或域名');
+        }
+      },
+      trigger: ['blur', 'change']
     }
-  },
-  port: {
-    required: true,
-    message: t('settings.validation.portNumber'),
-    trigger: ['blur', 'change'],
-    validator: (_rule, value) => {
-      return value >= 1 && value <= 65535;
+  ],
+  port: [
+    {
+      required: true,
+      message: t('settings.validation.portNumber'),
+      trigger: ['blur', 'change']
+    },
+    {
+      validator: (_rule: any, value: any) => {
+        if (value >= 1 && value <= 65535) {
+          return true;
+        } else {
+          return new Error('端口号必须在1-65535之间');
+        }
+      },
+      trigger: ['blur', 'change']
     }
-  }
+  ]
 };
 
 // 同步外部show属性变化
@@ -120,8 +140,7 @@ watch(
   () => visible.value,
   (newVal) => {
     emit('update:show', newVal);
-  }
-);
+  });
 
 // 同步外部config变化
 watch(

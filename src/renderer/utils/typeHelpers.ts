@@ -53,27 +53,27 @@ export const typeHelpers = {
   /**
    * 临时API数据处理
    */
-  tempApi: (data: unknown): TempApiData => {
-    console.log('🔄 使用临时API数据，建议后续添加类型定义');
+  _tempApi: (data: unknown): TempApiData => {
+    console.log('🔄, 使用临时API数据，建议后续添加类型定义');
     return data as TempApiData;
   },
 
   /**
    * 第三方库数据处理
    */
-  thirdParty: (data: unknown): ThirdPartyData => {
-    console.log('🔌 使用第三方库数据');
+  _thirdParty: (data: unknown): ThirdPartyData => {
+    console.log('🔌, 使用第三方库数据');
     return data as ThirdPartyData;
   },
 
   /**
    * 检查对象是否有指定属性
    */
-  hasProperty: <T extends object, K extends string>(
+  _hasProperty: <T extends object, K extends string>(
     obj: T,
-    key: K
+    _key: K
   ): obj is T & Record<K, unknown> => {
-    return key in obj;
+    return _key in obj;
   }
 };
 
@@ -84,15 +84,16 @@ export const typeGuards = {
   isString: (value: unknown): value is string => typeof value === 'string',
   isNumber: (value: unknown): value is number => typeof value === 'number',
   isBoolean: (value: unknown): value is boolean => typeof value === 'boolean',
-  isObject: (value: unknown): value is Record<string, unknown> => 
+  isObject: (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value),
   isArray: (value: unknown): value is unknown[] => Array.isArray(value),
   isFunction: (value: unknown): value is Function => typeof value === 'function',
-  
+
   // API响应类型守卫
   isApiResponse: <T>(value: unknown): value is ApiResponse<T> => {
-    return typeGuards.isObject(value) && 
-           typeGuards.isNumber((value as any).code);
+    return (
+      typeGuards.isObject(value) && typeGuards.isNumber((value as Record<string, unknown>).code)
+    );
   }
 };
 

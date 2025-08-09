@@ -81,7 +81,7 @@ watch(
 );
 
 // 启动定时器更新UI
-function startTimerUpdate() {
+function startTimerUpdate(): void {
   stopTimerUpdate(); // 先停止之前的计时器
 
   // 每秒更新UI
@@ -92,7 +92,7 @@ function startTimerUpdate() {
 }
 
 // 停止定时器更新UI
-function stopTimerUpdate() {
+function stopTimerUpdate(): void {
   if (timerUpdateInterval) {
     clearInterval(timerUpdateInterval);
     timerUpdateInterval = null;
@@ -121,11 +121,11 @@ onUnmounted(() => {
 
   @keyframes fadeInDown {
     from {
-      transform: translate(-50%, -150%);
+      transform: translate(-50% -150%);
       opacity: 0;
     }
     to {
-      transform: translate(-50%, -100%);
+      transform: translate(-50% -100%);
       opacity: 1;
     }
   }

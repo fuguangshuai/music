@@ -101,8 +101,7 @@ watch(
   () => visible.value,
   (newVal) => {
     emit('update:show', newVal);
-  }
-);
+  });
 
 const handleConfirm = () => {
   emit('confirm', selectedTypes.value);

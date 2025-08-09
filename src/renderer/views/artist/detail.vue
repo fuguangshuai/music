@@ -16,7 +16,7 @@
             {{ artistInfo.alias.join(' / ') }}
           </div>
           <div v-if="artistInfo?.briefDesc" class="artist-desc">
-            {{ artistInfo.briefDesc }}
+            {{ artistInfo?.briefDesc }}
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@
                       <song-item
                         :index="index"
                         :compact="isCompactLayout"
-                        :item="formatSong(item)"
+                        :item="formatSong(item) || item as any"
                         @play="handlePlay"
                       />
                     </div>
@@ -134,7 +134,9 @@
                 </template>
               </n-virtual-list>
 
-              <div v-if="songLoading" class="loading-more">{{ t('common.loading') }}</div>
+              <div v-if="songLoading" class="loading-more">
+                {{ t('common.loading') }}
+              </div>
               <div
                 v-else-if="songPage.hasMore"
                 ref="songsLoadMoreRef"
@@ -160,7 +162,9 @@
                   type: '专辑'
                 }"
               />
-              <div v-if="albumLoading" class="loading-more">{{ t('common.loading') }}</div>
+              <div v-if="albumLoading" class="loading-more">
+                {{ t('common.loading') }}
+              </div>
               <div
                 v-else-if="albumPage.hasMore"
                 ref="albumsLoadMoreRef"
@@ -399,7 +403,7 @@ const showSearch = () => {
   isSearchVisible.value = true;
   // 添加一个小延迟后聚焦搜索框
   nextTick(() => {
-    const inputEl = document.querySelector('.search-container input');
+    const inputEl = document.querySelector('.search-container, input');
     if (inputEl) {
       (inputEl as HTMLInputElement).focus();
     }
@@ -435,15 +439,15 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: any) => {
-      return artist.name?.toLowerCase().includes(keyword);
+    const artistsMatch = artists.some((artist: unknown) => {
+      return (artist as any).name?.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: any) => {
-      return artist.name && PinyinMatch.match(artist.name, keyword);
+    const artistsPinyinMatch = artists.some((artist: unknown) => {
+      return (artist as any).name && PinyinMatch.match((artist as any).name, keyword);
     });
 
     return (
@@ -511,11 +515,11 @@ const addToPlaylist = () => {
   message.success(t('comp.musicList.addToPlaylistSuccess', { count: newSongs.length }));
 };
 
-const handlePlay = (song?: any) => {
+const handlePlay = (song?: unknown) => {
   // 如果传入了特定歌曲（点击单曲播放），则将其作为播放列表的第一首
   if (song) {
     const songList = [...filteredSongs.value];
-    const index = songList.findIndex((item) => item.id === song.id);
+    const index = songList.findIndex((item) => item.id === (song as any).id);
 
     if (index !== -1) {
       // 将点击的歌曲移到第一位
@@ -531,7 +535,7 @@ const handlePlay = (song?: any) => {
     );
 
     // 设置当前播放歌曲
-    playerStore.setPlay(song);
+    playerStore.setPlay(song as any);
   } else {
     // 默认行为：播放整个过滤后的列表
     playerStore.setPlayList(
@@ -648,21 +652,21 @@ onUnmounted(() => {
 const songListRef = ref(null);
 
 // 格式化歌曲（使用在虚拟列表中）
-const formatSong = (item: any) => {
+const formatSong = (item: unknown) => {
   if (!item) {
     return null;
   }
   return {
     ...item,
-    picUrl: item.al?.picUrl || item.picUrl
+    picUrl: (item as any).al?.picUrl || (item as any).picUrl
   };
 };
 
 // 处理虚拟列表滚动
-const handleVirtualScroll = (e: any) => {
-  if (!e || !e.target) return;
+const handleVirtualScroll = (e: unknown) => {
+  if (!e || !(e as any).target) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
+  const { scrollTop, scrollHeight, clientHeight } = (e as any).target;
   const threshold = 200;
 
   if (

@@ -50,11 +50,11 @@ export function registerShortcuts(
     const oldShortcuts = { ...shortcuts } as unknown as Record<string, string>;
     const newShortcuts: ShortcutsConfig = {};
 
-    Object.entries(oldShortcuts).forEach(([key, value]) => {
-      newShortcuts[key] = {
+    Object.entries(oldShortcuts).forEach(([_key, value]) => {
+      newShortcuts[_key] = {
         key: value,
         enabled: true,
-        scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(key) ? 'app' : 'global'
+        scope: ['volumeUp', 'volumeDown', 'toggleFavorite'].includes(_key) ? 'app' : 'global'
       };
     });
 

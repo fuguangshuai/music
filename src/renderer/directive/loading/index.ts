@@ -21,19 +21,19 @@ class SmartLoadingManager {
    */
   startLoading(
     id: string,
-    message: string = '加载中...',
+    _message: string = '加载中...',
     priority: 'low' | 'medium' | 'high' = 'medium',
     minDuration: number = 300
   ): void {
-    const state: LoadingState = {
+    const _state: LoadingState = {
       isLoading: true,
       startTime: Date.now(),
       minDuration,
-      message,
+      message: _message,
       priority
     };
 
-    this.loadingStates.set(id, state);
+    this.loadingStates.set(id, _state);
     this.updateLoadingQueue();
 
     console.log(`🔄 开始加载 [${id}] 优先级: ${priority}`);
@@ -43,22 +43,22 @@ class SmartLoadingManager {
    * 结束加载（智能延迟）
    */
   async stopLoading(id: string): Promise<void> {
-    const state = this.loadingStates.get(id);
-    if (!state) return;
+    const _state = this.loadingStates.get(id);
+    if (!_state) return;
 
-    const elapsed = Date.now() - state.startTime;
-    const remainingTime = Math.max(0, state.minDuration - elapsed);
+    const elapsed = Date.now() - _state.startTime;
+    const remainingTime = Math.max(0, _state.minDuration - elapsed);
 
     if (remainingTime > 0) {
-      console.log(`⏳ 智能延迟 [${id}] ${remainingTime}ms`);
-      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      console.log(`⏳ 智能延迟 [${id}], ${remainingTime}ms`);
+      await new Promise((resolve) => setTimeout(resolve, remainingTime));
     }
 
-    state.isLoading = false;
+    _state.isLoading = false;
     this.loadingStates.delete(id);
     this.updateLoadingQueue();
 
-    console.log(`✅ 加载完成 [${id}]`);
+    console.log(`✅ 加载完成, [${id}]`);
   }
 
   /**
@@ -67,9 +67,9 @@ class SmartLoadingManager {
   private updateLoadingQueue(): void {
     this.loadingQueue = Array.from(this.loadingStates.entries())
       .filter(([_, state]) => state.isLoading)
-      .map(([id, state]) => ({
+      .map(([id, _state]) => ({
         id,
-        priority: state.priority === 'high' ? 3 : state.priority === 'medium' ? 2 : 1
+        priority: _state.priority === 'high' ? 3 : _state.priority === 'medium' ? 2 : 1
       }))
       .sort((a, b) => b.priority - a.priority);
   }
@@ -107,7 +107,7 @@ export const vLoading = {
   },
 
   // 在绑定元素的父组件 及他自己的所有子节点都更新后调用
-  updated: async (el: HTMLElement, binding: { value: boolean | LoadingOptions }) => {
+  _updated: async (el: HTMLElement, binding: { value: boolean | LoadingOptions }) => {
     const elementId = el.dataset.loadingId || generateElementId(el);
     const options = normalizeLoadingOptions(binding.value);
 
@@ -139,7 +139,7 @@ export const vLoading = {
   },
 
   // 绑定元素的父组件卸载后调用
-  unmounted: async (el: HTMLElement) => {
+  _unmounted: async (el: HTMLElement) => {
     const elementId = el.dataset.loadingId;
     if (elementId) {
       await smartLoadingManager.stopLoading(elementId);
@@ -189,7 +189,7 @@ function formatterClass(el: HTMLElement, binding: { value: boolean }): void {
     if (targetClass === -1) {
       el.setAttribute('class', `${classStr} loading-parent`.trim());
     }
-  } else if (targetClass > -1) {
+  } else if (targetClass !== -1) {
     // 移除 loading-parent 类
     const newClassStr = classStr.replace(/\s*loading-parent\s*/g, ' ').trim();
     el.setAttribute('class', newClassStr);
@@ -197,4 +197,4 @@ function formatterClass(el: HTMLElement, binding: { value: boolean }): void {
 }
 
 // 导出智能加载管理器和类型
-export { smartLoadingManager, type LoadingState, type LoadingOptions };
+export { type LoadingOptions, type LoadingState, smartLoadingManager };

@@ -24,7 +24,7 @@
             class="cursor-pointer hover:text-green-500"
             @click.stop="handleArtistClick(artists.id)"
           >
-            {{ artists.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
+            {{ artists?.name }}{{ artistsindex < artistList.length - 1 ? ' / ' : '' }}
           </span>
         </div>
       </div>

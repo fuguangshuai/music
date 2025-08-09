@@ -153,15 +153,17 @@
             object-fit="cover"
           />
         </div>
-        <div v-if="listInfo?.creator" class="creator-info">
-          <n-avatar round :size="24" :src="getImgUrl(listInfo.creator.avatarUrl, '50y50')" />
-          <span class="creator-name">{{ listInfo.creator.nickname }}</span>
+        <div v-if="(listInfo as any)?.creator" class="creator-info">
+          <n-avatar round :size="24" :src="getImgUrl((listInfo as any).creator.avatarUrl, '50y50')" />
+          <span class="creator-name">{{ (listInfo as any).creator.nickname }}</span>
         </div>
-        <div v-if="total" class="music-total">{{ t('player.songNum', { num: total }) }}</div>
+        <div v-if="total" class="music-total">
+          {{ t('player.songNum', { num: total }) }}
+        </div>
 
         <n-scrollbar style="max-height: 200px">
-          <div v-if="listInfo?.description" class="music-desc">
-            {{ listInfo.description }}
+          <div v-if="(listInfo as any)?.description" class="music-desc">
+            {{ (listInfo as any).description }}
           </div>
         </n-scrollbar>
       </div>
@@ -171,7 +173,7 @@
         <div class="music-list">
           <n-spin :show="loadingList || loading">
             <div class="music-list-content">
-              <div v-if="filteredSongs.length === 0 && searchKeyword" class="no-result">
+              <div v-if="filteredSongs.length === 0 && searchKeyword" class="no-_result">
                 {{ t('comp.musicList.noSearchResults') }}
               </div>
 
@@ -245,8 +247,8 @@ const message = useMessage();
 // 从路由参数或状态管理获取数据
 const name = ref('');
 const loading = ref(false);
-const songList = ref<any[]>([]);
-const listInfo = ref<any>(null);
+const songList = ref<any[]>([0]);
+const listInfo = ref<unknown>(null);
 const canRemove = ref(false);
 const canCollect = ref(false);
 const isCollected = ref(false);
@@ -273,7 +275,7 @@ const showSearch = () => {
   isSearchVisible.value = true;
   // 添加一个小延迟后聚焦搜索框
   nextTick(() => {
-    const inputEl = document.querySelector('.search-container input');
+    const inputEl = document.querySelector('.search-container, input');
     if (inputEl) {
       (inputEl as HTMLInputElement).focus();
     }
@@ -296,8 +298,8 @@ const handleSearchBlur = () => {
 
 // 计算总数
 const total = computed(() => {
-  if (listInfo.value?.trackIds) {
-    return listInfo.value.trackIds.length;
+  if ((listInfo.value as any)?.trackIds) {
+    return (listInfo.value as any).trackIds.length;
   }
   return songList.value.length;
 });
@@ -358,10 +360,10 @@ const initData = () => {
 // 根据类型加载数据
 const loadDataByType = async (type: string, id: string) => {
   try {
-    const result = await getMusicListByType(type, id);
+    const _result = await getMusicListByType(type, id);
 
     if (type === 'album') {
-      const { songs, album } = result.data;
+      const { songs, album } = _result.data;
       name.value = album.name;
       songList.value = songs.map((song: Song) => {
         if (song.al) {
@@ -379,7 +381,7 @@ const loadDataByType = async (type: string, id: string) => {
         description: album.description
       };
     } else if (type === 'playlist') {
-      const { playlist } = result.data;
+      const { playlist } = _result.data;
       name.value = playlist.name;
       listInfo.value = playlist;
 
@@ -397,7 +399,7 @@ const loadDataByType = async (type: string, id: string) => {
 };
 
 const getCoverImgUrl = computed(() => {
-  const coverImgUrl = listInfo.value?.coverImgUrl;
+  const coverImgUrl = (listInfo.value as any)?.coverImgUrl;
   if (coverImgUrl) {
     return coverImgUrl;
   }
@@ -461,7 +463,7 @@ const filteredSongs = computed(() => {
 });
 
 // 格式化歌曲数据 - 灵活版本，接受任何歌曲类型
-const formatSong = (item: any): SongResult => {
+const formatSong = (item: unknown): SongResult => {
   if (!item) {
     return {
       id: 0,
@@ -475,14 +477,14 @@ const formatSong = (item: any): SongResult => {
 
   return {
     ...item,
-    count: item.count || 0, // 添加必需的count属性
-    picUrl: item.al?.picUrl || item.album?.picUrl || item.picUrl || '',
-    ar: item.artists || item.ar || [],
-    al: item.album || item.al || { name: '', id: 0 },
+    count: (item as any).count || 0, // 添加必需的count属性
+    picUrl: (item as any).al?.picUrl || (item as any).album?.picUrl || (item as any).picUrl || '',
+    ar: (item as any).artists || (item as any).ar || [],
+    al: (item as any).album || (item as any).al || { name: '', id: 0 },
     song: {
-      artists: item.ar || item.artists,
-      name: item.al?.name || item.album?.name || item.name,
-      id: item.al?.id || item.album?.id || item.id
+      artists: (item as any).ar || (item as any).artists,
+      name: (item as any).al?.name || (item as any).album?.name || (item as any).name,
+      id: (item as any).al?.id || (item as any).album?.id || (item as any).id
     }
   } as SongResult;
 };
@@ -553,14 +555,14 @@ const loadFullPlaylist = async () => {
 
   try {
     // 如果没有trackIds，直接使用当前歌曲列表并标记为已完成
-    if (!listInfo.value?.trackIds) {
+    if (!(listInfo.value as any)?.trackIds) {
       isFullPlaylistLoaded.value = true;
       console.log('无trackIds信息，使用当前列表作为完整列表');
       return;
     }
 
     // 获取所有trackIds
-    const allIds = listInfo.value.trackIds.map((item: any) => item.id);
+    const allIds = (listInfo.value as any).trackIds.map((item: unknown) => (item as any).id);
     console.log(`歌单共有歌曲ID: ${allIds.length}首`);
 
     // 重置completePlaylist和当前显示歌曲ID集合，保证不会重复添加歌曲
@@ -581,7 +583,7 @@ const loadFullPlaylist = async () => {
     );
 
     // 过滤出尚未加载的歌曲ID
-    const unloadedIds = allIds.filter((id: any) => !loadedSongIds.has(id));
+    const unloadedIds = allIds.filter((id: unknown) => !loadedSongIds.has(id as number));
     console.log(`还需要加载的歌曲ID数量: ${unloadedIds.length}`);
 
     if (unloadedIds.length === 0) {
@@ -605,11 +607,13 @@ const loadFullPlaylist = async () => {
       // 添加新加载的歌曲到displayedSongs
       if (loadedBatch.length > 0) {
         // 过滤掉已有的歌曲，确保不会重复添加
-        const newSongs = loadedBatch.filter((song: any) => !loadedSongIds.has(song.id as number));
+        const newSongs = loadedBatch.filter(
+          (song: unknown) => !loadedSongIds.has((song as any).id as number)
+        );
 
         // 更新已加载ID集合
-        newSongs.forEach((song: any) => {
-          loadedSongIds.add(song.id as number);
+        newSongs.forEach((song: unknown) => {
+          loadedSongIds.add((song as any).id as number);
         });
 
         console.log(`新增${newSongs.length}首歌曲到显示列表`);
@@ -661,7 +665,7 @@ const loadFullPlaylist = async () => {
       // 如果数量不符，可能是API未返回所有歌曲，打印缺失的歌曲ID
       if (displayedSongs.value.length < allIds.length) {
         const loadedIds = new Set(displayedSongs.value.map((song) => song.id));
-        const missingIds = allIds.filter((id: any) => !loadedIds.has(id));
+        const missingIds = allIds.filter((id: unknown) => !loadedIds.has(id as string | number));
         console.warn(`缺失的歌曲ID: ${missingIds.join(', ')}`);
       }
     }
@@ -703,17 +707,17 @@ const handlePlay = async () => {
 
 // 添加从歌单移除歌曲的方法
 const handleRemoveSong = async (songId: number) => {
-  if (!listInfo.value?.id || !canRemove.value) return;
+  if (!(listInfo.value as any)?.id || !canRemove.value) return;
 
   try {
     const res = await updatePlaylistTracks({
       op: 'del',
-      pid: listInfo.value.id,
+      pid: (listInfo.value as any).id,
       tracks: songId.toString()
     });
 
     if (res.status === 200) {
-      message.success(t('user.message.deleteSuccess'));
+      message.success(t('user._message.deleteSuccess'));
 
       // 从显示列表和完整播放列表中移除歌曲
       displayedSongs.value = displayedSongs.value.filter((song) => song.id !== songId);
@@ -730,7 +734,7 @@ const handleRemoveSong = async (songId: number) => {
         musicStore.removeSongFromList(songId);
       }
     } else {
-      throw new Error(res.data?.msg || t('user.message.deleteFailed'));
+      throw new Error(res.data?.msg || t('user._message.deleteFailed'));
     }
   } catch (error: unknown) {
     console.error('删除歌曲失败:', error);
@@ -761,11 +765,11 @@ const loadMoreSongs = async () => {
     const start = displayedSongs.value.length;
     const end = Math.min(start + pageSize, total.value);
 
-    if (listInfo.value?.trackIds) {
-      const trackIdsToLoad = listInfo.value.trackIds
+    if ((listInfo.value as any)?.trackIds) {
+      const trackIdsToLoad = (listInfo.value as any).trackIds
         .slice(start, end)
-        .map((item: any) => item.id)
-        .filter((id: any) => !loadedIds.value.has(id));
+        .map((item: unknown) => (item as any).id)
+        .filter((id: unknown) => !loadedIds.value.has(id as number));
 
       if (trackIdsToLoad.length > 0) {
         await loadSongs(trackIdsToLoad, true, false);
@@ -822,7 +826,7 @@ const initSongList = (songs: Song[]) => {
 watch(
   () => listInfo.value,
   (newListInfo) => {
-    if (newListInfo?.trackIds) {
+    if ((newListInfo as any)?.trackIds) {
       loadFullPlaylist();
     }
   },
@@ -851,10 +855,10 @@ const toggleLayout = () => {
 // 初始化歌单收藏状态
 const checkCollectionStatus = () => {
   // 只有歌单类型才能收藏
-  if (route.query.type === 'playlist' && listInfo.value?.id) {
+  if (route.query.type === 'playlist' && (listInfo.value as any)?.id) {
     canCollect.value = true;
     // 检查是否已收藏
-    isCollected.value = listInfo.value.subscribed || false;
+    isCollected.value = (listInfo.value as any).subscribed || false;
   } else {
     canCollect.value = false;
   }
@@ -862,14 +866,14 @@ const checkCollectionStatus = () => {
 
 // 切换收藏状态
 const toggleCollect = async () => {
-  if (!listInfo.value?.id) return;
+  if (!(listInfo.value as any)?.id) return;
 
   try {
     loadingList.value = true;
     const tVal = isCollected.value ? 2 : 1; // 1:收藏, 2:取消收藏
     const response = await subscribePlaylist({
       t: tVal,
-      id: listInfo.value.id
+      id: (listInfo.value as any).id
     });
 
     // 假设API返回格式是 { data: { code: number, msg?: string } }
@@ -882,7 +886,7 @@ const toggleCollect = async () => {
         : 'comp.musicList.cancelCollectSuccess';
       message.success(t(msgKey));
       // 更新歌单信息
-      listInfo.value.subscribed = isCollected.value;
+      (listInfo.value as any).subscribed = isCollected.value;
     } else {
       throw new Error(res.msg || t('comp.musicList.operationFailed'));
     }
@@ -939,7 +943,7 @@ const addToPlaylist = () => {
 
 // 多选下载相关状态和方法
 const isSelecting = ref(false);
-const selectedSongs = ref<number[]>([]);
+const selectedSongs = ref<number[]>([0]);
 const { isDownloading, batchDownloadMusic } = useDownload();
 
 const startSelect = () => {
@@ -1060,7 +1064,7 @@ const handleBatchDownload = async () => {
   }
 }
 
-.no-result {
+.no-_result {
   @apply text-center py-8 text-gray-500 dark:text-gray-400;
 }
 
