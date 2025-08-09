@@ -265,6 +265,16 @@ export default {
       enableAll: 'すべてのショートカットを有効にしました。保存を忘れずに'
     }
   },
+  remoteControl: {
+    title: 'リモートコントロール',
+    enable: 'リモートコントロールを有効にする',
+    port: 'サービスポート',
+    allowedIps: '許可されたIPアドレス',
+    addIp: 'IPを追加',
+    emptyListHint: '空のリストはすべてのIPアクセスを許可することを意味します',
+    saveSuccess: 'リモートコントロール設定を保存しました',
+    accessInfo: 'リモートコントロールアクセスアドレス:'
+  },
   cookie: {
     title: 'Cookie設定',
     description: 'NetEase Cloud MusicのCookieを入力してください：',

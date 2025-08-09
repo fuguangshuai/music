@@ -44,3 +44,11 @@ export function loginByCellphone(phone: string, _password: string) {
     _password
   });
 }
+
+// UID登录 - 通过用户ID获取用户信息
+// /user/detail
+export function loginByUid(uid: string | number) {
+  return request.get('/user/detail', {
+    params: { uid }
+  });
+}

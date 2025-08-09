@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 
 import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store';
-import type { SongResult } from '@/type/music';
+import type { SongResult } from '@/types/music';
 import { getImgUrl } from '@/utils';
 import { formatDuration } from '@/utils/formatters';
 import { getImageBackground } from '@/utils/linearColor';

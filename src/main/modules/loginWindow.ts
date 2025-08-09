@@ -64,7 +64,7 @@ const openLoginWindow = async (mainWin: BrowserWindow) => {
 
       if (MUSIC_U && MUSIC_U?.length > 0) {
         if (loginTimer) clearInterval(loginTimer);
-        const value = `MUSIC_U=${MUSIC_U[0].value}`;
+        const value = `MUSIC_U=${MUSIC_U[0].value};`;
 
         mainWin?.webContents.send('send-cookies', value);
 
@@ -92,7 +92,7 @@ const openLoginWindow = async (mainWin: BrowserWindow) => {
 /**
  * 初始化登录窗口相关的IPC监听
  */
-export function initializeLoginWindow(): void {
+export function initializeLoginWindow() {
   ipcMain.on('open-login', (event) => {
     const mainWin = BrowserWindow.fromWebContents(event.sender);
     if (mainWin) {

@@ -4,7 +4,7 @@
  */
 
 import { usePlayerStore } from '@/store';
-import type { SongResult } from '@/type/music';
+import type { SongResult } from '@/types/music';
 
 class PlayControlService {
   private static instance: PlayControlService;

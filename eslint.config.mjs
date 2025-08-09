@@ -11,16 +11,7 @@ import globals from 'globals';
 export default [
   // 忽略文件配置
   {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'out/**',
-      '.gitignore',
-      // 忽略有语法错误的修复脚本文件
-      'fix-*.ts',
-      'scripts/fix-*.ts',
-      'scripts/fix-*.js'
-    ]
+    ignores: ['node_modules/**', 'dist/**', 'out/**', '.gitignore']
   },
 
   // 基础 JavaScript 配置

@@ -32,6 +32,8 @@ android/app/release
 .cursor
 .augment
 
-# Auto-generated files
+.auto-imports.d.ts
+.components.d.ts
+
 src/renderer/auto-imports.d.ts
 src/renderer/components.d.ts

@@ -1,6 +1,6 @@
 {
   "name": "size-music-player",
-  "version": "4.8.2",
+  "version": "4.9.0",
   "description": "Size Music Player",
   "author": "Size <mail@sizeof.top>",
   "main": "./out/main/index.js",
@@ -22,17 +22,7 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux",
-    "build:verify": "node scripts/build-verify.js",
-    "perf:enable": "node scripts/performance-monitor.js enable",
-    "perf:benchmark": "node scripts/performance-monitor.js benchmark",
-    "perf:analyze": "node scripts/performance-monitor.js analyze",
-    "perf:check": "node scripts/performance-monitor.js check",
-    "perf:all": "node scripts/performance-monitor.js all",
-    "build:incremental": "node scripts/incremental-build.js build",
-    "build:watch": "node scripts/incremental-build.js watch",
-    "build:clean": "node scripts/incremental-build.js clean",
-    "quality:check": "tsx scripts/quality-check.ts && echo 'Quality report generated'"
+    "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",

@@ -281,6 +281,16 @@ export default {
       enableAll: '모든 단축키가 활성화되었습니다. 저장을 잊지 마세요'
     }
   },
+  remoteControl: {
+    title: '원격 제어',
+    enable: '원격 제어 활성화',
+    port: '서비스 포트',
+    allowedIps: '허용된 IP 주소',
+    addIp: 'IP 추가',
+    emptyListHint: '빈 목록은 모든 IP 액세스를 허용함을 의미합니다',
+    saveSuccess: '원격 제어 설정이 저장되었습니다',
+    accessInfo: '원격 제어 액세스 주소:'
+  },
   cookie: {
     title: 'Cookie 설정',
     description: '넷이즈 클라우드 뮤직의 Cookie를 입력하세요:',

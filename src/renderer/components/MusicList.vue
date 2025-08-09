@@ -126,7 +126,7 @@ const emit = defineEmits<{
 import { getMusicDetail } from '@/api/music';
 import SongItem from '@/components/common/SongItem.vue';
 import { usePlayerStore } from '@/store/modules/player';
-import { SongResult } from '@/type/music';
+import { SongResult } from '@/types/music';
 import { getImgUrl, isMobile, setAnimationClass } from '@/utils';
 
 import PlayBottom from './common/PlayBottom.vue';

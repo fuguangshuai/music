@@ -66,7 +66,7 @@
       <div class="modal-close" @click="showSpeedModal = false">
         <i class="ri-close-line"></i>
       </div>
-      <h3>{{ t('player.playBar.playbackSpeed') }}</h3>
+      <h3>{{ t('player.playBar.playbackSpeed') }} ({{ playbackRate }}x)</h3>
       <div class="speed-controls">
         <div class="speed-options">
           <div

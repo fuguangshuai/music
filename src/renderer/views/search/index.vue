@@ -124,9 +124,9 @@ import SongItem from '@/components/common/SongItem.vue';
 import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSearchStore } from '@/store/modules/search';
-import type { SongResult } from '@/type/music';
-import type { IHotSearch } from '@/type/search';
 import type { Album, Artist, MV, Playlist, Song } from '@/types/common';
+import type { SongResult } from '@/types/music';
+import type { IHotSearch } from '@/types/search';
 import { isMobile, setAnimationClass, setAnimationDelay } from '@/utils';
 
 defineOptions({

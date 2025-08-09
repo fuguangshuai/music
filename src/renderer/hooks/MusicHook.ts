@@ -6,7 +6,7 @@ import useIndexedDB from '@/hooks/IndexDBHook';
 import { audioService } from '@/services/audioService';
 import type { usePlayerStore } from '@/store';
 import { getSongUrl } from '@/store/modules/player';
-import type { Artist, ILyricText, SongResult } from '@/type/music';
+import type { Artist, ILyricText, SongResult } from '@/types/music';
 import { isElectron } from '@/utils';
 import { getTextColors, type ITextColors } from '@/utils/linearColor';
 

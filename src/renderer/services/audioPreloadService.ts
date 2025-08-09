@@ -13,7 +13,7 @@
 import { Howl } from 'howler';
 import { ref } from 'vue';
 
-import type { SongResult } from '@/type/music';
+import type { SongResult } from '@/types/music';
 
 // 预加载音频实例接口
 interface PreloadedAudio {

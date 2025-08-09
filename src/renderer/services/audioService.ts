@@ -1,7 +1,7 @@
 import { Howl, Howler } from 'howler';
 
-import type { SongResult } from '@/type/music';
 import type { AudioNodeInfo } from '@/types/howler';
+import type { SongResult } from '@/types/music';
 import { isElectron } from '@/utils'; // 导入isElectron常量
 import { createAudioError, handleError } from '@/utils/errorHandler';
 

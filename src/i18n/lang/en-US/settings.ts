@@ -265,6 +265,16 @@ export default {
       enableAll: 'All shortcuts enabled, please save to apply'
     }
   },
+  remoteControl: {
+    title: 'Remote Control',
+    enable: 'Enable Remote Control',
+    port: 'Port',
+    allowedIps: 'Allowed IPs',
+    addIp: 'Add IP',
+    emptyListHint: 'Empty list means allow all IPs',
+    saveSuccess: 'Remote control settings saved',
+    accessInfo: 'Remote control access address:'
+  },
   cookie: {
     title: 'Cookie Settings',
     description: 'Please enter NetEase Cloud Music Cookie:',

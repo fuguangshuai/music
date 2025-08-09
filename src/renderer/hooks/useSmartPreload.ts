@@ -10,7 +10,7 @@ import {
   smartPreloadService,
   type UserBehaviorPattern
 } from '@/services/audioPreloadService';
-import type { SongResult } from '@/type/music';
+import type { SongResult } from '@/types/music';
 
 export function useSmartPreload(): unknown {
   const isEnabled = ref(true);

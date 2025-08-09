@@ -114,7 +114,7 @@ declare global {
     lyricTimers: NodeJS.Timeout[];
   }
 }
-import { SongResult } from '@/type/music';
+import { SongResult } from '@/types/music';
 import {
   getCurrentLyricThemeColor,
   loadLyricThemeColor,

@@ -264,6 +264,16 @@ export default {
       enableAll: '已启用所有快捷键，请记得保存'
     }
   },
+  remoteControl: {
+    title: '远程控制',
+    enable: '启用远程控制',
+    port: '服务端口',
+    allowedIps: '允许的IP地址',
+    addIp: '添加IP',
+    emptyListHint: '空列表表示允许所有IP访问',
+    saveSuccess: '远程控制设置已保存',
+    accessInfo: '远程控制访问地址:'
+  },
   cookie: {
     title: 'Cookie设置',
     description: '请输入网易云音乐的Cookie：',

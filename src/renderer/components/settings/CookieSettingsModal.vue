@@ -71,11 +71,11 @@ const handleSave = async () => {
   try {
     isLoading.value = true;
     emit('save', trimmedToken);
-    message.success(t('settings.cookie._message.saveSuccess'));
+    message.success(t('settings.cookie.message.saveSuccess'));
     handleClose();
   } catch (error) {
     console.error('保存Cookie失败:', error);
-    message.error(t('settings.cookie._message.saveError'));
+    message.error(t('settings.cookie.message.saveError'));
   } finally {
     isLoading.value = false;
   }
@@ -92,11 +92,11 @@ const handlePaste = async () => {
     const text = await navigator.clipboard.readText();
     if (text) {
       tokenInput.value = text;
-      message.success(t('settings.cookie._message.pasteSuccess'));
+      message.success(t('settings.cookie.message.pasteSuccess'));
     }
   } catch (error) {
     console.error('粘贴失败:', error);
-    message.error(t('settings.cookie._message.pasteError'));
+    message.error(t('settings.cookie.message.pasteError'));
   }
 };
 </script>

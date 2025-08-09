@@ -3,7 +3,7 @@
  * 统一处理音乐数据的格式化和标准化
  */
 
-import type { SongResult } from '@/type/music';
+import type { SongResult } from '@/types/music';
 
 /**
  * 格式化单个歌曲数据

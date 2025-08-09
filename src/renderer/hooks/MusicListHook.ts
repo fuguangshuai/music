@@ -5,7 +5,7 @@ import { useMusicHistory } from '@/hooks/MusicHistoryHook';
 import { audioPreloadService, smartPreloadService } from '@/services/audioPreloadService'; // 🎵 导入统一的预加载服务
 import { audioService } from '@/services/audioService';
 import { useSettingsStore } from '@/store';
-import type { ILyric, ILyricText, SongResult } from '@/type/music';
+import type { ILyric, ILyricText, SongResult } from '@/types/music';
 import { getImgUrl } from '@/utils';
 import { getImageLinearBackground } from '@/utils/linearColor';
 

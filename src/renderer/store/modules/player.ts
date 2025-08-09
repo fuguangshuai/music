@@ -9,8 +9,8 @@ import { getLikedList, getMusicLrc, getMusicUrl, getParsingMusicUrl, likeSong } 
 import { useMusicHistory } from '@/hooks/MusicHistoryHook';
 import { audioPreloadService, smartPreloadService } from '@/services/audioPreloadService'; // 🎵 导入统一的预加载服务
 import { audioService } from '@/services/audioService';
-import type { ILyric, ILyricText, SongResult } from '@/type/music';
-import { Platform } from '@/types/music';
+import type { ILyric, ILyricText, SongResult } from '@/types/music';
+import { type Platform } from '@/types/music';
 import { getImgUrl } from '@/utils';
 import { getImageLinearBackground } from '@/utils/linearColor';
 import { timerManager, TimerType } from '@/utils/timerManager'; // ⏰ 导入统一的定时器管理器
@@ -1591,13 +1591,15 @@ export const usePlayerStore = defineStore('player', () => {
     handlePause,
     playbackRate,
     setPlaybackRate,
-    userPlayIntent,
 
     // 音量管理
     volume,
     setVolume,
     getVolume,
     increaseVolume,
-    decreaseVolume
+    decreaseVolume,
+
+    // 用户播放意图
+    userPlayIntent
   };
 });

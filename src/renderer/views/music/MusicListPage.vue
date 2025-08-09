@@ -238,8 +238,8 @@ import PlayBottom from '@/components/common/PlayBottom.vue';
 import SongItem from '@/components/common/SongItem.vue';
 import { useDownload } from '@/hooks/useDownload';
 import { useMusicStore, usePlayerStore } from '@/store';
-import { SongResult } from '@/type/music';
 import type { Artist, ErrorObject, Song } from '@/types/common';
+import { SongResult } from '@/types/music';
 import { getImgUrl, isElectron, isMobile, setAnimationClass } from '@/utils';
 
 const { t } = useI18n();
