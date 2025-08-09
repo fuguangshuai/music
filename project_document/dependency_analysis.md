@@ -96,14 +96,7 @@
 
 ### 需要用户确认
 
-1. **测试相关依赖**：
-
-   ```bash
-   # 如果不计划添加测试，可以移除：
-   npm uninstall @vitest/coverage-v8 @vitest/ui @vue/test-utils vitest
-   ```
-
-2. **跨平台工具**：
+1. **跨平台工具**：
    ```bash
    # 如果不需要跨平台脚本支持：
    npm uninstall cross-env
