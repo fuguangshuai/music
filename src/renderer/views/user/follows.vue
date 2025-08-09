@@ -139,7 +139,7 @@ const loadFollowList = async () => {
 
   try {
     followListLoading.value = true;
-    const { data } = await getUserFollows(userId, followLimit.value, followOffset.value) as any;
+    const { data } = (await getUserFollows(userId, followLimit.value, followOffset.value)) as any;
 
     if (!data || !data.follow) {
       hasMoreFollows.value = false;

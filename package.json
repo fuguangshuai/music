@@ -24,13 +24,11 @@
     "build:linux": "npm run build && electron-builder --linux",
     "quality-check": "node scripts/quality-check.js",
     "build:verify": "node scripts/build-verify.js",
-
     "perf:enable": "node scripts/performance-monitor.js enable",
     "perf:benchmark": "node scripts/performance-monitor.js benchmark",
     "perf:analyze": "node scripts/performance-monitor.js analyze",
     "perf:check": "node scripts/performance-monitor.js check",
     "perf:all": "node scripts/performance-monitor.js all",
-
     "build:incremental": "node scripts/incremental-build.js build",
     "build:watch": "node scripts/incremental-build.js watch",
     "build:clean": "node scripts/incremental-build.js clean",

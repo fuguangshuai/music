@@ -72,7 +72,7 @@ const openToplist = (item: unknown) => {
       id: (item as any).id,
       type: 'playlist',
       name: (item as any).name,
-      songList: res.data.playlist.tracks as any || [],
+      songList: (res.data.playlist.tracks as any) || [],
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -83,7 +83,7 @@ const loading = ref(false);
 const loadToplist = async () => {
   loading.value = true;
   try {
-    const { data } = await getToplist() as any;
+    const { data } = (await getToplist()) as any;
     topList.value = data.list || [];
   } catch (error) {
     console.error('加载榜单列表失败:', error);

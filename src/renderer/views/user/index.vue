@@ -258,7 +258,7 @@ const openPlaylist = (item: unknown) => {
       id: (item as any).id,
       type: 'playlist',
       name: (item as any).name,
-      songList: res.data.playlist.tracks as any || [],
+      songList: (res.data.playlist.tracks as any) || [],
       listInfo: res.data.playlist,
       canRemove: true // 保留可移除功能
     });

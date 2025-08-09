@@ -154,7 +154,11 @@
           />
         </div>
         <div v-if="(listInfo as any)?.creator" class="creator-info">
-          <n-avatar round :size="24" :src="getImgUrl((listInfo as any).creator.avatarUrl, '50y50')" />
+          <n-avatar
+            round
+            :size="24"
+            :src="getImgUrl((listInfo as any).creator.avatarUrl, '50y50')"
+          />
           <span class="creator-name">{{ (listInfo as any).creator.nickname }}</span>
         </div>
         <div v-if="total" class="music-total">

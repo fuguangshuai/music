@@ -140,7 +140,8 @@ watch(
   () => visible.value,
   (newVal) => {
     emit('update:show', newVal);
-  });
+  }
+);
 
 // 同步外部config变化
 watch(

@@ -115,8 +115,8 @@
 import PinyinMatch from 'pinyin-match';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { formatSongData } from '@/utils/musicDataFormatter';
 
+import { formatSongData } from '@/utils/musicDataFormatter';
 
 const emit = defineEmits<{
   'remove-song': [id: string];
@@ -377,7 +377,9 @@ const loadFullPlaylist = async () => {
           const currentPlaylist = playerStore.playList;
           if (currentPlaylist.length > 0 && currentPlaylist[0].id === displayedSongs.value[0]?.id) {
             console.log('实时更新当前播放列表');
-            playerStore.setPlayList(displayedSongs.value.map(formatSong).filter(Boolean) as SongResult[]);
+            playerStore.setPlayList(
+              displayedSongs.value.map(formatSong).filter(Boolean) as SongResult[]
+            );
           }
         }
       }

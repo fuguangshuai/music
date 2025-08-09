@@ -130,7 +130,8 @@ const userSetOptions = ref(USER_SET_OPTIONS);
 const { t, locale } = useI18n();
 
 // 使用缩放hook
-const { zoomFactor, initZoomFactor, increaseZoom, decreaseZoom, resetZoom, isZoom100 } = useZoom() as any;
+const { zoomFactor, initZoomFactor, increaseZoom, decreaseZoom, resetZoom, isZoom100 } =
+  useZoom() as any;
 
 // 显示返回按钮
 const showBackButton = computed(() => {
@@ -154,7 +155,7 @@ const loadHotSearchKeyword = async () => {
 const loadPage = async () => {
   const token = localStorage.getItem('token');
   if (!token) return;
-  const { data } = await getUserDetail() as any;
+  const { data } = (await getUserDetail()) as any;
   console.log('data', data);
   userStore.user =
     data.profile || userStore.user || JSON.parse(localStorage.getItem('user') || '{}');

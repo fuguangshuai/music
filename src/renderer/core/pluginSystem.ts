@@ -66,7 +66,7 @@ export class PluginManager implements PluginApp {
     emit: (event: string, data?: any) => {
       const handlers = this.eventHandlers.get(event);
       if (handlers) {
-        handlers.forEach(handler => {
+        handlers.forEach((handler) => {
           try {
             handler(data);
           } catch (error) {
@@ -114,7 +114,7 @@ export class PluginManager implements PluginApp {
       console.error('插件注册失败：缺少必要信息');
       return false;
     }
-    
+
     this.plugins.set(plugin.id, plugin);
     console.log(`插件 ${plugin.name} 注册成功`);
     return true;
@@ -157,7 +157,7 @@ export class PluginManager implements PluginApp {
       if (plugin.uninstall) {
         await plugin.uninstall(this);
       }
-      
+
       this.plugins.delete(pluginId);
       console.log(`插件 ${plugin.name} 卸载成功`);
       return true;
@@ -238,7 +238,7 @@ export class PluginManager implements PluginApp {
   // 获取激活的插件列表
   getActivePlugins(): Plugin[] {
     return Array.from(this.activePlugins)
-      .map(id => this.plugins.get(id))
+      .map((id) => this.plugins.get(id))
       .filter((plugin): plugin is Plugin => plugin !== undefined);
   }
 

@@ -40,7 +40,7 @@ export const safeApiCall = async <T>(apiCall: () => Promise<unknown>): Promise<T
  * @returns 处理后的数据数组
  */
 export const handleBatchApiResponse = <T>(responses: unknown[]): T[] => {
-  return responses.map(response => handleApiResponse<T>(response));
+  return responses.map((response) => handleApiResponse<T>(response));
 };
 
 /**
@@ -74,10 +74,10 @@ export const safeHandleApiResponse = <T>(
   validator?: (data: any) => data is T
 ): T => {
   const data = handleApiResponse(response);
-  
+
   if (validator && !validator(data)) {
     throw new Error('API响应数据格式不正确');
   }
-  
+
   return data as T;
 };

@@ -20,7 +20,7 @@ export enum SecurityThreatType {
   INSECURE_STORAGE = 'INSECURE_STORAGE',
   INSECURE_TRANSPORT = 'INSECURE_TRANSPORT',
   WEAK_AUTHENTICATION = 'WEAK_AUTHENTICATION',
-  INJECTION = 'INJECTION',
+  INJECTION = 'INJECTION'
 }
 
 // 安全威胁级别
@@ -28,12 +28,12 @@ export enum SecurityThreatLevel {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH',
-  CRITICAL = 'CRITICAL',
+  CRITICAL = 'CRITICAL'
 }
 
 // 安全威胁信息
 export interface SecurityThreat {
-id: string;
+  id: string;
   type: SecurityThreatType;
   level: SecurityThreatLevel;
   title: string;
@@ -43,29 +43,26 @@ id: string;
   mitigation: string;
   timestamp: number;
   resolved: boolean;
-
 }
 
 // 安全检查结果
 export interface SecurityCheckResult {
-passed: boolean;
+  passed: boolean;
   threats: SecurityThreat[];
   score: number; // 0-100,
   recommendations: string[];
   timestamp: number;
-
 }
 
 // 安全检查器配置
 export interface SecurityCheckerConfig {
-enableXSSProtection: boolean;
+  enableXSSProtection: boolean;
   enableCSRFProtection: boolean;
   enableDataLeakDetection: boolean;
   enableStorageSecurityCheck: boolean;
   enableTransportSecurityCheck: boolean;
   autoMitigation: boolean;
   reportingEnabled: boolean;
-
 }
 
 // 安全检查器类
@@ -77,9 +74,15 @@ class SecurityChecker {
 
   constructor(config?: Partial<SecurityCheckerConfig>) {
     this.config = {
-      enableXSSProtection: true, enableCSRFProtection: true, enableDataLeakDetection: true, enableStorageSecurityCheck: true, enableTransportSecurityCheck: true, autoMitigation: true, reportingEnabled: (globalThis as any).process.env.NODE_ENV === 'development',
-      ...config,
-    }
+      enableXSSProtection: true,
+      enableCSRFProtection: true,
+      enableDataLeakDetection: true,
+      enableStorageSecurityCheck: true,
+      enableTransportSecurityCheck: true,
+      autoMitigation: true,
+      reportingEnabled: (globalThis as any).process.env.NODE_ENV === 'development',
+      ...config
+    };
 
     this.initialize();
   }
@@ -118,10 +121,10 @@ class SecurityChecker {
    */
   private setupXSSProtection(): void {
     // 监听DOM变化，检测潜在的XSS攻击
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach(node => {
+          mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               this.checkForXSS(node as Element);
             }
@@ -131,7 +134,9 @@ class SecurityChecker {
     });
 
     observer.observe(document.body, {
-      childList: true, subtree: true, });
+      childList: true,
+      subtree: true
+    });
   }
 
   /**
@@ -144,8 +149,8 @@ class SecurityChecker {
       /on\w+\s*=/gi,
       /<iframe[^>]*>/gi,
       /<object[^>]*>/gi,
-      /<embed[^>]*>/gi,
-    ]
+      /<embed[^>]*>/gi
+    ];
 
     const innerHTML = element.innerHTML;
     const outerHTML = element.outerHTML;
@@ -162,7 +167,8 @@ class SecurityChecker {
           evidence: innerHTML.substring(0, 100),
           mitigation: '清理HTML内容，使用安全的DOM操作方法',
           timestamp: Date.now(),
-          resolved: false, });
+          resolved: false
+        });
 
         if (this.config.autoMitigation) {
           this.mitigateXSS(element);
@@ -176,8 +182,8 @@ class SecurityChecker {
    */
   private mitigateXSS(element: Element): void {
     // 移除危险的属性和内容
-    const dangerousAttributes = ['onclick', 'onload', 'onerror', 'onmouseover']
-    dangerousAttributes.forEach(attr => {
+    const dangerousAttributes = ['onclick', 'onload', 'onerror', 'onmouseover'];
+    dangerousAttributes.forEach((attr) => {
       if (element.hasAttribute(attr)) {
         element.removeAttribute(attr);
       }
@@ -185,7 +191,7 @@ class SecurityChecker {
 
     // 清理脚本标签
     const scripts = element.querySelectorAll('script');
-    scripts.forEach(script => script.remove());
+    scripts.forEach((script) => script.remove());
 
     console.warn('🛡️, XSS攻击已被自动缓解');
   }
@@ -201,15 +207,15 @@ class SecurityChecker {
 
       // 只对同源请求添加CSRF令牌
       if (this.isSameOrigin(url) && this.csrfToken) {
-        init = init || {}
+        init = init || {};
         init.headers = {
           ...init.headers,
-          'X-CSRF-Token': this.csrfToken,
-        }
+          'X-CSRF-Token': this.csrfToken
+        };
       }
 
       return originalFetch(input, init);
-    }
+    };
   }
 
   /**
@@ -232,7 +238,7 @@ class SecurityChecker {
    * 🔍 运行完整安全检查
    */
   async runSecurityCheck(): Promise<SecurityCheckResult> {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
     let score = 100;
 
     // 传输安全检查
@@ -269,12 +275,12 @@ class SecurityChecker {
     score = Math.max(0, score);
 
     const result: SecurityCheckResult = {
-  passed: threats.length === 0,
+      passed: threats.length === 0,
       threats,
       score,
       recommendations: this.generateRecommendations(threats),
-      timestamp: Date.now(),
-    }
+      timestamp: Date.now()
+    };
 
     this.lastCheckResult.value = result;
     this.threats.value = threats;
@@ -290,31 +296,37 @@ class SecurityChecker {
    * 🌐 检查传输安全
    */
   private checkTransportSecurity(): SecurityThreat[] {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
 
     // 检查HTTPS
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
       threats.push({
-        id: 'insecure-transport', type: SecurityThreatType.INSECURE_TRANSPORT,
+        id: 'insecure-transport',
+        type: SecurityThreatType.INSECURE_TRANSPORT,
         level: SecurityThreatLevel.HIGH,
         title: '不安全的传输协议',
         description: '应用未使用HTTPS协议，数据传输不安全',
         mitigation: '配置HTTPS证书，强制使用安全传输',
         timestamp: Date.now(),
-        resolved: false, });
+        resolved: false
+      });
     }
 
     // 检查混合内容
-    const insecureResources = document.querySelectorAll('img[src^="http: "] > script[src^="http:"], link[href^="http:"]');
+    const insecureResources = document.querySelectorAll(
+      'img[src^="http: "] > script[src^="http:"], link[href^="http:"]'
+    );
     if (insecureResources.length > 0) {
       threats.push({
-        id: 'mixed-content', type: SecurityThreatType.INSECURE_TRANSPORT,
+        id: 'mixed-content',
+        type: SecurityThreatType.INSECURE_TRANSPORT,
         level: SecurityThreatLevel.MEDIUM,
         title: '混合内容',
         description: `发现${insecureResources.length}个不安全的资源引用`,
         mitigation: '将所有资源引用改为HTTPS',
         timestamp: Date.now(),
-        resolved: false, });
+        resolved: false
+      });
     }
 
     return threats;
@@ -324,22 +336,24 @@ class SecurityChecker {
    * 💾 检查存储安全
    */
   private checkStorageSecurity(): SecurityThreat[] {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
 
     // 检查localStorage中的敏感数据
-    const sensitiveKeys = ['password', 'token', 'secret', 'key', 'auth', 'session']
+    const sensitiveKeys = ['password', 'token', 'secret', 'key', 'auth', 'session'];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+      if (key && sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive))) {
         threats.push({
-          id: `insecure-storage-${key}`, type: SecurityThreatType.INSECURE_STORAGE,
+          id: `insecure-storage-${key}`,
+          type: SecurityThreatType.INSECURE_STORAGE,
           level: SecurityThreatLevel.MEDIUM,
           title: '不安全的数据存储',
           description: `localStorage中存储了可能的敏感数据: ${key}`,
           location: 'localStorage',
           mitigation: '使用加密存储或避免在客户端存储敏感数据',
           timestamp: Date.now(),
-          resolved: false, });
+          resolved: false
+        });
       }
     }
 
@@ -350,7 +364,7 @@ class SecurityChecker {
    * 📊 检查数据泄漏
    */
   private checkDataLeaks(): SecurityThreat[] {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
 
     // 检查控制台中的敏感信息
     const consoleMessages = this.getConsoleMessages();
@@ -361,13 +375,14 @@ class SecurityChecker {
       /api[_-]?key/i,
       /\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b/, // 信用卡号
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/ // 邮箱
-    ]
+    ];
 
     consoleMessages.forEach((_message, index) => {
       sensitivePatterns.forEach((pattern, patternIndex) => {
         if (pattern.test(_message)) {
           threats.push({
-            id: `data-leak-console-${index}-${patternIndex}`, type: SecurityThreatType.DATA_LEAK,
+            id: `data-leak-console-${index}-${patternIndex}`,
+            type: SecurityThreatType.DATA_LEAK,
             level: SecurityThreatLevel.HIGH,
             title: '控制台数据泄漏',
             description: '控制台中可能包含敏感信息',
@@ -375,7 +390,8 @@ class SecurityChecker {
             evidence: _message.substring(0, 50),
             mitigation: '移除控制台中的敏感信息输出',
             timestamp: Date.now(),
-            resolved: false, });
+            resolved: false
+          });
         }
       });
     });
@@ -387,7 +403,7 @@ class SecurityChecker {
    * 🔐 检查认证安全
    */
   private checkAuthenticationSecurity(): SecurityThreat[] {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
 
     // 检查弱密码策略（如果有密码输入框）
     const passwordInputs = document.querySelectorAll('input[type="_password"]');
@@ -395,14 +411,16 @@ class SecurityChecker {
       const passwordInput = input as HTMLInputElement;
       if (passwordInput.value && passwordInput.value.length < 8) {
         threats.push({
-          id: `weak-_password-${index}`, type: SecurityThreatType.WEAK_AUTHENTICATION,
+          id: `weak-_password-${index}`,
+          type: SecurityThreatType.WEAK_AUTHENTICATION,
           level: SecurityThreatLevel.MEDIUM,
           title: '弱密码',
           description: '检测到可能的弱密码',
           location: `_password input ${index}`,
           mitigation: '实施强密码策略，要求至少8位字符',
           timestamp: Date.now(),
-          resolved: false, });
+          resolved: false
+        });
       }
     });
 
@@ -413,18 +431,20 @@ class SecurityChecker {
    * 📋 检查内容安全策略
    */
   private checkContentSecurityPolicy(): SecurityThreat[] {
-    const threats: SecurityThreat[] = []
+    const threats: SecurityThreat[] = [];
 
     const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
     if (!cspMeta) {
       threats.push({
-        id: 'missing-csp', type: SecurityThreatType.XSS,
+        id: 'missing-csp',
+        type: SecurityThreatType.XSS,
         level: SecurityThreatLevel.MEDIUM,
         title: '缺少内容安全策略',
         description: '未配置Content Security Policy，增加XSS攻击风险',
         mitigation: '配置适当的CSP头部或meta标签',
         timestamp: Date.now(),
-        resolved: false, });
+        resolved: false
+      });
     }
 
     return threats;
@@ -434,9 +454,9 @@ class SecurityChecker {
    * 💡 生成安全建议
    */
   private generateRecommendations(threats: SecurityThreat[]): string[] {
-    const recommendations: string[] = []
+    const recommendations: string[] = [];
 
-    const threatTypes = new Set(threats.map(t => t.type));
+    const threatTypes = new Set(threats.map((t) => t.type));
 
     if (threatTypes.has(SecurityThreatType.INSECURE_TRANSPORT)) {
       recommendations.push('启用HTTPS并配置HSTS');
@@ -479,7 +499,7 @@ class SecurityChecker {
   private generateSecureToken(): string {
     const array = new Uint8Array(32);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
   }
 
   private isSameOrigin(url: string): boolean {
@@ -493,14 +513,14 @@ class SecurityChecker {
 
   private getConsoleMessages(): string[] {
     // 这里可以集成实际的控制台消息收集逻辑
-    return [] // 简化实现
+    return []; // 简化实现
   }
 
   private logSecurityReport(result: SecurityCheckResult): void {
     console.group('🔒, 安全检查报告');
     console.log(`安全评分: ${result.score}/100`);
     console.log(`威胁数量: ${result.threats.length}`);
-    console.log(`检查通过: ${result.passed  ? '是'  : '否'}`);
+    console.log(`检查通过: ${result.passed ? '是' : '否'}`);
 
     if (result.threats.length > 0) {
       console.warn('发现的威胁:', result.threats);
@@ -539,6 +559,10 @@ class SecurityChecker {
 export const securityChecker = new SecurityChecker();
 
 // 导出类型和实例
-export { SecurityChecker }
+export { SecurityChecker };
 // 导出类型别名以避免冲突
-export type { SecurityCheckerConfig as SecurityCheckerConfigExport, SecurityCheckResult as SecurityCheckResultExport, SecurityThreat as SecurityThreatExport }
+export type {
+  SecurityCheckerConfig as SecurityCheckerConfigExport,
+  SecurityCheckResult as SecurityCheckResultExport,
+  SecurityThreat as SecurityThreatExport
+};

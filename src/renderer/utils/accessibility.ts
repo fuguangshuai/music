@@ -24,7 +24,7 @@ export const AriaRoles = {
   MAIN: 'main',
   NAVIGATION: 'navigation',
   BANNER: 'banner',
-  CONTENTINFO: 'contentinfo',
+  CONTENTINFO: 'contentinfo'
 } as const;
 
 // 键盘导航键码
@@ -40,17 +40,16 @@ export const KeyCodes = {
   HOME: 'Home',
   END: 'End',
   PAGE_UP: 'PageUp',
-  PAGE_DOWN: 'PageDown',
+  PAGE_DOWN: 'PageDown'
 } as const;
 
 // 无障碍访问配置接口
 export interface AccessibilityConfig {
-enableKeyboardNavigation: boolean;
+  enableKeyboardNavigation: boolean;
   enableScreenReader: boolean;
   enableHighContrast: boolean;
   enableReducedMotion: boolean;
   fontSize: 'small' | 'medium' | 'large' | 'extra-large';
-
 }
 
 /**
@@ -58,16 +57,22 @@ enableKeyboardNavigation: boolean;
  */
 class AccessibilityManager {
   private config: AccessibilityConfig = {
-  enableKeyboardNavigation: true, enableScreenReader: true, enableHighContrast: false, enableReducedMotion: false, fontSize: 'medium',
-  }
+    enableKeyboardNavigation: true,
+    enableScreenReader: true,
+    enableHighContrast: false,
+    enableReducedMotion: false,
+    fontSize: 'medium'
+  };
 
   private focusableElements: string[] = [
-    'a[href]', 'button:not([disabled])',
+    'a[href]',
+    'button:not([disabled])',
     'input:not([disabled])',
     'select:not([disabled])',
-    'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"])',
-    '[contenteditable="true"]',
-  ]
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable="true"]'
+  ];
 
   constructor() {
     this.loadConfig();
@@ -78,7 +83,9 @@ class AccessibilityManager {
   /**
    * 🔧 设置ARIA属性
    */
-  setAriaAttributes(element: HTMLElement, attributes: Record<string, string | boolean | number>
+  setAriaAttributes(
+    element: HTMLElement,
+    attributes: Record<string, string | boolean | number>
   ): void {
     Object.entries(attributes).forEach(([_key, value]) => {
       const ariaKey = _key.startsWith('aria-') ? _key : `aria-${_key}`;
@@ -105,19 +112,21 @@ class AccessibilityManager {
    */
   getFocusableElements(container: HTMLElement = document.body): HTMLElement[] {
     const selector = this.focusableElements.join(', ');
-    return Array.from(container.querySelectorAll(selector)) as HTMLElement[]
+    return Array.from(container.querySelectorAll(selector)) as HTMLElement[];
   }
 
   /**
    * ⌨️ 设置键盘导航
    */
-  setupKeyboardNavigation(container: HTMLElement, _options: {
+  setupKeyboardNavigation(
+    container: HTMLElement,
+    _options: {
       circular?: boolean;
       orientation?: 'horizontal' | 'vertical' | 'both';
       onActivate?: (element: HTMLElement) => void;
     } = {}
   ): () => void {
-    if (!this.config.enableKeyboardNavigation) return () => {}
+    if (!this.config.enableKeyboardNavigation) return () => {};
 
     const { circular = true, orientation = 'both', onActivate } = _options;
 
@@ -192,14 +201,14 @@ class AccessibilityManager {
           this.manageFocus(focusableElements[nextIndex]);
         }
       }
-    }
+    };
 
     container.addEventListener('keydown', handleKeyDown);
 
     // 返回清理函数
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
-    }
+    };
   }
 
   /**
@@ -253,8 +262,12 @@ class AccessibilityManager {
    */
   setFontSize(_size: AccessibilityConfig['fontSize']): void {
     // 移除旧的字体大小类
-    document.documentElement.classList.remove('font-size-small', 'font-size-medium',
-      'font-_size-large', 'font-_size-extra-large');
+    document.documentElement.classList.remove(
+      'font-size-small',
+      'font-size-medium',
+      'font-_size-large',
+      'font-_size-extra-large'
+    );
 
     // 添加新的字体大小类
     document.documentElement.classList.add(`font-_size-${_size}`);
@@ -285,16 +298,16 @@ class AccessibilityManager {
    */
   private setupEventListeners(): void {
     // 监听系统偏好设置变化
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
       this.toggleReducedMotion(e.matches);
     });
 
-    window.matchMedia('(prefers-contrast: high)').addEventListener('change', e => {
+    window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
       this.toggleHighContrast(e.matches);
     });
 
     // 监听键盘快捷键
-    document.addEventListener('keydown', event => {
+    document.addEventListener('keydown', (event) => {
       // Alt + H: 切换高对比度
       if (event.altKey && event.key === 'h') {
         event.preventDefault();
@@ -327,7 +340,7 @@ class AccessibilityManager {
     try {
       const stored = localStorage.getItem('accessibility-config');
       if (stored) {
-        this.config = { ...this.config, ...JSON.parse(stored) }
+        this.config = { ...this.config, ...JSON.parse(stored) };
       }
     } catch (error) {
       console.warn('无法加载无障碍访问配置:', error);
@@ -338,14 +351,14 @@ class AccessibilityManager {
    * 📊 获取当前配置
    */
   getConfig(): AccessibilityConfig {
-    return { ...this.config }
+    return { ...this.config };
   }
 
   /**
    * ⚙️ 更新配置
    */
   updateConfig(newConfig: Partial<AccessibilityConfig>): void {
-    this.config = { ...this.config, ...newConfig }
+    this.config = { ...this.config, ...newConfig };
     this.saveConfig();
   }
 }
@@ -355,7 +368,9 @@ export const accessibilityManager = new AccessibilityManager();
 
 // 便捷的工具函数
 export const a11y = {
-  setAriaAttributes: (element: HTMLElement, attributes: Record<string, string | boolean | number>
+  setAriaAttributes: (
+    element: HTMLElement,
+    attributes: Record<string, string | boolean | number>
   ) => accessibilityManager.setAriaAttributes(element, attributes),
 
   manageFocus: (element: HTMLElement, _options?: { preventScroll?: boolean }) =>
@@ -371,8 +386,8 @@ export const a11y = {
 
   toggleReducedMotion: (enable?: boolean) => accessibilityManager.toggleReducedMotion(enable),
 
-  _setFontSize: (_size: AccessibilityConfig['fontSize']) => accessibilityManager.setFontSize(_size),
-}
+  _setFontSize: (_size: AccessibilityConfig['fontSize']) => accessibilityManager.setFontSize(_size)
+};
 
 // AccessibilityConfig已经在第47行作为interface导出了
 

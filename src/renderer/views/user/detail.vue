@@ -248,7 +248,7 @@ const openPlaylist = (item: unknown) => {
       id: (item as any).id,
       type: 'playlist',
       name: (item as any).name,
-      songList: res.data.playlist.tracks as any || [],
+      songList: (res.data.playlist.tracks as any) || [],
       listInfo: res.data.playlist,
       canRemove: false
     });
@@ -291,7 +291,11 @@ const showFollowerList = () => {
 
 // 判断是否为歌手
 const isArtist = (profile: unknown) => {
-  return (profile as any).userType === 4 || (profile as any).userType === 2 || (profile as any).accountType === 2;
+  return (
+    (profile as any).userType === 4 ||
+    (profile as any).userType === 2 ||
+    (profile as any).accountType === 2
+  );
 };
 </script>
 

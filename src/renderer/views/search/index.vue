@@ -280,7 +280,10 @@ const loadSearch = async (keywords: string, type: number | null = null, isLoadMo
       (searchDetail.value as any).songs = [...(searchDetail.value as any).songs, ...songs];
       (searchDetail.value as any).albums = [...(searchDetail.value as any).albums, ...albums];
       (searchDetail.value as any).mvs = [...(searchDetail.value as any).mvs, ...mvs];
-      (searchDetail.value as any).playlists = [...(searchDetail.value as any).playlists, ...playlists];
+      (searchDetail.value as any).playlists = [
+        ...(searchDetail.value as any).playlists,
+        ...playlists
+      ];
     } else {
       searchDetail.value = {
         songs,

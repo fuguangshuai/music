@@ -12,39 +12,35 @@
 
 // 时间格式化选项
 export interface TimeFormatOptions {
-format?: 'mm:ss' | 'hh:mm:ss' | 'h:mm:ss' | 'auto';
+  format?: 'mm:ss' | 'hh:mm:ss' | 'h:mm:ss' | 'auto';
   showHours?: boolean;
   padZero?: boolean;
   separator?: string;
-
 }
 
 // 数字格式化选项
 export interface NumberFormatOptions {
-locale?: string;
+  locale?: string;
   minimumFractionDigits?: number;
   maximumFractionDigits?: number;
   useGrouping?: boolean;
   notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
-
 }
 
 // 文件大小格式化选项
 export interface FileSizeFormatOptions {
-binary?: boolean; // 使用1024还是1000作为基数
+  binary?: boolean; // 使用1024还是1000作为基数
   precision?: number;
   locale?: string;
   longForm?: boolean; // 使用完整单位名称
-
 }
 
 // 文本格式化选项
 export interface TextFormatOptions {
-maxLength?: number;
+  maxLength?: number;
   ellipsis?: string;
   preserveWords?: boolean;
   case?: 'upper' | 'lower' | 'title' | 'sentence';
-
 }
 
 /**
@@ -57,8 +53,8 @@ export const formatTime = (time: number | string, _options: TimeFormatOptions = 
   const seconds = typeof time === 'string' ? parseFloat(time) : time;
 
   if (!seconds || seconds < 0 || !isFinite(seconds)) {
-    return format === 'hh:mm:ss' ? '00:00:00' : '00:00'
-}
+    return format === 'hh:mm:ss' ? '00:00:00' : '00:00';
+  }
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -80,10 +76,11 @@ export const formatTime = (time: number | string, _options: TimeFormatOptions = 
       return `${pad(hours)}${separator}${pad(minutes)}${separator}${pad(secs)}`;
     case 'h:mm:ss':
       return `${padZero ? pad(hours) : hours}${separator}${pad(minutes)}${separator}${pad(secs)}`;
-    case 'mm:ss': default:
+    case 'mm:ss':
+    default:
       return `${pad(minutes)}${separator}${pad(secs)}`;
   }
-}
+};
 
 /**
  * 🔢 数字格式化函数
@@ -94,7 +91,7 @@ export const formatNumber = (_num: number | string, _options: NumberFormatOption
     minimumFractionDigits = 0,
     maximumFractionDigits = 2,
     useGrouping = true,
-    notation = 'standard',
+    notation = 'standard'
   } = _options;
 
   // 处理输入
@@ -109,17 +106,20 @@ export const formatNumber = (_num: number | string, _options: NumberFormatOption
       minimumFractionDigits,
       maximumFractionDigits,
       useGrouping,
-      notation, }).format(number);
+      notation
+    }).format(number);
   } catch (error) {
     console.warn('数字格式化失败，使用默认格式:', error);
     return number.toLocaleString();
   }
-}
+};
 
 /**
  * 📊 大数字格式化（K, M, B等）
  */
-export const formatLargeNumber = (_num: number | string, _options: { precision?: number; locale?: string } = {}
+export const formatLargeNumber = (
+  _num: number | string,
+  _options: { precision?: number; locale?: string } = {}
 ): string => {
   const { precision = 1, locale = 'zh-CN' } = _options;
   const number = typeof _num === 'string' ? parseFloat(_num) : _num;
@@ -131,21 +131,23 @@ export const formatLargeNumber = (_num: number | string, _options: { precision?:
   const abs = Math.abs(number);
   const sign = number < 0 ? '-' : '';
 
-  if (abs  >= 1e9) {
+  if (abs >= 1e9) {
     return `${sign}${(abs / 1e9).toFixed(precision)}B`;
-  } else if (abs  >= 1e6) {
+  } else if (abs >= 1e6) {
     return `${sign}${(abs / 1e6).toFixed(precision)}M`;
-  } else if (abs  >= 1e3) {
+  } else if (abs >= 1e3) {
     return `${sign}${(abs / 1e3).toFixed(precision)}K`;
   }
 
   return formatNumber(number, { locale, maximumFractionDigits: precision });
-}
+};
 
 /**
  * 💾 文件大小格式化函数
  */
-export const formatFileSize = (_bytes: number | string, _options: FileSizeFormatOptions = {}
+export const formatFileSize = (
+  _bytes: number | string,
+  _options: FileSizeFormatOptions = {}
 ): string => {
   const { binary = true, precision = 2, locale = 'zh-CN', longForm = false } = _options;
 
@@ -163,7 +165,7 @@ export const formatFileSize = (_bytes: number | string, _options: FileSizeFormat
       : ['B', 'KB', 'MB', 'GB', 'TB']
     : longForm
       ? ['字节', '千字节', '兆字节', '吉字节', '太字节']
-      : ['B', 'kB', 'MB', 'GB', 'TB']
+      : ['B', 'kB', 'MB', 'GB', 'TB'];
 
   if (size === 0) {
     return `0 ${units[0]}`;
@@ -174,10 +176,12 @@ export const formatFileSize = (_bytes: number | string, _options: FileSizeFormat
 
   const formattedValue = formatNumber(value, {
     locale,
-    maximumFractionDigits: precision, minimumFractionDigits: i === 0 ? 0 : precision, });
+    maximumFractionDigits: precision,
+    minimumFractionDigits: i === 0 ? 0 : precision
+  });
 
   return `${formattedValue} ${units[i] || units[units.length - 1]}`;
-}
+};
 
 /**
  * 📝 文本格式化函数
@@ -201,7 +205,9 @@ export const formatText = (text: string, _options: TextFormatOptions = {}): stri
         result = result.toLowerCase();
         break;
       case 'title':
-        result = result.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+        result = result.replace(
+          /\w\S*/g,
+          (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
         );
         break;
       case 'sentence':
@@ -227,13 +233,16 @@ export const formatText = (text: string, _options: TextFormatOptions = {}): stri
   }
 
   return result;
-}
+};
 
 /**
  * 💰 货币格式化函数
  */
-export const formatCurrency = (amount: number | string, currency: string = 'CNY',
-  locale: string = 'zh-CN'): string => {
+export const formatCurrency = (
+  amount: number | string,
+  currency: string = 'CNY',
+  locale: string = 'zh-CN'
+): string => {
   const number = typeof amount === 'string' ? parseFloat(amount) : amount;
 
   if (!isFinite(number)) {
@@ -245,17 +254,21 @@ export const formatCurrency = (amount: number | string, currency: string = 'CNY'
       style: 'currency',
       currency,
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2, }).format(number);
+      maximumFractionDigits: 2
+    }).format(number);
   } catch (error) {
     console.warn('货币格式化失败，使用默认格式:', error);
     return `¥${number.toFixed(2)}`;
   }
-}
+};
 
 /**
  * 📅 相对时间格式化函数
  */
-export const formatRelativeTime = (date: Date | number | string, _locale: string = 'zh-CN'): string => {
+export const formatRelativeTime = (
+  date: Date | number | string,
+  _locale: string = 'zh-CN'
+): string => {
   const targetDate = new Date(date);
   const now = new Date();
   const diffMs = now.getTime() - targetDate.getTime();
@@ -282,24 +295,30 @@ export const formatRelativeTime = (date: Date | number | string, _locale: string
     const years = Math.floor(diffDay / 365);
     return `${years}年前`;
   }
-}
+};
 
 /**
  * 📊 百分比格式化函数
  */
-export const formatPercentage = (value: number, total: number = 100, precision: number = 1): string => {
+export const formatPercentage = (
+  value: number,
+  total: number = 100,
+  precision: number = 1
+): string => {
   if (!isFinite(value) || !isFinite(total) || total === 0) {
     return '0%';
   }
 
   const percentage = (value / total) * 100;
   return `${percentage.toFixed(precision)}%`;
-}
+};
 
 /**
  * 🔗 URL格式化函数
  */
-export const formatUrl = (url: string, _options: {
+export const formatUrl = (
+  url: string,
+  _options: {
     protocol?: boolean;
     www?: boolean;
     maxLength?: number;
@@ -332,11 +351,19 @@ export const formatUrl = (url: string, _options: {
   }
 
   return result;
-}
+};
 
 // 导出所有格式化函数的集合
 export const formatters = {
-  time: formatTime, number: formatNumber, largeNumber: formatLargeNumber, fileSize: formatFileSize, text: formatText, currency: formatCurrency, relativeTime: formatRelativeTime, percentage: formatPercentage, url: formatUrl,
+  time: formatTime,
+  number: formatNumber,
+  largeNumber: formatLargeNumber,
+  fileSize: formatFileSize,
+  text: formatText,
+  currency: formatCurrency,
+  relativeTime: formatRelativeTime,
+  percentage: formatPercentage,
+  url: formatUrl
 } as const;
 
 // 导出类型

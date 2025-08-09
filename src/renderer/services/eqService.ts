@@ -96,7 +96,9 @@ export class EQService {
       });
 
       // 连接节点链
-      this.source!.connect((this.equalizer as any).input).connect(this.gainNode).connect(Howler.masterGain);
+      this.source!.connect((this.equalizer as any).input)
+        .connect(this.gainNode)
+        .connect(Howler.masterGain);
 
       // 恢复音量设置
       const volume = localStorage.getItem('volume');

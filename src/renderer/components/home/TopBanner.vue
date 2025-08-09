@@ -268,7 +268,7 @@ const loadNonUserData = async () => {
 const loadUserData = async () => {
   try {
     if (userStore.user) {
-      const { data: playlistData } = await getUserPlaylist(userStore.user?.userId) as any;
+      const { data: playlistData } = (await getUserPlaylist(userStore.user?.userId)) as any;
       // 确保最多只显示4个歌单，并按播放次数排序
       userPlaylist.value = (playlistData.playlist as Playlist[])
         .sort((a, b) => b.playCount - a.playCount)
@@ -314,7 +314,7 @@ const openPlaylist = (item: unknown) => {
       id: (item as any).id,
       type: 'playlist',
       name: (item as any).name,
-      songList: res.data.playlist.tracks as any || [],
+      songList: (res.data.playlist.tracks as any) || [],
       listInfo: res.data.playlist,
       canRemove: false
     });

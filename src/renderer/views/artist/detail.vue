@@ -125,7 +125,7 @@
                       <song-item
                         :index="index"
                         :compact="isCompactLayout"
-                        :item="formatSong(item) || item as any"
+                        :item="formatSong(item) || (item as any)"
                         @play="handlePlay"
                       />
                     </div>

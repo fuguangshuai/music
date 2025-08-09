@@ -91,7 +91,12 @@ const handleClick = async () => {
     };
 
     // 保存数据到store
-    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value as Record<string, unknown>, false);
+    musicStore.setCurrentMusicList(
+      songList.value,
+      props.item.name,
+      listInfo.value as Record<string, unknown>,
+      false
+    );
 
     // 使用路由跳转
     router.push({
@@ -105,7 +110,12 @@ const handleClick = async () => {
     listInfo.value = res.data.playlist;
 
     // 保存数据到store
-    musicStore.setCurrentMusicList(songList.value, props.item.name, listInfo.value as Record<string, unknown>, false);
+    musicStore.setCurrentMusicList(
+      songList.value,
+      props.item.name,
+      listInfo.value as Record<string, unknown>,
+      false
+    );
 
     // 使用路由跳转
     router.push({

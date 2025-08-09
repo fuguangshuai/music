@@ -11,9 +11,10 @@ import { registerExamplePlugins, testExamplePlugins } from '../../../plugins/exa
  * 插件系统初始化配置
  */
 const PLUGIN_CONFIG = {
-  autoLoad: true, enableDevMode: (globalThis as any).process.env.NODE_ENV === 'development',
-  enableTesting: (globalThis as any).process.env.NODE_ENV === 'development',
-}
+  autoLoad: true,
+  enableDevMode: (globalThis as any).process.env.NODE_ENV === 'development',
+  enableTesting: (globalThis as any).process.env.NODE_ENV === 'development'
+};
 
 /**
  * 初始化插件系统
@@ -68,14 +69,14 @@ export async function destroyPluginSystem(): Promise<void> {
 /**
  * 获取插件管理器实例
  */
-export function getPluginManager() : unknown {
+export function getPluginManager(): unknown {
   return pluginManager;
 }
 
 /**
  * 输出插件系统状态
  */
-function logPluginSystemStatus() : void {
+function logPluginSystemStatus(): void {
   const plugins = pluginManager.getAllPlugins();
   const installed = pluginManager.getAllPlugins();
   const active = pluginManager.getActivePlugins();
@@ -87,7 +88,7 @@ function logPluginSystemStatus() : void {
 
   if (plugins.length > 0) {
     console.log('\n📋, 插件列表:');
-    plugins.forEach(plugin => {
+    plugins.forEach((plugin) => {
       const status = pluginManager.getPluginStatus(plugin.id);
       const statusIcon = status === 'active' ? '🟢' : status === 'inactive' ? '🟡' : '⚪';
       console.log(`  ${statusIcon} ${plugin.name}, (${plugin.id}) v${plugin.version}`);
@@ -126,8 +127,8 @@ export const pluginSystemUtils = {
       installed: installed.length,
       active: active.length,
       enabled: active.length, // 简化实现
-      errors: 0, // 简化实现
-    }
+      errors: 0 // 简化实现
+    };
   },
 
   /**
@@ -137,7 +138,9 @@ export const pluginSystemUtils = {
     const plugins = pluginManager.getAllPlugins();
     const lowerQuery = query.toLowerCase();
 
-    return plugins.filter(plugin => plugin.name.toLowerCase().includes(lowerQuery) ||
+    return plugins.filter(
+      (plugin) =>
+        plugin.name.toLowerCase().includes(lowerQuery) ||
         plugin.id.toLowerCase().includes(lowerQuery) ||
         (plugin.description && plugin.description.toLowerCase().includes(lowerQuery)) ||
         (plugin.author && plugin.author.toLowerCase().includes(lowerQuery))
@@ -163,9 +166,11 @@ export const pluginSystemUtils = {
   /**
    * 批量操作插件
    */
-  async batchOperation(pluginIds: string[], operation: 'install' | 'uninstall' | 'activate' | 'deactivate'
+  async batchOperation(
+    pluginIds: string[],
+    operation: 'install' | 'uninstall' | 'activate' | 'deactivate'
   ): Promise<{ success: string[]; failed: string[] }> {
-    const results: { success: string[]; failed: string[] } = { success: [], failed: [] }
+    const results: { success: string[]; failed: string[] } = { success: [], failed: [] };
 
     for (const pluginId of pluginIds) {
       try {
@@ -173,7 +178,7 @@ export const pluginSystemUtils = {
 
         switch (operation) {
           case 'install':
-            const plugin = pluginManager.getAllPlugins().find(p => p.id === pluginId);
+            const plugin = pluginManager.getAllPlugins().find((p) => p.id === pluginId);
             if (plugin) {
               success = await pluginManager.install(plugin);
             }
@@ -210,12 +215,12 @@ export const pluginSystemUtils = {
     const plugins = pluginManager.getAllPlugins();
     const configs = {} as any;
 
-    plugins.forEach(plugin => {
+    plugins.forEach((plugin) => {
       const status = pluginManager.getPluginStatus(plugin.id);
       configs[plugin.id] = {
         enabled: status === 'active',
-        settings: {}, // 暂时返回空对象，后续可以扩展配置功能
-      }
+        settings: {} // 暂时返回空对象，后续可以扩展配置功能
+      };
     });
 
     return JSON.stringify(configs, null, 2);
@@ -231,7 +236,7 @@ export const pluginSystemUtils = {
       for (const [pluginId, config] of Object.entries(configs as any)) {
         const pluginConfig = config as any;
         if (pluginConfig.enabled) {
-          const plugin = pluginManager.getAllPlugins().find(p => p.id === pluginId);
+          const plugin = pluginManager.getAllPlugins().find((p) => p.id === pluginId);
           if (plugin) {
             await pluginManager.install(plugin);
           }
@@ -249,8 +254,8 @@ export const pluginSystemUtils = {
       console.error('导入插件配置失败:', error);
       return false;
     }
-  },
-}
+  }
+};
 
 /**
  * 插件系统事件监听器
@@ -307,15 +312,15 @@ export const devTools = {
    * 获取插件调试信息
    */
   getDebugInfo(pluginId: string) {
-    const plugin = pluginManager.getAllPlugins().find(p => p.id === pluginId);
+    const plugin = pluginManager.getAllPlugins().find((p) => p.id === pluginId);
     const status = pluginManager.getPluginStatus(pluginId);
 
     return {
       plugin,
       status,
       config: {}, // 暂时返回空配置
-      timestamp: Date.now(),
-    }
+      timestamp: Date.now()
+    };
   },
 
   /**
@@ -327,8 +332,8 @@ export const devTools = {
       pluginApp.events.emit(event, data);
       console.log(`🎯 模拟事件: ${event}`, data);
     }
-  },
-}
+  }
+};
 
 // 导出主要接口
-export { pluginManager }
+export { pluginManager };

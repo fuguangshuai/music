@@ -237,7 +237,8 @@ watch(
     if (!visible) {
       showColorPicker.value = false;
     }
-  });
+  }
+);
 </script>
 
 <style scoped lang="scss">

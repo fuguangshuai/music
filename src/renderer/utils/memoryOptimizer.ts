@@ -25,7 +25,7 @@ class MemoryOptimizer {
         memoryUsage: memory.usedJSHeapSize / memory.jsHeapSizeLimit
       };
     }
-    
+
     // 如果不支持memory API，返回默认值
     return {
       usedJSHeapSize: 0,
@@ -47,7 +47,7 @@ class MemoryOptimizer {
    */
   cleanup(): void {
     // 执行所有注册的清理任务
-    this.cleanupTasks.forEach(task => {
+    this.cleanupTasks.forEach((task) => {
       try {
         task();
       } catch (error) {
@@ -75,7 +75,7 @@ class MemoryOptimizer {
 
     this.monitoringInterval = window.setInterval(() => {
       const stats = this.getMemoryStats();
-      
+
       if (stats.memoryUsage > this.memoryThreshold) {
         console.warn('High memory usage detected:', stats);
         this.cleanup();
@@ -106,7 +106,7 @@ class MemoryOptimizer {
   clearImageCache(): void {
     // 清理可能的图片缓存
     const images = document.querySelectorAll('img');
-    images.forEach(img => {
+    images.forEach((img) => {
       if (img.src && img.src.startsWith('blob:')) {
         URL.revokeObjectURL(img.src);
       }
@@ -119,7 +119,7 @@ class MemoryOptimizer {
   clearAudioCache(): void {
     // 清理可能的音频缓存
     const audios = document.querySelectorAll('audio');
-    audios.forEach(audio => {
+    audios.forEach((audio) => {
       if (audio.src && audio.src.startsWith('blob:')) {
         URL.revokeObjectURL(audio.src);
       }
@@ -139,7 +139,8 @@ class MemoryOptimizer {
       advice.push('内存使用率较高，建议清理缓存');
     }
 
-    if (stats.usedJSHeapSize > 100 * 1024 * 1024) { // 100MB
+    if (stats.usedJSHeapSize > 100 * 1024 * 1024) {
+      // 100MB
       advice.push('JavaScript堆内存使用较多，建议清理不必要的数据');
     }
 

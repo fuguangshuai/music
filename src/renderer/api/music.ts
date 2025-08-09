@@ -196,7 +196,10 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
             br: (result.data as any).成功列表.音质 || 320000,
             url: (result.data as any).成功列表.播放链接 || '',
             md5: '',
-            source: (result.data as any).成功列表.音源ID || (result.data as any).成功列表.音源名称 || apiName
+            source:
+              (result.data as any).成功列表.音源ID ||
+              (result.data as any).成功列表.音源名称 ||
+              apiName
           }
         };
       }

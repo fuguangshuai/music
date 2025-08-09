@@ -7,10 +7,9 @@ import { type CacheStats, CacheType, smartCacheService } from '@/services/cacheS
 
 // 缓存配置接口
 export interface CacheConfig {
-ttl?: number;
+  ttl?: number;
   useMemoryCache?: boolean;
   key?: string;
-
 }
 
 // 缓存装饰器选项
@@ -45,9 +44,13 @@ export function cached(_options: CacheDecoratorOptions) {
 
         // 缓存结果
         if (result !== undefined) {
-          await smartCacheService.cacheData(_options.type, cacheKey,
+          await smartCacheService.cacheData(
+            _options.type,
+            cacheKey,
             result,
-            _options.ttl, _options.useMemoryCache);
+            _options.ttl,
+            _options.useMemoryCache
+          );
         }
 
         return result;
@@ -56,10 +59,10 @@ export function cached(_options: CacheDecoratorOptions) {
         // 降级到原方法
         return await originalMethod.apply(this, args);
       }
-    }
+    };
 
     return descriptor;
-  }
+  };
 }
 
 /**
@@ -82,26 +85,37 @@ export class CacheUtils {
   /**
    * 🎵 音频元数据缓存
    */
-  static async cacheAudioMetadata(songId: string, metadata: Record<string, unknown>, ttl?: number
+  static async cacheAudioMetadata(
+    songId: string,
+    metadata: Record<string, unknown>,
+    ttl?: number
   ): Promise<boolean> {
     return await smartCacheService.cacheData(CacheType.AUDIO_METADATA, songId, metadata, ttl);
   }
 
-  static async getCachedAudioMetadata(songId: string
-,  ): Promise<Record<string, unknown> | undefined> {
+  static async getCachedAudioMetadata(
+    songId: string
+  ): Promise<Record<string, unknown> | undefined> {
     return await smartCacheService.getCachedData(CacheType.AUDIO_METADATA, songId);
   }
 
   /**
    * 🌐 API响应缓存
    */
-  static async cacheApiResponse(endpoint: string, params: Record<string, unknown>, response: unknown, ttl?: number
+  static async cacheApiResponse(
+    endpoint: string,
+    params: Record<string, unknown>,
+    response: unknown,
+    ttl?: number
   ): Promise<boolean> {
     const _key = this.generateApiKey(endpoint, params);
     return await smartCacheService.cacheData(CacheType.API_RESPONSE, _key, response, ttl);
   }
 
-  static async getCachedApiResponse(endpoint: string, params: Record<string, unknown>): Promise<unknown> {
+  static async getCachedApiResponse(
+    endpoint: string,
+    params: Record<string, unknown>
+  ): Promise<unknown> {
     const _key = this.generateApiKey(endpoint, params);
     return await smartCacheService.getCachedData(CacheType.API_RESPONSE, _key);
   }
@@ -109,7 +123,10 @@ export class CacheUtils {
   /**
    * 👤 用户数据缓存
    */
-  static async cacheUserData(userId: string, data: Record<string, unknown>, ttl?: number
+  static async cacheUserData(
+    userId: string,
+    data: Record<string, unknown>,
+    ttl?: number
   ): Promise<boolean> {
     return await smartCacheService.cacheData(CacheType.USER_DATA, userId, data, ttl);
   }
@@ -155,20 +172,23 @@ export class CacheUtils {
         string,
         CacheStats
       > | null;
-      const recommendations: string[] = []
+      const recommendations: string[] = [];
 
       if (totalStats && totalStats instanceof Map) {
         for (const [type, stats] of totalStats.entries()) {
           // 分析命中率
           if (stats.hitRate < 50) {
-            recommendations.push( `${type}缓存命中率较低(${stats.hitRate.toFixed(1)}%)，建议增加TTL或优化缓存策略`
+            recommendations.push(
+              `${type}缓存命中率较低(${stats.hitRate.toFixed(1)}%)，建议增加TTL或优化缓存策略`
             );
           }
 
           // 分析内存使用
           if (stats.memoryUsage > 50 * 1024 * 1024) {
             // 50MB
-            recommendations.push(`${type}缓存内存使用过高(${(stats.memoryUsage / 1024 / 1024).toFixed(1)}MB)，建议清理或减少缓存项`);
+            recommendations.push(
+              `${type}缓存内存使用过高(${(stats.memoryUsage / 1024 / 1024).toFixed(1)}MB)，建议清理或减少缓存项`
+            );
           }
 
           // 分析缓存项数量
@@ -182,10 +202,10 @@ export class CacheUtils {
         recommendations.push('缓存性能良好，无需优化');
       }
 
-      return { totalStats, recommendations }
+      return { totalStats, recommendations };
     } catch (error) {
       console.error('缓存性能分析失败:', error);
-      return { totalStats: null, recommendations: ['缓存性能分析失败'] }
+      return { totalStats: null, recommendations: ['缓存性能分析失败'] };
     }
   }
 
@@ -217,10 +237,10 @@ export class CacheUtils {
         }
       }
 
-      return { cleaned, errors }
+      return { cleaned, errors };
     } catch (error) {
       errors.push(`智能清理失败: ${error}`);
-      return { cleaned, errors }
+      return { cleaned, errors };
     }
   }
 }
@@ -234,28 +254,34 @@ export const CacheDecorators = {
    */
   apiResponse: (ttl: number = 5 * 60 * 1000) =>
     cached({
-      type: CacheType.API_RESPONSE, ttl,
-      keyGenerator: (...args): string => `api_${JSON.stringify(args)}` }),
+      type: CacheType.API_RESPONSE,
+      ttl,
+      keyGenerator: (...args): string => `api_${JSON.stringify(args)}`
+    }),
 
   /**
    * 图片缓存装饰器
    */
   _image: (ttl: number = 60 * 60 * 1000) =>
     cached({
-      type: CacheType.IMAGE, ttl,
-      keyGenerator: (...args: unknown[]) => CacheUtils.generateImageKey(args[0] as string) }),
+      type: CacheType.IMAGE,
+      ttl,
+      keyGenerator: (...args: unknown[]) => CacheUtils.generateImageKey(args[0] as string)
+    }),
 
   /**
    * 用户数据缓存装饰器
    */
   _userData: (ttl: number = 30 * 60 * 1000) =>
     cached({
-      type: CacheType.USER_DATA, ttl,
-      keyGenerator: (...args: unknown[]) => args[0] as string }),
-}
+      type: CacheType.USER_DATA,
+      ttl,
+      keyGenerator: (...args: unknown[]) => args[0] as string
+    })
+};
 
 // 导出类型
-export type { CacheStats }
+export type { CacheStats };
 
 // 🔧 开发环境调试工具
 if (import.meta.env.DEV) {

@@ -9,7 +9,7 @@ import fs from 'fs';
 import glob from 'glob';
 
 interface QualityMetrics {
-typeErrors: number;
+  typeErrors: number;
   lintErrors: number;
   lintWarnings: number;
   testCoverage: number;
@@ -19,11 +19,10 @@ typeErrors: number;
   securityIssues: number;
   duplicateCode: number;
   technicalDebt: string;
-
 }
 
 interface QualityReport {
-timestamp: string;
+  timestamp: string;
   overallScore: number;
   metrics: QualityMetrics;
   recommendations: string[];
@@ -33,10 +32,10 @@ timestamp: string;
 
 class QualityChecker {
   private report: QualityReport = {
-  timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
     overallScore: 0,
     metrics: {
-  typeErrors: 0,
+      typeErrors: 0,
       lintErrors: 0,
       lintWarnings: 0,
       testCoverage: 0,
@@ -45,12 +44,12 @@ class QualityChecker {
       codeSmells: 0,
       securityIssues: 0,
       duplicateCode: 0,
-      technicalDebt: '0h',
+      technicalDebt: '0h'
     },
     recommendations: [],
     criticalIssues: [],
-    improvements: [],
-  }
+    improvements: []
+  };
 
   /**
    * 🚀 开始质量检查
@@ -104,7 +103,8 @@ class QualityChecker {
       // 检查 web 端类型
       const _webResult = execSync('npm run typecheck:web', {
         encoding: 'utf-8',
-        stdio: 'pipe' });
+        stdio: 'pipe'
+      });
       console.log('✅ Web 端类型检查通过');
     } catch (error: unknown) {
       const output = error.stdout || error.stderr || '';
@@ -112,8 +112,9 @@ class QualityChecker {
       this.report.metrics.typeErrors = errorMatches ? errorMatches.length : 0;
 
       if (this.report.metrics.typeErrors > 0) {
-        this.report.criticalIssues.push(`发现 ${this.report.metrics.typeErrors} 个 TypeScript 类型错误`
-      ,  );
+        this.report.criticalIssues.push(
+          `发现 ${this.report.metrics.typeErrors} 个 TypeScript 类型错误`
+        );
         console.log(`⚠️ 发现 ${this.report.metrics.typeErrors} > 个类型错误`);
       }
     }
@@ -122,7 +123,8 @@ class QualityChecker {
       // 检查 node 端类型
       const _nodeResult = execSync('npm run typecheck:node', {
         encoding: 'utf-8',
-        stdio: 'pipe' });
+        stdio: 'pipe'
+      });
       console.log('✅ Node 端类型检查通过');
     } catch {
       console.log('⚠️ Node 端类型检查有问题（可能是依赖问题）');
@@ -138,7 +140,8 @@ class QualityChecker {
     try {
       const _result = execSync('npx eslint src/renderer/**/*.{ts,vue} --format json', {
         encoding: 'utf-8',
-        stdio: 'pipe' });
+        stdio: 'pipe'
+      });
 
       const lintResults = JSON.parse(result);
       let totalErrors = 0;
@@ -175,7 +178,9 @@ class QualityChecker {
         'npx vitest run tests/security/security-system.test.ts --reporter=json',
         {
           encoding: 'utf-8',
-          stdio: 'pipe' });
+          stdio: 'pipe'
+        }
+      );
 
       const securityResults = JSON.parse(securityTestResult);
       const securityPassing =
@@ -187,7 +192,9 @@ class QualityChecker {
         'npx vitest run tests/i18n/i18n-system.test.ts --reporter=json',
         {
           encoding: 'utf-8',
-          stdio: 'pipe' });
+          stdio: 'pipe'
+        }
+      );
 
       const i18nResults = JSON.parse(i18nTestResult);
       const i18nPassing =
@@ -201,7 +208,9 @@ class QualityChecker {
           ? (this.report.metrics.testsPassing / this.report.metrics.testsTotal) * 100
           : 0;
 
-      console.log(`📊 测试结果: ${this.report.metrics.testsPassing}/${this.report.metrics.testsTotal} 通过 > (${this.report.metrics.testCoverage.toFixed(1)}%)`);
+      console.log(
+        `📊 测试结果: ${this.report.metrics.testsPassing}/${this.report.metrics.testsTotal} 通过 > (${this.report.metrics.testCoverage.toFixed(1)}%)`
+      );
 
       if (this.report.metrics.testCoverage < 80) {
         this.report.improvements.push('提高测试覆盖率到80%以上');
@@ -222,12 +231,15 @@ class QualityChecker {
       // 检查 npm 安全漏洞
       const auditResult = execSync('npm audit --json', {
         encoding: 'utf-8',
-        stdio: 'pipe' });
+        stdio: 'pipe'
+      });
 
       const auditData = JSON.parse(auditResult);
       const vulnerabilities = auditData.metadata?.vulnerabilities || {};
       const totalVulnerabilities = Object.values(vulnerabilities).reduce(
-        (sum: number, count: unknown) => sum + (count as number), 0);
+        (sum: number, count: unknown) => sum + (count as number),
+        0
+      );
 
       this.report.metrics.securityIssues = totalVulnerabilities;
 
@@ -249,7 +261,8 @@ class QualityChecker {
     console.log('📊 > 检查代码复杂度...');
 
     const files = glob.sync('src/renderer/**/*.ts', {
-      ignore: ['**/*.d.ts', '**/node_modules/**'] });
+      ignore: ['**/*.d.ts', '**/node_modules/**']
+    });
     let totalComplexity = 0;
     let highComplexityFiles = 0;
 
@@ -283,7 +296,8 @@ class QualityChecker {
     console.log('🔄 > 检查重复代码...');
 
     const files = glob.sync('src/renderer/**/*.ts', {
-      ignore: ['**/*.d.ts', '**/node_modules/**'] });
+      ignore: ['**/*.d.ts', '**/node_modules/**']
+    });
     const codeBlocks = new Map<string, number>();
     let duplicateBlocks = 0;
 
@@ -340,9 +354,10 @@ class QualityChecker {
       /\bcatch\b/g,
       /\b\?\s*.*\s*:/g, // 三元操作符
       /\b&&\b/g,
-      /\b\|\|\b/g];
+      /\b\|\|\b/g
+    ];
 
-    decisionPatterns.forEach(pattern => {
+    decisionPatterns.forEach((pattern) => {
       const matches = code.match(pattern);
       if (matches) {
         complexity += matches.length;
@@ -432,7 +447,9 @@ class QualityChecker {
     console.log(`  TypeScript 错误: ${this.report.metrics.typeErrors}`);
     console.log(`  ESLint 错误: ${this.report.metrics.lintErrors}`);
     console.log(`  ESLint 警告: ${this.report.metrics.lintWarnings}`);
-    console.log(`  测试通过率: ${this.report.metrics.testsPassing}/${this.report.metrics.testsTotal} > (${this.report.metrics.testCoverage.toFixed(1)}%)`);
+    console.log(
+      `  测试通过率: ${this.report.metrics.testsPassing}/${this.report.metrics.testsTotal} > (${this.report.metrics.testCoverage.toFixed(1)}%)`
+    );
     console.log(`  安全漏洞: ${this.report.metrics.securityIssues}`);
     console.log(`  代码异味: ${this.report.metrics.codeSmells}`);
     console.log(`  重复代码: ${this.report.metrics.duplicateCode}`);
@@ -441,7 +458,7 @@ class QualityChecker {
     // 关键问题
     if (this.report.criticalIssues.length > 0) {
       console.log('🚨 > 关键问题:');
-      this.report.criticalIssues.forEach(issue => {
+      this.report.criticalIssues.forEach((issue) => {
         console.log(`  - > ${issue}`);
       });
       console.log('');
@@ -450,7 +467,7 @@ class QualityChecker {
     // 改进建议
     if (this.report.recommendations.length > 0) {
       console.log('💡 > 改进建议:');
-      this.report.recommendations.forEach(rec => {
+      this.report.recommendations.forEach((rec) => {
         console.log(`  - > ${rec}`);
       });
       console.log('');
@@ -459,7 +476,7 @@ class QualityChecker {
     // 改进项目
     if (this.report.improvements.length > 0) {
       console.log('🔧 > 改进项目:');
-      this.report.improvements.forEach(imp => {
+      this.report.improvements.forEach((imp) => {
         console.log(`  - > ${imp}`);
       });
       console.log('');

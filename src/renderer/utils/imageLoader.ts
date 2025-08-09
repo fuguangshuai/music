@@ -13,30 +13,28 @@ export enum ImageLoadState {
   LOADING = 'loading',
   LOADED = 'loaded',
   ERROR = 'error',
-  RETRY = 'retry',
+  RETRY = 'retry'
 }
 
 /**
  * 图片加载选项
  */
 export interface ImageLoadOptions {
-maxRetries?: number;
+  maxRetries?: number;
   retryDelay?: number;
   fallbackUrl?: string;
   onStateChange?: (_state: ImageLoadState) => void;
   onError?: (error: Error) => void;
-
 }
 
 /**
  * 图片加载结果
  */
 export interface ImageLoadResult {
-success: boolean;
+  success: boolean;
   url: string;
   error?: Error;
   retryCount: number;
-
 }
 
 /**
@@ -47,12 +45,12 @@ export class ImageLoader {
   private readonly maxCacheSize = 100; // 最大缓存数量
   private accessOrder = new Map<string, number>(); // 访问顺序跟踪
   private defaultOptions: Required<ImageLoadOptions> = {
-  maxRetries: 3,
+    maxRetries: 3,
     retryDelay: 1000,
     fallbackUrl: '/default-cover.jpg',
-    onStateChange: () =>  {},
-    onError: () =>  {},
-  }
+    onStateChange: () => {},
+    onError: () => {}
+  };
 
   /**
    * LRU缓存清理
@@ -81,7 +79,7 @@ export class ImageLoader {
    * 加载图片
    */
   async loadImage(url: string, _options: ImageLoadOptions = {}): Promise<ImageLoadResult> {
-    const opts = { ...this.defaultOptions, ..._options }
+    const opts = { ...this.defaultOptions, ..._options };
 
     // 更新访问时间
     this.accessOrder.set(url, Date.now());
@@ -100,7 +98,9 @@ export class ImageLoader {
   /**
    * 执行图片加载
    */
-  private async performLoad(url: string, options: Required<ImageLoadOptions>
+  private async performLoad(
+    url: string,
+    options: Required<ImageLoadOptions>
   ): Promise<ImageLoadResult> {
     let retryCount = 0;
     let lastError: Error = new Error('未知错误');
@@ -115,8 +115,8 @@ export class ImageLoader {
         return {
           success: true,
           url,
-          retryCount,
-        }
+          retryCount
+        };
       } catch (error) {
         lastError = error as Error;
         retryCount++;
@@ -134,9 +134,10 @@ export class ImageLoader {
         await this.loadSingleImage(options.fallbackUrl);
         options.onStateChange(ImageLoadState.LOADED);
         return {
-          success: true, url: options.fallbackUrl,
-          retryCount,
-        }
+          success: true,
+          url: options.fallbackUrl,
+          retryCount
+        };
       } catch (fallbackError) {
         console.error('备用图片也加载失败: ', options.fallbackUrl, fallbackError);
       }
@@ -146,7 +147,8 @@ export class ImageLoader {
     const networkError = createNetworkError(`图片加载失败: ${url}`, 'IMAGE_LOAD_FAILED', {
       url,
       retryCount,
-      originalError: lastError, });
+      originalError: lastError
+    });
 
     options.onStateChange(ImageLoadState.ERROR);
     options.onError(networkError);
@@ -155,8 +157,8 @@ export class ImageLoader {
       success: false,
       url,
       error: networkError,
-      retryCount,
-    }
+      retryCount
+    };
   }
 
   /**
@@ -177,12 +179,12 @@ export class ImageLoader {
       img.onload = () => {
         clearTimeout(timeout);
         resolve();
-      }
+      };
 
       img.onerror = () => {
         clearTimeout(timeout);
         reject(new Error(`Failed to load image: ${url}`));
-      }
+      };
 
       img.src = url;
     });
@@ -192,7 +194,7 @@ export class ImageLoader {
    * 延迟函数
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -206,7 +208,7 @@ export class ImageLoader {
    * 预加载图片
    */
   async preloadImages(urls: string[], _options: ImageLoadOptions = {}): Promise<ImageLoadResult[]> {
-    const promises = urls.map(url => this.loadImage(url, _options));
+    const promises = urls.map((url) => this.loadImage(url, _options));
     return Promise.all(promises);
   }
 }
@@ -228,14 +230,15 @@ export const useImageLoader = (initialUrl: string, _options: ImageLoadOptions = 
     try {
       const result = await imageLoader.loadImage(url, {
         ..._options,
-        onStateChange: newState => {;
+        onStateChange: (newState) => {
           _state.value = newState;
           _options.onStateChange?.(newState);
         },
-        onError: err => {;
+        onError: (err) => {
           error.value = err;
           _options.onError?.(err);
-        }, });
+        }
+      });
 
       if (result.success) {
         currentUrl.value = result.url;
@@ -247,7 +250,7 @@ export const useImageLoader = (initialUrl: string, _options: ImageLoadOptions = 
       error.value = err as Error;
       handleError(err as Error);
     }
-  }
+  };
 
   // 初始加载
   onMounted(() => {
@@ -260,6 +263,6 @@ export const useImageLoader = (initialUrl: string, _options: ImageLoadOptions = 
     state: readonly(_state),
     currentUrl: readonly(currentUrl),
     error: readonly(error),
-    loadImage,
-  }
-}
+    loadImage
+  };
+};

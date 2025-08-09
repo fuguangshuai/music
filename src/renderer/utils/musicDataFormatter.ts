@@ -12,7 +12,7 @@ import type { SongResult } from '@/types';
  */
 export const formatSongData = (item: unknown): SongResult => {
   const song = item as any;
-  
+
   return {
     id: song.id || 0,
     name: song.name || song.al?.name || song.album?.name || '',
@@ -41,8 +41,8 @@ export const formatSongList = (items: unknown[]): SongResult[] => {
   if (!Array.isArray(items)) {
     return [];
   }
-  
-  return items.map(formatSongData).filter(song => song.id);
+
+  return items.map(formatSongData).filter((song) => song.id);
 };
 
 /**
@@ -52,7 +52,7 @@ export const formatSongList = (items: unknown[]): SongResult[] => {
  */
 export const formatArtists = (artists: unknown): string => {
   if (!artists) return '';
-  
+
   const artistArray = Array.isArray(artists) ? artists : [artists];
   return artistArray
     .map((artist: any) => artist.name || artist)
@@ -67,7 +67,7 @@ export const formatArtists = (artists: unknown): string => {
  */
 export const formatAlbum = (album: unknown): string => {
   if (!album) return '';
-  
+
   const albumData = album as any;
   return albumData.name || albumData.al?.name || '';
 };
@@ -80,7 +80,7 @@ export const formatAlbum = (album: unknown): string => {
  */
 export const formatPicUrl = (picUrl: unknown, size = '200y200'): string => {
   if (!picUrl) return '';
-  
+
   const url = String(picUrl);
   if (url.includes('?')) {
     return `${url}&param=${size}`;
@@ -98,7 +98,7 @@ export const formatDuration = (duration: unknown): string => {
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  
+
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
@@ -119,7 +119,7 @@ export const isSongPlayable = (song: unknown): boolean => {
  */
 export const formatPlaylistInfo = (playlist: unknown) => {
   const data = playlist as any;
-  
+
   return {
     id: data.id || 0,
     name: data.name || '',

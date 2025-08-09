@@ -10,22 +10,22 @@
  */
 export const getComponentElement = (ref: any): HTMLElement | null => {
   if (!ref) return null;
-  
+
   // 如果是Vue组件实例，获取$el
   if (ref.value?.$el) {
     return ref.value.$el;
   }
-  
+
   // 如果是直接的DOM元素
   if (ref.value instanceof HTMLElement) {
     return ref.value;
   }
-  
+
   // 如果ref本身就是DOM元素
   if (ref instanceof HTMLElement) {
     return ref;
   }
-  
+
   return null;
 };
 
@@ -36,7 +36,7 @@ export const getComponentElement = (ref: any): HTMLElement | null => {
  */
 export const scrollToPosition = (ref: any, options: ScrollToOptions) => {
   const element = getComponentElement(ref);
-  
+
   if (element && typeof element.scrollTo === 'function') {
     element.scrollTo(options);
   }
@@ -93,7 +93,7 @@ export const getScrollHeight = (ref: any): number => {
 export const isNearBottom = (ref: any, threshold = 10): boolean => {
   const element = getComponentElement(ref);
   if (!element) return false;
-  
+
   const { scrollTop, scrollHeight, clientHeight } = element;
   return scrollTop + clientHeight >= scrollHeight - threshold;
 };
@@ -107,14 +107,14 @@ export const isNearBottom = (ref: any, threshold = 10): boolean => {
  */
 export const callComponentMethod = (ref: any, methodName: string, ...args: any[]): any => {
   if (!ref?.value) return undefined;
-  
+
   const component = ref.value;
   const method = component[methodName];
-  
+
   if (typeof method === 'function') {
     return method.apply(component, args);
   }
-  
+
   return undefined;
 };
 
@@ -126,7 +126,7 @@ export const callComponentMethod = (ref: any, methodName: string, ...args: any[]
  */
 export const getComponentProperty = (ref: any, propertyName: string): any => {
   if (!ref?.value) return undefined;
-  
+
   return ref.value[propertyName];
 };
 
@@ -138,7 +138,7 @@ export const getComponentProperty = (ref: any, propertyName: string): any => {
  */
 export const setComponentProperty = (ref: any, propertyName: string, value: any): void => {
   if (!ref?.value) return;
-  
+
   ref.value[propertyName] = value;
 };
 
@@ -157,7 +157,7 @@ export const getScrollInfo = (event: Event) => {
       offsetHeight: 0
     };
   }
-  
+
   return {
     scrollTop: target.scrollTop,
     scrollHeight: target.scrollHeight,

@@ -12,28 +12,25 @@
 
 // 重试配置接口
 export interface RetryOptions {
-maxRetries?: number;
+  maxRetries?: number;
   delay?: number;
   backoff?: 'linear' | 'exponential' | 'fixed';
   maxDelay?: number;
   retryCondition?: (error: unknown, _attempt: number) => boolean;
   onRetry?: (error: unknown, _attempt: number) => void;
-
 }
 
 // 防抖配置接口
 export interface DebounceOptions {
-leading?: boolean;
+  leading?: boolean;
   trailing?: boolean;
   maxWait?: number;
-
 }
 
 // 节流配置接口
 export interface ThrottleOptions {
-leading?: boolean;
+  leading?: boolean;
   trailing?: boolean;
-
 }
 
 // 队列任务接口
@@ -101,24 +98,27 @@ export const retry = async <T>(fn: () => Promise<T>, options: RetryOptions = {})
   }
 
   throw lastError;
-}
+};
 
 /**
  * 🛡️ 网络请求重试（专门针对网络错误）
  */
-export const retryNetwork = <T>(fn: () => Promise<T>, options: Omit<RetryOptions, 'retryCondition'> = {}
+export const retryNetwork = <T>(
+  fn: () => Promise<T>,
+  options: Omit<RetryOptions, 'retryCondition'> = {}
 ): Promise<T> => {
   return retry(fn, {
     ...options,
-    retryCondition: error => {;
+    retryCondition: (error) => {
       // 网络错误或5xx服务器错误才重试
-      return ((error as any).code === 'NETWORK_ERROR' ||
+      return (
+        (error as any).code === 'NETWORK_ERROR' ||
         (error as any).code === 'TIMEOUT' ||
         ((error as any).response && (error as any).response.status >= 500)
       );
     }
-});
-}
+  });
+};
 
 /**
  * ⏰ 防抖函数
@@ -147,13 +147,13 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     lastInvokeTime = time;
     result = func.apply(thisArg, args);
     return result;
-  }
+  };
 
   const leadingEdge = (time: number): ReturnType<T> | undefined => {
     lastInvokeTime = time;
     timeoutId = setTimeout(timerExpired, wait);
     return leading ? invokeFunc(time) : result;
-  }
+  };
 
   const remainingWait = (time: number): number => {
     const timeSinceLastCall = time - lastCallTime!;
@@ -163,18 +163,19 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     return maxWait !== undefined
       ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
       : timeWaiting;
-  }
+  };
 
   const shouldInvoke = (time: number): boolean => {
     const timeSinceLastCall = time - lastCallTime!;
     const timeSinceLastInvoke = time - lastInvokeTime;
 
-    return (lastCallTime === null ||
+    return (
+      lastCallTime === null ||
       timeSinceLastCall >= wait ||
       timeSinceLastCall < 0 ||
       (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
     );
-  }
+  };
 
   const timerExpired = (): ReturnType<T> | undefined => {
     const time = Date.now();
@@ -183,7 +184,7 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     }
     timeoutId = setTimeout(timerExpired, remainingWait(time));
     return undefined;
-  }
+  };
 
   const trailingEdge = (time: number): ReturnType<T> | undefined => {
     timeoutId = null;
@@ -194,7 +195,7 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     lastArgs = null;
     lastThis = null;
     return result;
-  }
+  };
 
   const cancel = (): void => {
     if (timeoutId !== null) {
@@ -209,11 +210,11 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     lastThis = null;
     timeoutId = null;
     maxTimeoutId = null;
-  }
+  };
 
   const flush = (): ReturnType<T> | undefined => {
     return timeoutId === null ? result : trailingEdge(Date.now());
-  }
+  };
 
   const debounced = function (this: unknown, ...args: Parameters<T>): ReturnType<T> | undefined {
     const time = Date.now();
@@ -242,12 +243,15 @@ export const debounce = <T extends (...args: unknown[]) => any>(
   (debounced as any).flush = flush;
 
   return debounced as T & { cancel(): void; flush(): ReturnType<T> | undefined };
-}
+};
 
 /**
  * 🚦 节流函数
  */
-export const throttle = <T extends (...args: unknown[]) => any>(func: T, wait: number, _options: ThrottleOptions = {}
+export const throttle = <T extends (...args: unknown[]) => any>(
+  func: T,
+  wait: number,
+  _options: ThrottleOptions = {}
 ): T & { cancel(): void; flush(): ReturnType<T> | undefined } => {
   const { leading = true, trailing = true } = _options;
 
@@ -256,14 +260,14 @@ export const throttle = <T extends (...args: unknown[]) => any>(func: T, wait: n
     trailing,
     maxWait: wait
   });
-}
+};
 
 /**
  * 😴 睡眠函数
  */
 export const sleep = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 /**
  * ⏱️ 超时控制
@@ -275,13 +279,13 @@ export const timeout = <T>(promise: Promise<T>, ms: number, message = '操作超
       setTimeout(() => reject(new Error(message)), ms);
     })
   ]);
-}
+};
 
 /**
  * 🎯 并发控制队列
  */
 export class ConcurrencyQueue {
-  private queue: QueueTask[] = []
+  private queue: QueueTask[] = [];
   private running: Set<string> = new Set();
   private maxConcurrency: number;
 
@@ -296,7 +300,7 @@ export class ConcurrencyQueue {
     return new Promise((resolve, reject) => {
       const wrappedTask: QueueTask<T> = {
         ...task,
-        fn: async () => {;
+        fn: async () => {
           try {
             this.running.add(task.id);
 
@@ -317,7 +321,7 @@ export class ConcurrencyQueue {
             this.processQueue();
           }
         }
-}
+      };
 
       this.queue.push(wrappedTask);
       this.queue.sort((a, b) => (b.priority || 0) - (a.priority || 0));
@@ -329,7 +333,7 @@ export class ConcurrencyQueue {
    * 处理队列
    */
   private processQueue(): void {
-    if (this.running.size  >= this.maxConcurrency || this.queue.length === 0) {
+    if (this.running.size >= this.maxConcurrency || this.queue.length === 0) {
       return;
     }
 
@@ -343,7 +347,7 @@ export class ConcurrencyQueue {
    * 清空队列
    */
   clear(): void {
-    this.queue = []
+    this.queue = [];
   }
 
   /**
@@ -351,14 +355,14 @@ export class ConcurrencyQueue {
    */
   getStatus(): {
     pending: number;
-  running: number;
+    running: number;
     maxConcurrency: number;
   } {
     return {
       pending: this.queue.length,
       running: this.running.size,
       maxConcurrency: this.maxConcurrency
-    }
+    };
   }
 }
 
@@ -383,8 +387,9 @@ export const batch = async <T, R>(
     const batchPromises = batch.map((item, batchIndex) => {
       const globalIndex = i + batchIndex;
       return queue.add({
-        id: `batch-${globalIndex}`, fn: () =>  processor(item, globalIndex),
-        priority: -globalIndex, // 保持顺序
+        id: `batch-${globalIndex}`,
+        fn: () => processor(item, globalIndex),
+        priority: -globalIndex // 保持顺序
       });
     });
 
@@ -397,7 +402,7 @@ export const batch = async <T, R>(
   }
 
   return results;
-}
+};
 
 /**
  * 🎲 随机延迟
@@ -405,7 +410,7 @@ export const batch = async <T, R>(
 export const randomDelay = (min: number, max: number): Promise<void> => {
   const delay = Math.random() * (max - min) + min;
   return sleep(delay);
-}
+};
 
 /**
  * 🔁 轮询函数
@@ -445,7 +450,7 @@ export const poll = async <T>(
   }
 
   throw new Error(`轮询失败，已尝试 ${maxAttempts}, 次`);
-}
+};
 
 // 导出所有异步工具的集合
 export const asyncUtils = {

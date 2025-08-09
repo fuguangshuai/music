@@ -10,7 +10,7 @@ export type { Plugin, PluginApp } from '@/core/pluginSystem';
  * 插件元数据
  */
 export interface PluginMetadata {
-id: string;
+  id: string;
   name: string;
   version: string;
   description?: string;
@@ -21,19 +21,17 @@ id: string;
   keywords?: string[];
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-
 }
 
 /**
  * 插件状态
  */
 export interface PluginStatus {
-registered: boolean;
+  registered: boolean;
   installed: boolean;
   active: boolean;
   enabled: boolean;
   error?: string;
-
 }
 
 /**
@@ -58,23 +56,21 @@ export type PluginEventType =
  * 插件事件数据
  */
 export interface PluginEventData {
-type: PluginEventType;
+  type: PluginEventType;
   plugin?: Plugin;
   data?: unknown; // 简化类型
   timestamp: number;
-
 }
 
 /**
  * 插件配置项
  */
 export interface PluginConfigItem {
-key: string;
+  key: string;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'select' | 'textarea';
   defaultValue?: unknown;
-  options?: Array<{ label: string; value: unknown 
-}>;
+  options?: Array<{ label: string; value: unknown }>;
   description?: string;
   required?: boolean;
   validation?: (value: unknown) => boolean | string;
@@ -84,7 +80,7 @@ key: string;
  * 插件配置模式
  */
 export interface PluginConfigSchema {
-title: string;
+  title: string;
   description?: string;
   items: PluginConfigItem[];
 }
@@ -93,31 +89,32 @@ title: string;
  * 插件API权限
  */
 export interface PluginPermissions {
-player?: boolean;
+  player?: boolean;
   ui?: boolean;
   storage?: boolean;
   network?: boolean;
   filesystem?: boolean;
   system?: boolean;
-
 }
 
 /**
  * 插件加载选项
  */
 export interface PluginLoadOptions {
-autoInstall?: boolean;
+  autoInstall?: boolean;
   autoActivate?: boolean;
   permissions?: PluginPermissions;
   timeout?: number;
-
 }
 
 /**
  * 插件错误类型
  */
 export class PluginError extends Error {
-  constructor(_message: string, public pluginId: string, public code?: string
+  constructor(
+    _message: string,
+    public pluginId: string,
+    public code?: string
   ) {
     super(_message);
     this.name = 'PluginError';
@@ -128,7 +125,7 @@ export class PluginError extends Error {
  * 插件工具函数类型
  */
 export interface PluginUtils {
-/**
+  /**
    * 创建插件实例
    */
   createPlugin: (metadata: PluginMetadata) => Plugin;
@@ -152,14 +149,13 @@ export interface PluginUtils {
    * 生成插件ID
    */
   generatePluginId: (name: string, author?: string) => string;
-
 }
 
 /**
  * 插件生命周期钩子
  */
 export interface PluginLifecycleHooks {
-beforeInstall?: (plugin: Plugin) => void | Promise<void>;
+  beforeInstall?: (plugin: Plugin) => void | Promise<void>;
   afterInstall?: (plugin: Plugin) => void | Promise<void>;
   beforeUninstall?: (plugin: Plugin) => void | Promise<void>;
   afterUninstall?: (plugin: Plugin) => void | Promise<void>;
@@ -167,40 +163,37 @@ beforeInstall?: (plugin: Plugin) => void | Promise<void>;
   afterActivate?: (plugin: Plugin) => void | Promise<void>;
   beforeDeactivate?: (plugin: Plugin) => void | Promise<void>;
   afterDeactivate?: (plugin: Plugin) => void | Promise<void>;
-
 }
 
 /**
  * 插件管理器配置
  */
 export interface PluginManagerConfig {
-autoLoad?: boolean;
+  autoLoad?: boolean;
   pluginDir?: string;
   maxPlugins?: number;
   timeout?: number;
   hooks?: PluginLifecycleHooks;
   permissions?: PluginPermissions;
-
 }
 
 /**
  * 插件注册表项
  */
 export interface PluginRegistryEntry {
-plugin: Plugin;
+  plugin: Plugin;
   metadata: PluginMetadata;
   status: PluginStatus;
   loadTime?: number;
   activateTime?: number;
   error?: PluginError;
-
 }
 
 /**
  * 插件搜索过滤器
  */
 export interface PluginFilter {
-name?: string;
+  name?: string;
   author?: string;
   version?: string;
   status?: keyof PluginStatus;
@@ -211,29 +204,27 @@ name?: string;
  * 插件排序选项
  */
 export interface PluginSortOptions {
-field: 'name' | 'version' | 'author' | 'loadTime' | 'activateTime';
+  field: 'name' | 'version' | 'author' | 'loadTime' | 'activateTime';
   order: 'asc' | 'desc';
-
 }
 
 /**
  * 插件统计信息
  */
 export interface PluginStats {
-total: number;
+  total: number;
   registered: number;
   installed: number;
   active: number;
   enabled: number;
   errors: number;
-
 }
 
 /**
  * 插件开发工具类型
  */
 export interface PluginDevTools {
-/**
+  /**
    * 热重载插件
    */
   hotReload: (pluginId: string) => Promise<boolean>;
@@ -246,7 +237,7 @@ export interface PluginDevTools {
   /**
    * 获取插件日志
    */
-  getLogs: (pluginId: string) => string[]
+  getLogs: (pluginId: string) => string[];
 
   /**
    * 清理插件日志
@@ -257,14 +248,13 @@ export interface PluginDevTools {
    * 插件性能分析
    */
   profile: (pluginId: string) => Promise<unknown>;
-
 }
 
 /**
  * 简化的插件构建器
  */
 export class PluginBuilder {
-  private plugin: unknown = {}
+  private plugin: unknown = {};
 
   id(id: string): this {
     (this.plugin as any).id = id;
@@ -334,4 +324,4 @@ export class PluginBuilder {
  */
 export const createPlugin = (): PluginBuilder => {
   return new PluginBuilder();
-}
+};
