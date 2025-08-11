@@ -137,7 +137,7 @@ import { getUserPlaylist } from '@/api/user';
 import { navigateToMusicList } from '@/components/common/MusicListNavigator';
 import { useArtist } from '@/hooks/useArtist';
 import { usePlayerStore, useUserStore } from '@/store';
-import { IDayRecommend } from '@/types/day_recommend';
+import { type DailySong, IDayRecommend } from '@/types/day_recommend';
 import { Playlist } from '@/types/list';
 import type { IListDetail } from '@/types/listDetail';
 import { SongResult } from '@/types/music';
@@ -240,7 +240,7 @@ const loadDayRecommendData = async () => {
     dayRecommendData.value = {
       ...dayRecommendSource,
       dailySongs: dayRecommendSource.dailySongs.filter(
-        (song: any) => !playerStore.dislikeList.includes(song.id)
+        (song: DailySong) => !playerStore.dislikeList.includes(song.id)
       )
     };
   } catch (error) {
@@ -302,19 +302,19 @@ const showDayRecommend = () => {
   });
 };
 
-const openPlaylist = (item: any) => {
+const openPlaylist = (item: Playlist) => {
   playlistItem.value = item;
   playlistLoading.value = true;
 
-  getListDetail((item as any).id).then((res) => {
+  getListDetail(item.id).then((res) => {
     playlistDetail.value = res.data;
     playlistLoading.value = false;
 
     navigateToMusicList(router, {
-      id: (item as any).id,
+      id: item.id,
       type: 'playlist',
-      name: (item as any).name,
-      songList: (res.data.playlist.tracks as any) || [],
+      name: item.name,
+      songList: res.data.playlist.tracks || [],
       listInfo: res.data.playlist,
       canRemove: false
     });

@@ -115,7 +115,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { usePlayerStore } from '@/store/modules/player';
-import { formatTime } from '@/utils/formatters';
+import { formatTime } from '@/utils';
 
 const { t } = useI18n();
 const playerStore = usePlayerStore();
@@ -175,7 +175,7 @@ const formattedRemainingTime = computed(() => {
   const remaining = Math.max(0, sleepTimer.value.endTime - Date.now());
   const totalSeconds = Math.floor(remaining / 1000);
 
-  return formatTime(totalSeconds, 'hh:mm:ss');
+  return formatTime(totalSeconds, { format: 'hh:mm:ss' });
 });
 
 // 监听剩余时间变化

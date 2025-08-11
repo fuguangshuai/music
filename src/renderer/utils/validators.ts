@@ -5,36 +5,40 @@
 
 /**
  * URL验证函数
- * 验证字符串是否为有效的URL
- * @param url 待验证的URL字符串
- * @returns 是否为有效URL
+ * 验证字符串是否为有效的URL（内部委托给 modules/validation 的规则实现）
  */
 export const isValidUrl = (url: string): boolean => {
-  if (!url || typeof url !== 'string' || url.trim() === '') {
-    return false;
-  }
-
+  if (typeof url !== 'string') return false;
+  // 复用统一验证规则，避免正则逻辑漂移
   try {
-    new URL(url);
-    return true;
+    // 动态导入以避免循环依赖
+    const { stringRules } = require('./modules/validation');
+    const rule = stringRules.url();
+    return rule.validate(url) as boolean;
   } catch {
-    return false;
+    // 回退：使用 URL 构造器兜底
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   }
 };
 
 /**
- * 邮箱验证函数
- * 验证字符串是否为有效的邮箱地址
- * @param email 待验证的邮箱字符串
- * @returns 是否为有效邮箱
+ * 邮箱验证函数（内部委托给 modules/validation 的规则实现）
  */
 export const isValidEmail = (email: string): boolean => {
-  if (!email || typeof email !== 'string') {
-    return false;
+  if (typeof email !== 'string') return false;
+  try {
+    const { stringRules } = require('./modules/validation');
+    const rule = stringRules.email();
+    return rule.validate(email) as boolean;
+  } catch {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 };
 
 /**

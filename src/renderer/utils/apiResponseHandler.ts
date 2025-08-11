@@ -91,7 +91,7 @@ export const handleBatchApiResponse = <T>(responses: ApiResponseData[]): T[] => 
  * @returns 是否成功
  */
 export const isApiSuccess = (response: ApiResponseData): boolean => {
-  const apiResponse = response as StandardApiResponse<unknown>;
+  const apiResponse = response as StandardApiResponse<any>;
   return apiResponse.code === 200;
 };
 
@@ -101,7 +101,7 @@ export const isApiSuccess = (response: ApiResponseData): boolean => {
  * @returns 错误信息
  */
 export const getApiErrorMessage = (response: ApiResponseData): string => {
-  const apiResponse = response as StandardApiResponse<unknown>;
+  const apiResponse = response as StandardApiResponse<any>;
   return apiResponse.message || '未知错误';
 };
 
@@ -113,7 +113,7 @@ export const getApiErrorMessage = (response: ApiResponseData): string => {
  * @deprecated 使用 handleApiResponse 替代
  */
 export const safeHandleApiResponse = <T>(
-  response: unknown,
+  response: any,
   validator?: (data: any) => data is T
 ): T => {
   return handleApiResponse(response, validator);
@@ -128,7 +128,7 @@ export const safeHandleApiResponse = <T>(
 export const createSearchResponseHandler = () => {
   const cachedValidator = createCachedValidator(isEnhancedSearchResult);
 
-  return (response: unknown) => {
+  return (response: any) => {
     return handleApiResponse(response, cachedValidator);
   };
 };
@@ -140,7 +140,7 @@ export const createSearchResponseHandler = () => {
 export const createSongResponseHandler = () => {
   const cachedValidator = createCachedValidator(isEnhancedSong);
 
-  return (response: unknown) => {
+  return (response: any) => {
     return handleApiResponse(response, cachedValidator);
   };
 };
@@ -152,7 +152,7 @@ export const createSongResponseHandler = () => {
 export const createArtistResponseHandler = () => {
   const cachedValidator = createCachedValidator(isEnhancedArtist);
 
-  return (response: unknown) => {
+  return (response: any) => {
     return handleApiResponse(response, cachedValidator);
   };
 };
@@ -176,7 +176,7 @@ export class CachedApiResponseHandler<T> {
    * @param response API响应对象
    * @returns 处理后的数据
    */
-  handle(response: unknown): T {
+  handle(response: any): T {
     // 只对对象类型使用缓存
     if (typeof response === 'object' && response !== null) {
       if (this.cache.has(response)) {

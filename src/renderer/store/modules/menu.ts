@@ -5,10 +5,10 @@ import type { RouteRecordRaw } from 'vue-router';
 import homeRouter from '@/router/home';
 
 export const useMenuStore = defineStore('menu', () => {
-  const menus = ref(homeRouter);
+  const menus = ref<RouteRecordRaw[]>(homeRouter as RouteRecordRaw[]);
 
   const setMenus = (newMenus: RouteRecordRaw[]) => {
-    menus.value = newMenus as any;
+    menus.value = newMenus;
   };
 
   return {

@@ -96,7 +96,7 @@ export const typeHelpers = {
    * @returns 类型安全的转换结果
    * @throws {TypeError} 当验证失败且无回退值时抛出
    */
-  safeCast: <T>(value: unknown, validator: (val: unknown) => val is T, fallback?: T): T => {
+  safeCast: <T>(value: any, validator: (val: any) => val is T, fallback?: T): T => {
     if (validator(value)) {
       return value;
     }
@@ -256,7 +256,7 @@ export const typeGuards = {
   isApiResponse: <T = any>(value: ValidationInput): value is ApiResponse<T> => {
     if (!typeGuards.isObject(value)) return false;
 
-    const obj = value as Record<string, unknown>;
+    const obj = value as Record<string, any>;
 
     // 必须有code字段且为数字
     if (!typeGuards.isNumber(obj.code)) return false;
@@ -270,7 +270,7 @@ export const typeGuards = {
   },
 
   // 配置对象类型守卫
-  isConfigObject: (value: unknown): value is ConfigObject => {
+  isConfigObject: (value: any): value is ConfigObject => {
     if (!typeGuards.isObject(value)) return false;
 
     return Object.values(value).every(
@@ -279,12 +279,12 @@ export const typeGuards = {
   },
 
   // 临时API数据类型守卫
-  isTempApiData: (value: unknown): value is TempApiData => {
+  isTempApiData: (value: any): value is TempApiData => {
     return typeGuards.isJsonValue(value) || typeGuards.isObject(value);
   },
 
   // 第三方数据类型守卫
-  isThirdPartyData: (value: unknown): value is ThirdPartyData => {
+  isThirdPartyData: (value: any): value is ThirdPartyData => {
     return typeGuards.isJsonValue(value) || typeGuards.isObject(value);
   }
 };

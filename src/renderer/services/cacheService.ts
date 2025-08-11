@@ -27,7 +27,7 @@ export interface CacheStats {
 }
 
 // 本地内存缓存接口
-interface MemoryCacheItem<T = unknown> {
+interface MemoryCacheItem<T = any> {
   data: T;
   timestamp: number;
   ttl?: number;
@@ -273,7 +273,7 @@ class SmartCacheService {
     return await this.cacheData(CacheType.LYRIC, id.toString(), data);
   }
 
-  async getCachedLyric(id: number): Promise<unknown> {
+  async getCachedLyric(id: number): Promise<any> {
     return await this.getCachedData(CacheType.LYRIC, id.toString());
   }
 

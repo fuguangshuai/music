@@ -194,7 +194,7 @@ import { useI18n } from 'vue-i18n';
 
 import { getMvUrl } from '@/api/mv';
 import { IMvItem } from '@/types/mv';
-import { formatTime } from '@/utils/formatters';
+import { formatTime } from '@/utils';
 
 const { t } = useI18n();
 type PlayMode = 'single' | 'auto';

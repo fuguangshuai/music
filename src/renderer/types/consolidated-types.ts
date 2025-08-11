@@ -68,6 +68,47 @@ export type FunctionArgs = any[];
 // ============================================================================
 
 /**
+ * 共享媒体“Like”类型：用于统一 utils 返回值类型，避免直接使用 any/any[]
+ * 说明：保持字段可选与宽松（索引签名），不改变现有运行时结构
+ */
+export interface ArtistLike extends GenericObject {
+  id?: number | string;
+  name?: string;
+  picUrl?: string;
+  alias?: string[];
+}
+
+export interface AlbumLike extends GenericObject {
+  id?: number | string;
+  name?: string;
+  picUrl?: string;
+  artist?: ArtistLike;
+  artists?: ArtistLike[];
+  publishTime?: number;
+}
+
+export interface SongLike extends GenericObject {
+  id?: number | string;
+  name?: string;
+  ar?: ArtistLike[];
+  artists?: ArtistLike[];
+  al?: AlbumLike;
+  album?: AlbumLike;
+  duration?: number;
+  dt?: number;
+  picUrl?: string;
+}
+
+export interface PlaylistLike extends GenericObject {
+  id?: number | string;
+  name?: string;
+  coverImgUrl?: string;
+  playCount?: number;
+  bookCount?: number;
+  tracks?: SongLike[];
+}
+
+/**
  * 统一的 API 响应类型
  */
 export type ApiResponse<T = any> = StandardApiResponse<T>;

@@ -12,7 +12,7 @@ interface RecommendReason {
   targetUrl: null;
 }
 
-interface DailySong {
+export interface DailySong {
   name: string;
   id: number;
   pst: number;

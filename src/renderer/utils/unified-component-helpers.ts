@@ -25,7 +25,7 @@ export interface SafeComponentRef {
   value?: {
     $el?: HTMLElement;
     [key: string]: any;
-  };
+  } | null;
 }
 
 /**

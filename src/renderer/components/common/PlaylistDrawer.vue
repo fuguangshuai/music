@@ -128,7 +128,8 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue']);
 
 const message = useMessage();
-const playlists = ref<any[]>([0]);
+import type { PlaylistLike } from '@/types/consolidated-types';
+const playlists = ref<PlaylistLike[]>([]);
 const creating = ref(false);
 const isCreating = ref(false);
 
@@ -162,7 +163,9 @@ const fetchUserPlaylists = async () => {
 
     const res = await getUserPlaylist(user.userId, 999);
     if (res.data?.playlist) {
-      playlists.value = res.data.playlist.filter((item: any) => item.userId === user.userId);
+      playlists.value = res.data.playlist.filter(
+        (item: PlaylistLike) => item.userId === user.userId
+      );
     }
   } catch (error) {
     console.error('获取歌单失败:', error);
@@ -171,12 +174,12 @@ const fetchUserPlaylists = async () => {
 };
 
 // 添加到歌单
-const handleAddToPlaylist = async (playlist: { id: number; name: string }) => {
+const handleAddToPlaylist = async (playlist: PlaylistLike) => {
   if (!props.songId) return;
   try {
     const res = await updatePlaylistTracks({
       op: 'add',
-      pid: playlist.id,
+      pid: Number(playlist.id),
       tracks: props.songId.toString()
     });
     console.log('res.data', res.data);

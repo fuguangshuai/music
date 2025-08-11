@@ -250,3 +250,28 @@ export const formatPlaylistInfo = (playlist: any) => {
     tracks: [] // 默认值
   };
 };
+
+/**
+ * 根据命名模板格式化歌曲显示名称
+ * 模板占位符支持：{songName}、{artistName}、{albumName}
+ */
+export const formatSongName = (
+  songInfo: Record<string, any>,
+  nameFormat: string = '{songName} - {artistName}'
+): string => {
+  if (!songInfo || typeof songInfo !== 'object') return '';
+
+  const artists = (songInfo.ar || songInfo.artists || []) as Array<{ name?: string }>;
+  const artistName =
+    artists
+      .map((a) => a?.name || '')
+      .filter(Boolean)
+      .join('/ ') || '';
+  const songName = (songInfo.name as string) || '';
+  const albumName = ((songInfo.al || songInfo.album) as { name?: string })?.name || '';
+
+  return nameFormat
+    .replace(/\{songName\}/g, String(songName))
+    .replace(/\{artistName\}/g, String(artistName))
+    .replace(/\{albumName\}/g, String(albumName));
+};

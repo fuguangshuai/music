@@ -391,5 +391,5 @@ export type LoginResponse = EnhancedLoginResponse;
 /**
  * API响应类型别名
  */
-export type ApiResponse<T = unknown> = StandardApiResponse<T>;
+export type ApiResponse<T = any> = StandardApiResponse<T>;
 export type PaginatedResponse<T> = PaginatedApiResponse<T>;

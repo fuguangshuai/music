@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 
 interface MusicState {
-  currentMusicList: Record<string, unknown>[] | null;
+  currentMusicList: Record<string, any>[] | null;
   currentMusicListName: string;
-  currentListInfo: Record<string, unknown> | null;
+  currentListInfo: Record<string, any> | null;
   canRemoveSong: boolean;
 }
 
@@ -18,9 +18,9 @@ export const useMusicStore = defineStore('music', {
   actions: {
     // 设置当前音乐列表
     setCurrentMusicList(
-      list: Record<string, unknown>[],
+      list: Record<string, any>[],
       name: string,
-      listInfo: Record<string, unknown> | null = null,
+      listInfo: Record<string, any> | null = null,
       canRemove = false
     ) {
       this.currentMusicList = list;

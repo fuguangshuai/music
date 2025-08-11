@@ -6,7 +6,7 @@ import { playControl } from '@/services/playControlService';
 import { usePlayerStore } from '@/store';
 import type { SongResult } from '@/types/music';
 import { getImgUrl } from '@/utils';
-import { formatDuration } from '@/utils/formatters';
+import { formatDuration } from '@/utils';
 import { getImageBackground } from '@/utils/linearColor';
 
 import { useArtist } from './useArtist';

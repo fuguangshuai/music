@@ -34,10 +34,10 @@ import { typeGuards } from './typeHelpers';
  * @param value 待验证的值
  * @returns 类型守卫结果
  */
-export const isEnhancedSong = (value: unknown): value is EnhancedSong => {
+export const isEnhancedSong = (value: any): value is EnhancedSong => {
   if (!typeGuards.isObject(value)) return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证必需字段
   if (!typeGuards.isNumber(obj.id) || !typeGuards.isString(obj.name)) {
@@ -67,10 +67,10 @@ export const isEnhancedSong = (value: unknown): value is EnhancedSong => {
  * @param value 待验证的值
  * @returns 类型守卫结果
  */
-export const isEnhancedArtist = (value: unknown): value is EnhancedArtist => {
+export const isEnhancedArtist = (value: any): value is EnhancedArtist => {
   if (!typeGuards.isObject(value)) return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证必需字段
   if (!typeGuards.isNumber(obj.id) || !typeGuards.isString(obj.name)) {
@@ -94,10 +94,10 @@ export const isEnhancedArtist = (value: unknown): value is EnhancedArtist => {
  * @param value 待验证的值
  * @returns 类型守卫结果
  */
-export const isEnhancedAlbum = (value: unknown): value is EnhancedAlbum => {
+export const isEnhancedAlbum = (value: any): value is EnhancedAlbum => {
   if (!typeGuards.isObject(value)) return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证必需字段
   if (!typeGuards.isNumber(obj.id) || !typeGuards.isString(obj.name)) {
@@ -124,10 +124,10 @@ export const isEnhancedAlbum = (value: unknown): value is EnhancedAlbum => {
  * @param value 待验证的值
  * @returns 类型守卫结果
  */
-export const isEnhancedSearchResult = (value: unknown): value is EnhancedSearchResult => {
+export const isEnhancedSearchResult = (value: any): value is EnhancedSearchResult => {
   if (!typeGuards.isObject(value)) return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证songs字段
   if (obj.songs !== undefined) {
@@ -192,7 +192,7 @@ export const convertToSongResult = (song: EnhancedSong): any => {
  * @param searchResult 搜索结果对象
  * @returns 类型安全的SongResult数组
  */
-export const extractSearchSongs = (searchResult: unknown): any[] => {
+export const extractSearchSongs = (searchResult: any): any[] => {
   try {
     if (!isEnhancedSearchResult(searchResult)) {
       console.warn('🔍 搜索结果格式不正确，返回空数组');
@@ -218,7 +218,7 @@ export const extractSearchSongs = (searchResult: unknown): any[] => {
  * @param searchResult 搜索结果对象
  * @returns 类型安全的艺术家数组
  */
-export const extractSearchArtists = (searchResult: unknown): EnhancedArtist[] => {
+export const extractSearchArtists = (searchResult: any): EnhancedArtist[] => {
   try {
     if (!isEnhancedSearchResult(searchResult)) {
       console.warn('🔍 搜索结果格式不正确，返回空数组');
@@ -248,11 +248,8 @@ export const extractSearchArtists = (searchResult: unknown): EnhancedArtist[] =>
  * @param fallback 验证失败时的回退值
  * @returns 类型安全的提取器函数
  */
-export const createTypeSafeExtractor = <T>(
-  validator: (value: unknown) => value is T,
-  fallback: T
-) => {
-  return (data: unknown): T => {
+export const createTypeSafeExtractor = <T>(validator: (value: any) => value is T, fallback: T) => {
+  return (data: any): T => {
     if (validator(data)) {
       return data;
     }
@@ -275,8 +272,8 @@ export const createTypeSafeExtractor = <T>(
  * @throws {TypeError} 当验证失败时抛出
  */
 export const safeTypeAssertion = <T>(
-  value: unknown,
-  validator: (val: unknown) => val is T,
+  value: any,
+  validator: (val: any) => val is T,
   errorMessage?: string
 ): T => {
   if (validator(value)) {
@@ -294,10 +291,10 @@ export const safeTypeAssertion = <T>(
  * @param value 待验证的值
  * @returns 类型守卫结果
  */
-export const isEnhancedUser = (value: unknown): value is EnhancedUser => {
+export const isEnhancedUser = (value: any): value is EnhancedUser => {
   if (!typeGuards.isObject(value)) return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证必需字段
   if (!typeGuards.isNumber(obj.userId) || !typeGuards.isString(obj.nickname)) {
@@ -315,8 +312,8 @@ export const isEnhancedUser = (value: unknown): value is EnhancedUser => {
  * @returns 类型守卫结果
  */
 export const isStandardApiResponse = <T = unknown>(
-  value: unknown,
-  dataValidator?: (data: unknown) => data is T
+  value: any,
+  dataValidator?: (data: any) => data is T
 ): value is StandardApiResponse<T> => {
   if (!typeGuards.isObject(value)) return false;
 
@@ -349,8 +346,8 @@ export const isStandardApiResponse = <T = unknown>(
  * @returns 类型安全的数据
  */
 export const extractApiResponseData = <T>(
-  response: unknown,
-  dataValidator: (data: unknown) => data is T,
+  response: any,
+  dataValidator: (data: any) => data is T,
   fallback: T
 ): T => {
   try {
@@ -375,10 +372,7 @@ export const extractApiResponseData = <T>(
  * @param validator 元素验证器
  * @returns 验证通过的元素数组
  */
-export const validateArrayElements = <T>(
-  array: unknown,
-  validator: (item: unknown) => item is T
-): T[] => {
+export const validateArrayElements = <T>(array: any, validator: (item: any) => item is T): T[] => {
   if (!typeGuards.isArray(array)) {
     if (import.meta.env.DEV) {
       console.warn('🔒 输入不是数组，返回空数组');
@@ -403,10 +397,10 @@ export const validateArrayElements = <T>(
  * @param validator 原始验证器
  * @returns 带缓存的验证器
  */
-export const createCachedValidator = <T>(validator: (value: unknown) => value is T) => {
+export const createCachedValidator = <T>(validator: (value: any) => value is T) => {
   const cache = new WeakMap<object, boolean>();
 
-  return (value: unknown): value is T => {
+  return (value: any): value is T => {
     // 只对对象类型使用缓存
     if (typeof value === 'object' && value !== null) {
       if (cache.has(value)) {

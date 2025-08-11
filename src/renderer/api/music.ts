@@ -9,6 +9,7 @@ import type { SongResult } from '@/types/music';
 import { isElectron } from '@/utils';
 import request from '@/utils/request';
 import requestMusic from '@/utils/request_music';
+import { safeExtractData, safeExtractMusicUrl } from '@/utils/unified-api-handler';
 
 import { parseFromGDMusic } from './gdmusic';
 
@@ -206,8 +207,15 @@ export const getParsingMusicUrl = async (id: number, data: SongResult) => {
         };
       }
       if (result?.data) {
+        const extractedData = safeExtractData(data);
+        let songName = '未知';
+        if (extractedData && typeof extractedData === 'object' && 'name' in extractedData) {
+          const maybeName = (extractedData as Record<string, unknown>).name;
+          if (typeof maybeName === 'string' && maybeName) songName = maybeName;
+        }
+        const musicSource = safeExtractMusicUrl(result) || apiName;
         console.log(
-          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${(data as any).name || '未知'}, 音源: ${(result as any).data?.data?.source || apiName}`
+          `🎵 ${apiName}音乐解析成功 - 歌曲ID: ${id}, 歌曲: ${songName}, 音源: ${musicSource}`
         );
         return result;
       } else {

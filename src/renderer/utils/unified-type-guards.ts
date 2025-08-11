@@ -151,19 +151,20 @@ export const apiTypeGuards = {
    * 检查是否为标准API响应格式
    */
   isStandardApiResponse: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) && basicTypeGuards.isNumber((value as any).code),
+    complexTypeGuards.isObject(value) &&
+    basicTypeGuards.isNumber((value as Record<string, any>).code),
 
   /**
    * 检查是否为成功的API响应
    */
   isSuccessApiResponse: (value: ValidationInput): boolean =>
-    apiTypeGuards.isStandardApiResponse(value) && (value as any).code === 200,
+    apiTypeGuards.isStandardApiResponse(value) && (value as Record<string, any>).code === 200,
 
   /**
    * 检查是否为错误的API响应
    */
   isErrorApiResponse: (value: ValidationInput): boolean =>
-    apiTypeGuards.isStandardApiResponse(value) && (value as any).code !== 200,
+    apiTypeGuards.isStandardApiResponse(value) && (value as Record<string, any>).code !== 200,
 
   /**
    * 检查是否包含data字段
@@ -176,8 +177,8 @@ export const apiTypeGuards = {
    */
   isPaginatedResponse: (value: ValidationInput): boolean =>
     apiTypeGuards.hasDataField(value) &&
-    complexTypeGuards.isObject((value as any).data) &&
-    basicTypeGuards.isNumber((value as any).data.total)
+    complexTypeGuards.isObject((value as Record<string, any>).data) &&
+    basicTypeGuards.isNumber((value as Record<string, any>).data.total)
 } as const;
 
 // ============================================================================
@@ -200,35 +201,37 @@ export const musicTypeGuards = {
    */
   isValidSongData: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    musicTypeGuards.isValidSongId((value as any).id) &&
-    basicTypeGuards.isString((value as any).name),
+    musicTypeGuards.isValidSongId((value as Record<string, any>).id) &&
+    basicTypeGuards.isString((value as Record<string, any>).name),
 
   /**
    * 检查是否为有效的艺术家数据
    */
   isValidArtistData: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) && basicTypeGuards.isString((value as any).name),
+    complexTypeGuards.isObject(value) &&
+    basicTypeGuards.isString((value as Record<string, any>).name),
 
   /**
    * 检查是否为有效的专辑数据
    */
   isValidAlbumData: (value: ValidationInput): boolean =>
-    complexTypeGuards.isObject(value) && basicTypeGuards.isString((value as any).name),
+    complexTypeGuards.isObject(value) &&
+    basicTypeGuards.isString((value as Record<string, any>).name),
 
   /**
    * 检查是否为有效的播放列表数据
    */
   isValidPlaylistData: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    musicTypeGuards.isValidSongId((value as any).id) &&
-    basicTypeGuards.isString((value as any).name),
+    musicTypeGuards.isValidSongId((value as Record<string, any>).id) &&
+    basicTypeGuards.isString((value as Record<string, any>).name),
 
   /**
    * 检查歌曲是否可播放（基于fee字段）
    */
   isSongPlayable: (value: ValidationInput): boolean => {
     if (!musicTypeGuards.isValidSongData(value)) return false;
-    const fee = (value as any).fee;
+    const fee = (value as Record<string, any>).fee;
     return fee !== 1 && fee !== 4;
   }
 } as const;
@@ -253,25 +256,25 @@ export const configTypeGuards = {
    */
   isValidProxyConfig: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isString((value as any).host) &&
-    basicTypeGuards.isNumber((value as any).port),
+    basicTypeGuards.isString((value as Record<string, any>).host) &&
+    basicTypeGuards.isNumber((value as Record<string, any>).port),
 
   /**
    * 检查是否为有效的音频配置
    */
   isValidAudioConfig: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isNumber((value as any).volume) &&
-    (value as any).volume >= 0 &&
-    (value as any).volume <= 1,
+    basicTypeGuards.isNumber((value as Record<string, any>).volume) &&
+    (value as Record<string, any>).volume >= 0 &&
+    (value as Record<string, any>).volume <= 1,
 
   /**
    * 检查是否为有效的主题配置
    */
   isValidThemeConfig: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isString((value as any).mode) &&
-    ['light', 'dark', 'auto'].includes((value as any).mode),
+    basicTypeGuards.isString((value as Record<string, any>).mode) &&
+    ['light', 'dark', 'auto'].includes((value as Record<string, any>).mode),
 
   /**
    * 检查是否为有效的语言配置
@@ -301,22 +304,23 @@ export const errorTypeGuards = {
     errorTypeGuards.isError(value) &&
     ((value as Error).message.includes('network') ||
       (value as Error).message.includes('fetch') ||
-      (value as any).code === 'NETWORK_ERROR'),
+      (value as Record<string, any>).code === 'NETWORK_ERROR'),
 
   /**
    * 检查是否为音频错误
    */
   isAudioError: (value: ValidationInput): boolean =>
     errorTypeGuards.isError(value) &&
-    ((value as Error).message.includes('audio') || (value as any).code === 'AUDIO_ERROR'),
+    ((value as Error).message.includes('audio') ||
+      (value as Record<string, any>).code === 'AUDIO_ERROR'),
 
   /**
    * 检查是否为API错误
    */
   isApiError: (value: ValidationInput): boolean =>
     complexTypeGuards.isObject(value) &&
-    basicTypeGuards.isNumber((value as any).code) &&
-    (value as any).code !== 200,
+    basicTypeGuards.isNumber((value as Record<string, any>).code) &&
+    (value as Record<string, any>).code !== 200,
 
   /**
    * 检查是否为可恢复的错误

@@ -157,7 +157,7 @@
                   id: album.id,
                   picUrl: album.picUrl,
                   name: album.name,
-                  desc: formatPublishTime(album.publishTime),
+                  desc: useDateFormat(album.publishTime, 'YYYY-MM-DD').value,
                   size: album.size,
                   type: '专辑'
                 }"
@@ -188,6 +188,7 @@
 
 <script setup lang="ts">
 // import { useDateFormat } from '@vueuse/core'; // 暂时未使用
+import { useDateFormat } from '@vueuse/core';
 import { useMessage } from 'naive-ui';
 import PinyinMatch from 'pinyin-match';
 import {
@@ -211,7 +212,6 @@ import SongItem from '@/components/common/SongItem.vue';
 import { usePlayerStore } from '@/store';
 import { IArtist } from '@/types/artist';
 import { getImgUrl, isMobile } from '@/utils';
-import { formatPublishTime } from '@/utils/formatters';
 import { isEnhancedArtist } from '@/utils/typeSafeHelpers';
 
 defineOptions({

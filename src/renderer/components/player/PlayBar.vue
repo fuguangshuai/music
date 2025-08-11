@@ -4,7 +4,7 @@
     :class="[
       setAnimationClass('animate__bounceInUp'),
       musicFullVisible ? 'play-bar-opcity' : '',
-      musicFullVisible && (MusicFullRef as any)?.musicFullRef?.config?.hidePlayBar
+      musicFullVisible && getMusicFullConfig()?.hidePlayBar
         ? 'animate__animated animate__slideOutDown'
         : ''
     ]"
@@ -178,10 +178,17 @@ import { audioService } from '@/services/audioService';
 import { usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { getImgUrl, isElectron, isMobile, secondToMinute, setAnimationClass } from '@/utils';
+import { SafeComponentRefHelper } from '@/utils/unified-component-helpers';
 
 const playerStore = usePlayerStore();
 const settingsStore = useSettingsStore();
 const { t } = useI18n();
+
+// 安全获取MusicFull配置
+const getMusicFullConfig = () => {
+  const musicFullRef = SafeComponentRefHelper.getProperty(MusicFullRef, 'musicFullRef');
+  return musicFullRef?.config || null;
+};
 const message = useMessage();
 // 是否播放
 const play = computed(() => playerStore.isPlay);
@@ -324,7 +331,9 @@ function handlePrev(): void {
   playerStore.prevPlay();
 }
 
-const MusicFullRef = ref<unknown>(null);
+const MusicFullRef = ref<{ musicFullRef?: { config?: Record<string, unknown> | null } } | null>(
+  null
+);
 const showSliderTooltip = ref(false);
 
 // 播放暂停按钮事件

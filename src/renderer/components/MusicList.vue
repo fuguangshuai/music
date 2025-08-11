@@ -119,6 +119,13 @@ import { useI18n } from 'vue-i18n';
 import type { MusicApiResponse } from '@/types/api-responses';
 import { formatSongData } from '@/utils/musicDataFormatter';
 
+// 定义艺术家类型
+interface Artist {
+  id: number;
+  name: string;
+  [key: string]: any;
+}
+
 const emit = defineEmits<{
   'remove-song': [id: string];
   'update:show': [show: boolean];
@@ -209,18 +216,15 @@ const filteredSongs = computed(() => {
     // 原始文本匹配
     const nameMatch = songName.includes(keyword);
     const albumMatch = albumName.includes(keyword);
-    const artistsMatch = artists.some((artist: any) => {
-      return (artist as MusicApiResponse).name?.toLowerCase().includes(keyword);
+    const artistsMatch = artists.some((artist: Artist) => {
+      return artist.name?.toLowerCase().includes(keyword);
     });
 
     // 拼音匹配
     const namePinyinMatch = song.name && PinyinMatch.match(song.name, keyword);
     const albumPinyinMatch = song.al?.name && PinyinMatch.match(song.al.name, keyword);
-    const artistsPinyinMatch = artists.some((artist: any) => {
-      return (
-        (artist as MusicApiResponse).name &&
-        PinyinMatch.match((artist as MusicApiResponse).name, keyword)
-      );
+    const artistsPinyinMatch = artists.some((artist: Artist) => {
+      return artist.name && PinyinMatch.match(artist.name, keyword);
     });
 
     return (
@@ -235,7 +239,7 @@ const filteredSongs = computed(() => {
 });
 
 // 格式化歌曲数据
-const formatSong = (item: any) => {
+const formatSong = (item: MusicApiResponse | SongResult): SongResult | null => {
   if (!item) {
     return null;
   }
@@ -266,13 +270,13 @@ const loadSongs = async (ids: number[], appendToList = true, updateComplete = fa
       let newSongs = songs;
       if (!updateComplete) {
         // 在普通加载模式下继续过滤已加载的歌曲，避免重复
-        newSongs = songs.filter((song: any) => !loadedIds.value.has(song.id));
+        newSongs = songs.filter((song: SongResult) => !loadedIds.value.has(Number(song.id)));
         console.log(`过滤已加载ID后剩余歌曲数量: ${newSongs.length}`);
       }
 
       // 更新已加载ID集合
-      songs.forEach((song: any) => {
-        loadedIds.value.add((song as MusicApiResponse).id);
+      songs.forEach((song: SongResult) => {
+        loadedIds.value.add(Number(song.id));
       });
 
       // 追加到显示列表 - 仅当appendToList=true时添加到displayedSongs
@@ -494,11 +498,11 @@ const loadMoreSongs = async () => {
         await loadSongs(trackIdsToLoad, true, false);
       }
     } else if (start < props.songList.length) {
-      const newSongs = props.songList.slice(start, end);
-      newSongs.forEach((song: any) => {
-        if (!loadedIds.value.has((song as MusicApiResponse).id as number)) {
-          loadedIds.value.add((song as MusicApiResponse).id as number);
-          displayedSongs.value.push(song as any);
+      const newSongs = props.songList.slice(start, end) as unknown as SongResult[];
+      newSongs.forEach((song: SongResult) => {
+        if (!loadedIds.value.has(Number(song.id))) {
+          loadedIds.value.add(Number(song.id));
+          displayedSongs.value.push(song);
         }
       });
     }
@@ -543,10 +547,10 @@ const resetListState = () => {
 };
 
 // 初始化歌曲列表
-const initSongList = (songs: any[]) => {
+const initSongList = (songs: SongResult[]) => {
   if (songs.length > 0) {
-    displayedSongs.value = [...songs] as SongResult[];
-    songs.forEach((song) => loadedIds.value.add((song as MusicApiResponse).id));
+    displayedSongs.value = [...songs];
+    songs.forEach((song) => loadedIds.value.add(Number((song as SongResult).id)));
     page.value = Math.ceil(songs.length / pageSize);
   }
 
@@ -571,7 +575,7 @@ watch(
     resetListState;
 
     // 初始化歌曲列表
-    initSongList(newSongs);
+    initSongList(newSongs as unknown as SongResult[]);
 
     // 如果还有更多歌曲需要加载，且差距较小，立即加载
     if (hasMore.value && props.listInfo?.trackIds) {

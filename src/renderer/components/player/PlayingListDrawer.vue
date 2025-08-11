@@ -65,6 +65,7 @@ import SongItem from '@/components/common/SongItem.vue';
 import { usePlayerStore } from '@/store/modules/player';
 import type { SongResult } from '@/types/music';
 import { isMobile } from '@/utils';
+import { SafeComponentRefHelper } from '@/utils/unified-component-helpers';
 
 const { t } = useI18n();
 const message = useMessage();
@@ -114,7 +115,7 @@ watch(
 const playList = computed(() => playerStore.playList as SongResult[]);
 
 // 播放列表引用
-const playListRef = ref<unknown>(null);
+const playListRef = ref<{ scrollTo?: (options: { top: number }) => void } | null>(null);
 
 // 关闭面板
 const closePanel = () => {
@@ -169,7 +170,7 @@ const scrollToCurrentSong = () => {
     if (playListRef.value && playList.value.length > 0) {
       const index = playerStore.playListIndex;
       console.log('滚动到歌曲索引:', index);
-      (playListRef.value as any).scrollTo({
+      SafeComponentRefHelper.callMethod(playListRef, 'scrollTo', {
         top: (index > 3 ? index - 3 : 0) * 62
       });
     }

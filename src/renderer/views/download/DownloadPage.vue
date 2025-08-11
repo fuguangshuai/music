@@ -428,7 +428,8 @@ import { getMusicDetail } from '@/api/music';
 import { usePlayerStore } from '@/store/modules/player';
 import type { SongResult } from '@/types/music';
 import { getImgUrl } from '@/utils';
-import { formatFileSize, formatSongName } from '@/utils/formatters';
+import { formatFileSize } from '@/utils/modules/format';
+import { formatSongName } from '@/utils/musicDataFormatter';
 
 const { t } = useI18n();
 const playerStore = usePlayerStore();

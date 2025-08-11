@@ -13,6 +13,7 @@
 import { reactive, ref } from 'vue';
 
 import { isElectron } from '@/utils';
+import { SafePerformanceAPI } from '@/utils/unified-browser-api';
 
 // 性能指标接口定义
 export interface PerformanceMetrics {
@@ -170,12 +171,12 @@ class PerformanceMonitor {
    * 跟踪内存使用情况
    */
   trackMemoryUsage(): void {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
+    const memoryInfo = SafePerformanceAPI.getMemoryInfo();
+    if (memoryInfo) {
       this.metrics.memory = {
-        usedJSHeapSize: memory.usedJSHeapSize,
-        totalJSHeapSize: memory.totalJSHeapSize,
-        jsHeapSizeLimit: memory.jsHeapSizeLimit,
+        usedJSHeapSize: memoryInfo.usedJSHeapSize || 0,
+        totalJSHeapSize: memoryInfo.totalJSHeapSize || 0,
+        jsHeapSizeLimit: memoryInfo.jsHeapSizeLimit || 0,
         timestamp: Date.now()
       };
     }

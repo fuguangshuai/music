@@ -3,13 +3,81 @@
  * 整合智能加载、错误恢复、无障碍访问等功能
  */
 
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, type ComputedRef, nextTick, onMounted, onUnmounted, type Ref, ref } from 'vue';
 
 import { smartLoadingManager } from '@/directive/loading';
 import { a11y, type AccessibilityConfig, accessibilityManager } from '@/utils/accessibility';
 import { AppError, globalErrorHandler } from '@/utils/errorHandler';
 
-export function useUXEnhancer(): any {
+/**
+ * UX增强Hook返回类型接口
+ */
+export interface UseUXEnhancerReturn {
+  /** 加载状态 */
+  isLoading: Ref<boolean>;
+  /** 加载消息 */
+  loadingMessage: Ref<string>;
+  /** 是否有任何加载中 */
+  isAnyLoading: ComputedRef<boolean>;
+  /** 开始加载 */
+  startLoading: (
+    id: string,
+    message?: string,
+    priority?: 'low' | 'medium' | 'high',
+    minDuration?: number
+  ) => void;
+  /** 停止加载 */
+  stopLoading: (id: string) => Promise<void>;
+  /** 错误信息 */
+  error: Ref<AppError | null>;
+  /** 处理错误 */
+  handleError: (err: Error | AppError) => void;
+  /** 清除错误 */
+  clearError: () => void;
+  /** 重试最后操作 */
+  retryLastAction: (action?: () => Promise<void>) => Promise<void>;
+  /** 无障碍配置 */
+  accessibilityConfig: Ref<AccessibilityConfig>;
+  /** 设置无障碍 */
+  setupAccessibility: (container: HTMLElement, options?: any) => () => void;
+  /** 设置ARIA属性 */
+  setAriaAttributes: (
+    element: HTMLElement,
+    attributes: Record<string, string | boolean | number>
+  ) => void;
+  /** 管理焦点 */
+  manageFocus: (element: HTMLElement, options?: { preventScroll?: boolean }) => void;
+  /** 公告 */
+  announce: (message: string, priority?: 'polite' | 'assertive') => void;
+  /** 切换高对比度 */
+  toggleHighContrast: (enable?: boolean) => void;
+  /** 切换减少动画 */
+  toggleReducedMotion: (enable?: boolean) => void;
+  /** 设置字体大小 */
+  setFontSize: (size: any) => void;
+  /** 焦点陷阱 */
+  trapFocus: (container: HTMLElement) => () => void;
+  /** 释放焦点陷阱 */
+  releaseFocusTrap: () => void;
+  /** 页面过渡 */
+  pageTransition: Ref<any>;
+  /** 屏幕尺寸 */
+  screenSize: Ref<any>;
+  /** 是否移动设备 */
+  isMobile: Ref<boolean>;
+  /** 是否平板设备 */
+  isTablet: Ref<boolean>;
+  /** 是否桌面设备 */
+  isDesktop: ComputedRef<boolean>;
+  /** 设置页面过渡 */
+  setPageTransition: (transition: any) => void;
+  /** UX指标 */
+  uxMetrics: Ref<any>;
+  /** 更新UX指标 */
+  updateUXMetrics: (metrics: any) => void;
+}
+
+export function useUXEnhancer(): UseUXEnhancerReturn {
   const isLoading = ref(false);
   const loadingMessage = ref('加载中...');
   const error = ref<AppError | null>(null);
@@ -63,8 +131,8 @@ export function useUXEnhancer(): any {
     error.value = null;
   };
 
-  const retryLastAction = async (action: () => Promise<void>) => {
-    if (!error.value) return;
+  const retryLastAction = async (action?: () => Promise<void>) => {
+    if (!error.value || !action) return;
 
     clearError();
 
@@ -148,6 +216,7 @@ export function useUXEnhancer(): any {
   const isMobile = ref(false);
   const isTablet = ref(false);
   const screenSize = ref<'mobile' | 'tablet' | 'desktop'>('desktop');
+  const isDesktop = computed(() => !isMobile.value && !isTablet.value);
 
   const updateScreenSize = () => {
     const width = window.innerWidth;
@@ -301,6 +370,7 @@ export function useUXEnhancer(): any {
     // 响应式适配
     isMobile,
     isTablet,
+    isDesktop,
     screenSize,
 
     // 焦点管理

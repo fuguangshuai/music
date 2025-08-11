@@ -14,6 +14,7 @@ import { Howl } from 'howler';
 import { ref } from 'vue';
 
 import type { SongResult } from '@/types/music';
+import { SafeNetworkAPI } from '@/utils/unified-browser-api';
 
 // 预加载音频实例接口
 interface PreloadedAudio {
@@ -510,10 +511,7 @@ class SmartPreloadService extends AudioPreloadService {
 
   private detectNetworkCondition(): NetworkCondition {
     // 使用Navigator API检测网络状况
-    const connection =
-      (navigator as any).connection ||
-      (navigator as any).mozConnection ||
-      (navigator as any).webkitConnection;
+    const connection = SafeNetworkAPI.getConnection();
 
     if (connection) {
       const speed = connection.downlink || 1; // Mbps
@@ -537,11 +535,20 @@ class SmartPreloadService extends AudioPreloadService {
   }
 
   private setupNetworkMonitoring(): void {
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
-      connection.addEventListener('change', () => {
-        this.adaptToNetworkConditions();
-      });
+    const connection = SafeNetworkAPI.getConnection();
+    if (connection) {
+      // 注意：实际的connection对象可能不支持addEventListener
+      // 这里保持原有逻辑，但使用类型安全的方式获取connection
+      try {
+        const rawConnection = (navigator as any).connection;
+        if (rawConnection && typeof rawConnection.addEventListener === 'function') {
+          rawConnection.addEventListener('change', () => {
+            this.adaptToNetworkConditions();
+          });
+        }
+      } catch (error) {
+        console.warn('🌐 网络监听设置失败', error);
+      }
     }
 
     // 监听在线/离线状态

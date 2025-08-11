@@ -171,10 +171,15 @@ import { useSettingsStore } from '@/store/modules/settings';
 import { DEFAULT_LYRIC_CONFIG, LyricConfig } from '@/types/lyric';
 import { getImgUrl, isMobile } from '@/utils';
 import { animateGradient, getHoverBackgroundColor, getTextColors } from '@/utils/linearColor';
+import {
+  safeAddEventListener,
+  SafeComponentRefHelper,
+  safeRemoveEventListener
+} from '@/utils/unified-component-helpers';
 
 const { t } = useI18n();
 // 定义 refs
-const lrcSider = ref<unknown>(null);
+const lrcSider = ref<{ $el?: HTMLElement } | null>(null);
 const isMouse = ref(false);
 const lrcContainer = ref<HTMLElement | null>(null);
 const currentBackground = ref('');
@@ -442,7 +447,9 @@ watch(
 // 监听滚动事件
 const handleScroll = () => {
   if (!lrcSider.value || !config.value.hideCover) return;
-  const { scrollTop } = (lrcSider.value as any).$el;
+  const element = SafeComponentRefHelper.getElement(lrcSider);
+  if (!element) return;
+  const { scrollTop } = element;
   showStickyHeader.value = scrollTop > 100;
 };
 
@@ -455,8 +462,9 @@ const closeMusicFull = () => {
 
 // 添加滚动监听
 onMounted(() => {
-  if ((lrcSider.value as any)?.$el) {
-    (lrcSider.value as any).$el.addEventListener('scroll', handleScroll);
+  const element = SafeComponentRefHelper.getElement(lrcSider);
+  if (element) {
+    safeAddEventListener(element, 'scroll', handleScroll);
   }
 });
 
@@ -465,8 +473,9 @@ onBeforeUnmount(() => {
   if (animationFrame.value) {
     cancelAnimationFrame(animationFrame.value);
   }
-  if ((lrcSider.value as any)?.$el) {
-    (lrcSider.value as any).$el.removeEventListener('scroll', handleScroll);
+  const element = SafeComponentRefHelper.getElement(lrcSider);
+  if (element) {
+    safeRemoveEventListener(element, 'scroll', handleScroll);
   }
 });
 
@@ -510,8 +519,9 @@ onMounted(() => {
   if (savedConfig) {
     config.value = { ...config.value, ...JSON.parse(savedConfig) };
   }
-  if ((lrcSider.value as any)?.$el) {
-    (lrcSider.value as any).$el.addEventListener('scroll', handleScroll);
+  const element = SafeComponentRefHelper.getElement(lrcSider);
+  if (element) {
+    safeAddEventListener(element, 'scroll', handleScroll);
   }
 });
 

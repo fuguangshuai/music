@@ -1,10 +1,38 @@
-import { ref } from 'vue';
+import { type Ref, ref } from 'vue';
+
+/**
+ * 缩放功能返回类型接口
+ */
+export interface UseZoomReturn {
+  /** 当前缩放因子 */
+  zoomFactor: Ref<number>;
+  /** 初始化缩放因子 */
+  initZoomFactor: () => Promise<void>;
+  /** 增加缩放比例 */
+  increaseZoom: () => void;
+  /** 减少缩放比例 */
+  decreaseZoom: () => void;
+  /** 重置缩放比例 */
+  resetZoom: () => Promise<void>;
+  /** 设置为100%缩放 */
+  setZoom100: () => void;
+  /** 设置缩放因子 */
+  setZoomFactor: (zoom: number) => void;
+  /** 检查是否为100%缩放 */
+  isZoom100: () => boolean;
+  /** 最小缩放值 */
+  MIN_ZOOM: number;
+  /** 最大缩放值 */
+  MAX_ZOOM: number;
+  /** 缩放步长 */
+  ZOOM_STEP: number;
+}
 
 /**
  * 页面缩放功能的组合式API
  * 提供页面缩放相关的状态和方法
  */
-export function useZoom(): any {
+export function useZoom(): UseZoomReturn {
   // 缩放相关常量
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 1.5;

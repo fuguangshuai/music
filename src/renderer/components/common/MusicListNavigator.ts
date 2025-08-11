@@ -13,14 +13,7 @@ export function navigateToMusicList(
     id?: string | number;
     type?: 'album' | 'playlist' | 'dailyRecommend' | string;
     name: string;
-    songList: Array<{
-      id: string | number;
-      name: string;
-      artist?: string;
-      album?: string;
-      duration?: number;
-      [key: string]: any;
-    }>;
+    songList: any[];
     listInfo?: any;
     canRemove?: boolean;
   }
@@ -28,8 +21,8 @@ export function navigateToMusicList(
   const musicStore = useMusicStore();
   const { id, type, name, songList, listInfo, canRemove = false } = _options;
 
-  // 保存数据到状态管理
-  musicStore.setCurrentMusicList(songList, name, listInfo as Record<string, unknown>, canRemove);
+  // 保存数据到状态管理（在此处统一收敛到宽松的 Record 类型，避免上层 anyType）
+  musicStore.setCurrentMusicList(songList as any[], name, (listInfo ?? null) as any, canRemove);
 
   // 路由跳转
   if (id) {

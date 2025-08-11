@@ -3,12 +3,46 @@
  * 提供Vue组件中使用智能缓存的便捷接口
  */
 
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, type ComputedRef, onMounted, onUnmounted, type Ref, ref } from 'vue';
 
 import { type CacheStats, CacheType, smartCacheService } from '@/services/cacheService';
 import { CacheUtils } from '@/utils/cacheUtils';
 
-export function useSmartCache(): any {
+/**
+ * 智能缓存Hook返回类型接口
+ */
+export interface UseSmartCacheReturn {
+  /** 缓存统计信息 */
+  cacheStats: Ref<Map<string, CacheStats> | null>;
+  /** 加载状态 */
+  isLoading: Ref<boolean>;
+  /** 错误信息 */
+  error: Ref<string | null>;
+  /** 总缓存大小 */
+  totalCacheSize: ComputedRef<number>;
+  /** 平均命中率 */
+  averageHitRate: ComputedRef<number>;
+  /** 总缓存项数 */
+  totalCacheItems: ComputedRef<number>;
+  /** 缓存数据 */
+  cacheData: <T>(type: CacheType, key: string, data: T, ttl?: number) => Promise<boolean>;
+  /** 获取缓存数据 */
+  getCachedData: <T>(type: CacheType, key: string) => Promise<T | undefined>;
+  /** 清理缓存 */
+  clearCache: (type: CacheType) => Promise<boolean>;
+  /** 刷新统计 */
+  refreshStats: () => Promise<void>;
+  /** 分析性能 */
+  analyzePerformance: () => Promise<any>;
+  /** 智能清理 */
+  smartCleanup: () => Promise<any>;
+  /** 开始自动刷新 */
+  startAutoRefresh: (intervalMs?: number) => void;
+  /** 停止自动刷新 */
+  stopAutoRefresh: () => void;
+}
+
+export function useSmartCache(): UseSmartCacheReturn {
   const cacheStats = ref<Map<string, CacheStats> | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -232,10 +266,22 @@ export function useSmartCache(): any {
 }
 
 /**
+ * 图片缓存Hook返回类型接口
+ */
+export interface UseImageCacheReturn {
+  /** 缓存图片 */
+  cacheImage: (url: string, imageData: Blob, ttl?: number) => Promise<boolean>;
+  /** 获取缓存图片 */
+  getCachedImage: (url: string) => Promise<string | Blob | undefined>;
+  /** 清理图片缓存 */
+  clearImageCache: () => Promise<boolean>;
+}
+
+/**
  * 特定类型缓存的组合式函数
  */
-export function useImageCache(): any {
-  const { clearCache } = useSmartCache() as any;
+export function useImageCache(): UseImageCacheReturn {
+  const { clearCache } = useSmartCache();
 
   const cacheImage = async (url: string, imageData: string | Blob, ttl?: number) => {
     return await CacheUtils.cacheImage(url, imageData, ttl);
@@ -256,8 +302,25 @@ export function useImageCache(): any {
   };
 }
 
-export function useApiCache(): any {
-  const { clearCache } = useSmartCache() as any;
+/**
+ * API缓存Hook返回类型接口
+ */
+export interface UseApiCacheReturn {
+  /** 缓存API响应 */
+  cacheApiResponse: (
+    endpoint: string,
+    params: Record<string, unknown>,
+    response: any,
+    ttl?: number
+  ) => Promise<boolean>;
+  /** 获取缓存API响应 */
+  getCachedApiResponse: (endpoint: string, params: Record<string, unknown>) => Promise<any>;
+  /** 清理API缓存 */
+  clearApiCache: () => Promise<boolean>;
+}
+
+export function useApiCache(): UseApiCacheReturn {
+  const { clearCache } = useSmartCache();
 
   const cacheApiResponse = async (
     endpoint: string,
@@ -283,8 +346,20 @@ export function useApiCache(): any {
   };
 }
 
-export function useUserDataCache(): any {
-  const { clearCache } = useSmartCache() as any;
+/**
+ * 用户数据缓存Hook返回类型接口
+ */
+export interface UseUserDataCacheReturn {
+  /** 缓存用户数据 */
+  cacheUserData: (userId: string, data: Record<string, unknown>, ttl?: number) => Promise<boolean>;
+  /** 获取缓存用户数据 */
+  getCachedUserData: (userId: string) => Promise<Record<string, unknown> | undefined>;
+  /** 清理用户数据缓存 */
+  clearUserDataCache: () => Promise<boolean>;
+}
+
+export function useUserDataCache(): UseUserDataCacheReturn {
+  const { clearCache } = useSmartCache();
 
   const cacheUserData = async (userId: string, data: Record<string, unknown>, ttl?: number) => {
     return await CacheUtils.cacheUserData(userId, data, ttl);

@@ -8,24 +8,25 @@
         </div>
       </div>
       <div class="app-menu-list">
-        <div v-for="(item, index) in menus" :key="String((item as any).path)" class="app-menu-item">
+        <div v-for="(item, index) in menus" :key="String(item.path)" class="app-menu-item">
           <n-tooltip :delay="200" :disabled="isText || isMobile" placement="bottom">
             <template #trigger>
-              <router-link class="app-menu-item-link" :to="(item as any).path">
+              <router-link class="app-menu-item-link" :to="item.path">
                 <i
                   class="iconfont app-menu-item-icon"
                   :style="iconStyle(index)"
-                  :class="(item as any).meta?.icon"
+                  :class="item.meta?.icon as string"
                 ></i>
                 <span
                   v-if="isText"
                   class="app-menu-item-text ml-3"
                   :class="isChecked(index) ? 'text-green-500' : ''"
-                  >{{ t((item as any).meta?.title) }}</span
                 >
+                  {{ t((item.meta?.title as string) || '') }}
+                </span>
               </router-link>
             </template>
-            <div v-if="!isText">{{ t((item as any).meta?.title) }}</div>
+            <div v-if="!isText">{{ t((item.meta?.title as string) || '') }}</div>
           </n-tooltip>
         </div>
       </div>
@@ -36,29 +37,26 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteRecordRaw } from 'vue-router';
 import { useRoute } from 'vue-router';
 
 import icon from '@/assets/icon.png';
 import { isMobile } from '@/utils';
 
-const props = defineProps({
-  _size: {
-    type: String,
-    default: '26px'
-  },
-  color: {
-    type: String,
-    default: '#aaa'
-  },
-  selectColor: {
-    type: String,
-    default: '#10B981'
-  },
-  menus: {
-    type: Array as () => Array<Record<string, unknown>>,
-    default: () => []
+const props = withDefaults(
+  defineProps<{
+    _size?: string;
+    color?: string;
+    selectColor?: string;
+    menus: RouteRecordRaw[];
+  }>(),
+  {
+    _size: '26px',
+    color: '#aaa',
+    selectColor: '#10B981',
+    menus: () => []
   }
-});
+);
 
 const route = useRoute();
 const path = ref(route.path);

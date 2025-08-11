@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRules } from 'naive-ui';
+import type { FormItemRule, FormRules } from 'naive-ui';
 import { useMessage } from 'naive-ui';
 import { defineEmits, defineProps, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -92,7 +92,7 @@ const proxyRules: FormRules = {
       trigger: ['blur', 'change']
     },
     {
-      validator: (_rule: any, value: any) => {
+      validator: (_rule: FormItemRule, value: string) => {
         if (!value) {
           return new Error('请输入代理主机地址');
         }
@@ -115,7 +115,7 @@ const proxyRules: FormRules = {
       trigger: ['blur', 'change']
     },
     {
-      validator: (_rule: any, value: any) => {
+      validator: (_rule: FormItemRule, value: number) => {
         if (value >= 1 && value <= 65535) {
           return true;
         } else {

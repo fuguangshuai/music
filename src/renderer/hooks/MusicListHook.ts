@@ -8,6 +8,7 @@ import { useSettingsStore } from '@/store';
 import type { ILyric, ILyricText, SongResult } from '@/types/music';
 import { getImgUrl } from '@/utils';
 import { getImageLinearBackground } from '@/utils/linearColor';
+import { safeExtractLyrics } from '@/utils/unified-api-handler';
 
 const musicHistory = useMusicHistory();
 
@@ -235,11 +236,21 @@ export const useMusicListHook = () => {
   const loadLrc = async (_playMusicId: number): Promise<ILyric> => {
     try {
       const { data } = await getMusicLrc(_playMusicId);
-      const { lyrics, times } = parseLyrics((data as any).lrc.lyric);
+      const lrcData = safeExtractLyrics(data);
+
+      if (!lrcData?.lrc?.lyric) {
+        console.warn('🎵 歌词数据不完整');
+        return {
+          lrcTimeArray: [],
+          lrcArray: []
+        };
+      }
+
+      const { lyrics, times } = parseLyrics(lrcData.lrc.lyric);
       const tlyric: Record<string, string> = {};
 
-      if ((data as any).tlyric && (data as any).tlyric.lyric) {
-        const { lyrics: tLyrics, times: tTimes } = parseLyrics((data as any).tlyric.lyric);
+      if (lrcData.tlyric?.lyric) {
+        const { lyrics: tLyrics, times: tTimes } = parseLyrics(lrcData.tlyric.lyric);
         tLyrics.forEach((lyric, index) => {
           tlyric[tTimes[index].toString()] = lyric.text;
         });

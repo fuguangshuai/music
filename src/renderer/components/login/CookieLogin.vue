@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 
 import { getUserDetail } from '@/api/login';
 import { isElectron, setAnimationClass } from '@/utils';
+import { safeExtractLoginData } from '@/utils/unified-api-handler';
 
 defineOptions({
   name: 'CookieLogin'
@@ -38,10 +39,11 @@ const loginByToken = async () => {
 
     // 获取用户信息验证token有效性
     const user = await getUserDetail();
-    if ((user as any).data && (user as any).data.profile) {
+    const loginData = safeExtractLoginData(user);
+    if (loginData?.profile) {
       const successMsg = t('login.message.tokenLoginSuccess');
       message.success(successMsg);
-      emit('loginSuccess', (user as any).data.profile, 'token');
+      emit('loginSuccess', loginData.profile, 'token');
     } else {
       // token无效，清除localStorage
       localStorage.removeItem('token');
@@ -78,10 +80,11 @@ const handleCookieReceived = async (_event: any, cookieValue: string) => {
 
     // 验证Cookie有效性
     const user = await getUserDetail();
-    if ((user as any).data && (user as any).data.profile) {
+    const loginData = safeExtractLoginData(user);
+    if (loginData?.profile) {
       const successMsg = t('login.message.autoGetCookieSuccess');
       message.success(successMsg);
-      emit('loginSuccess', (user as any).data.profile, 'cookie');
+      emit('loginSuccess', loginData.profile, 'cookie');
     } else {
       localStorage.removeItem('token');
       const errorMsg = t('login.message.autoGetCookieFailed');

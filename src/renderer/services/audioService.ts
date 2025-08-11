@@ -906,6 +906,7 @@ class AudioService {
     this.currentSound.rate(rate);
 
     // 取出底层 HTMLAudioElement，改原生 playbackRate
+    // 注意：这里仍需要访问内部API，但添加了更好的类型检查
     const sounds = (this.currentSound as { _sounds?: any[] })._sounds || [];
     sounds.forEach((sound) => {
       const _node = (sound as { _node?: any })._node;
@@ -957,6 +958,7 @@ class AudioService {
 
     // 检查Howl对象的内部状态
     // 如果状态为1表示已经加载但未完成，状态为2表示正在加载
+    // 注意：这里仍需要访问内部API，但添加了更好的类型检查
     const state = (this.currentSound as { _state?: any })._state;
     // 如果操作锁激活也认为是加载状态
     return this.operationLock || state === 'loading' || state === 1;

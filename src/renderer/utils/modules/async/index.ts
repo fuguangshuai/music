@@ -16,8 +16,8 @@ export interface RetryOptions {
   delay?: number;
   backoff?: 'linear' | 'exponential' | 'fixed';
   maxDelay?: number;
-  retryCondition?: (error: unknown, _attempt: number) => boolean;
-  onRetry?: (error: unknown, _attempt: number) => void;
+  retryCondition?: (error: any, _attempt: number) => boolean;
+  onRetry?: (error: any, _attempt: number) => void;
 }
 
 // 防抖配置接口
@@ -34,7 +34,7 @@ export interface ThrottleOptions {
 }
 
 // 队列任务接口
-export interface QueueTask<T = unknown> {
+export interface QueueTask<T = any> {
   id: string;
   fn: () => Promise<T>;
   priority?: number;
@@ -86,7 +86,7 @@ export const retryNetwork = <T>(
 /**
  * ⏰ 防抖函数
  */
-export const debounce = <T extends (...args: unknown[]) => any>(
+export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number,
   options: DebounceOptions = {}
@@ -98,7 +98,7 @@ export const debounce = <T extends (...args: unknown[]) => any>(
   let lastCallTime: number | null = null;
   let lastInvokeTime = 0;
   let lastArgs: Parameters<T> | null = null;
-  let lastThis: unknown = null;
+  let lastThis: any = null;
   let result: ReturnType<T> | undefined;
 
   const invokeFunc = (time: number): ReturnType<T> | undefined => {
@@ -179,7 +179,7 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     return timeoutId === null ? result : trailingEdge(Date.now());
   };
 
-  const debounced = function (this: unknown, ...args: Parameters<T>): ReturnType<T> | undefined {
+  const debounced = function (this: any, ...args: Parameters<T>): ReturnType<T> | undefined {
     const time = Date.now();
     const isInvoking = shouldInvoke(time);
 
@@ -202,16 +202,14 @@ export const debounce = <T extends (...args: unknown[]) => any>(
     return result;
   };
 
-  (debounced as any).cancel = cancel;
-  (debounced as any).flush = flush;
-
-  return debounced as T & { cancel(): void; flush(): ReturnType<T> | undefined };
+  const debouncedWithControls = Object.assign(debounced, { cancel, flush });
+  return debouncedWithControls as T & { cancel(): void; flush(): ReturnType<T> | undefined };
 };
 
 /**
  * 🚦 节流函数
  */
-export const throttle = <T extends (...args: unknown[]) => any>(
+export const throttle = <T extends (...args: any[]) => any>(
   func: T,
   wait: number,
   _options: ThrottleOptions = {}

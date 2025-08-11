@@ -13,7 +13,14 @@
  * @since v4.11.0
  */
 
-import type { ApiResponseData, ValidationInput } from '../types/consolidated-types';
+import type {
+  AlbumLike,
+  ApiResponseData,
+  ArtistLike,
+  PlaylistLike,
+  SongLike,
+  ValidationInput
+} from '../types/consolidated-types';
 import { unifiedTypeGuards } from './unified-type-guards';
 
 // ============================================================================
@@ -284,7 +291,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取歌曲列表数据
    */
-  static extractSongs(response: ApiResponseData): any[] {
+  static extractSongs(response: ApiResponseData): SongLike[] {
     const data = this.extractData(response);
     if (!data) return [];
 
@@ -309,7 +316,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取播放列表数据
    */
-  static extractPlaylist(response: ApiResponseData): any {
+  static extractPlaylist(response: ApiResponseData): PlaylistLike | null {
     const data = this.extractData(response);
     if (!data) return null;
 
@@ -332,7 +339,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取用户数据
    */
-  static extractUser(response: ApiResponseData): any {
+  static extractUser(response: ApiResponseData): Record<string, any> | null {
     const data = this.extractData(response);
     if (!data) return null;
 
@@ -356,7 +363,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取歌词数据
    */
-  static extractLyrics(response: ApiResponseData): any {
+  static extractLyrics(response: ApiResponseData): Record<string, any> | null {
     const data = this.extractData(response);
     if (!data) return null;
 
@@ -405,7 +412,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取专辑数据
    */
-  static extractAlbum(response: ApiResponseData): any {
+  static extractAlbum(response: ApiResponseData): AlbumLike | null {
     const data = this.extractData(response);
     if (!data) return null;
 
@@ -429,7 +436,7 @@ export class TypeSafeApiExtractor {
   /**
    * 安全提取艺术家数据
    */
-  static extractArtists(response: ApiResponseData): any[] {
+  static extractArtists(response: ApiResponseData): ArtistLike[] {
     const data = this.extractData(response);
     if (!data) return [];
 
@@ -534,28 +541,28 @@ export const safeExtractData = <T>(response: ApiResponseData, fallback?: T): T |
 /**
  * 快速提取歌曲列表
  */
-export const safeExtractSongs = (response: ApiResponseData): any[] => {
+export const safeExtractSongs = (response: ApiResponseData): SongLike[] => {
   return TypeSafeApiExtractor.extractSongs(response);
 };
 
 /**
  * 快速提取播放列表
  */
-export const safeExtractPlaylist = (response: ApiResponseData): any => {
+export const safeExtractPlaylist = (response: ApiResponseData): PlaylistLike | null => {
   return TypeSafeApiExtractor.extractPlaylist(response);
 };
 
 /**
  * 快速提取用户数据
  */
-export const safeExtractUser = (response: ApiResponseData): any => {
+export const safeExtractUser = (response: ApiResponseData): Record<string, any> | null => {
   return TypeSafeApiExtractor.extractUser(response);
 };
 
 /**
  * 快速提取歌词数据
  */
-export const safeExtractLyrics = (response: ApiResponseData): any => {
+export const safeExtractLyrics = (response: ApiResponseData): Record<string, any> | null => {
   return TypeSafeApiExtractor.extractLyrics(response);
 };
 
@@ -569,14 +576,14 @@ export const safeExtractMusicUrl = (response: ApiResponseData): string | null =>
 /**
  * 快速提取专辑数据
  */
-export const safeExtractAlbum = (response: ApiResponseData): any => {
+export const safeExtractAlbum = (response: ApiResponseData): AlbumLike | null => {
   return TypeSafeApiExtractor.extractAlbum(response);
 };
 
 /**
  * 快速提取艺术家数据
  */
-export const safeExtractArtists = (response: ApiResponseData): any[] => {
+export const safeExtractArtists = (response: ApiResponseData): ArtistLike[] => {
   return TypeSafeApiExtractor.extractArtists(response);
 };
 

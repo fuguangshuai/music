@@ -19,7 +19,7 @@ export interface ConfigOptions<T> {
   /** 存储键名 */
   key?: string;
   /** 配置验证器 */
-  validator?: (value: unknown) => value is T;
+  validator?: (value: any) => value is T;
   /** 是否自动保存 */
   autoSave?: boolean;
 }
@@ -27,7 +27,7 @@ export interface ConfigOptions<T> {
 /**
  * 配置管理器类
  */
-export class ConfigManager<T extends Record<string, unknown>> {
+export class ConfigManager<T extends Record<string, any>> {
   private config!: T;
   private options: ConfigOptions<T>;
   private listeners: Set<(config: T) => void> = new Set();
@@ -218,7 +218,7 @@ export class ConfigManager<T extends Record<string, unknown>> {
 /**
  * 创建配置管理器实例
  */
-export const createConfig = <T extends Record<string, unknown>>(
+export const createConfig = <T extends Record<string, any>>(
   _options: ConfigOptions<T>
 ): ConfigManager<T> => {
   return new ConfigManager(_options);
@@ -227,11 +227,11 @@ export const createConfig = <T extends Record<string, unknown>>(
 /**
  * 配置验证器
  */
-export const createValidator = <T>(schema: Record<keyof T, (value: unknown) => boolean>) => {
-  return (value: unknown): value is T => {
+export const createValidator = <T>(schema: Record<keyof T, (value: any) => boolean>) => {
+  return (value: any): value is T => {
     if (!value || typeof value !== 'object') return false;
 
-    const obj = value as Record<string, unknown>;
+    const obj = value as Record<string, any>;
     return Object.entries(schema).every(([_key, validator]) => {
       return (validator as any)(obj[_key]);
     });
@@ -242,15 +242,15 @@ export const createValidator = <T>(schema: Record<keyof T, (value: unknown) => b
  * 常用验证函数
  */
 export const validators = {
-  string: (value: unknown): value is string => typeof value === 'string',
-  number: (value: unknown): value is number => typeof value === 'number' && !isNaN(value),
-  boolean: (value: unknown): value is boolean => typeof value === 'boolean',
-  array: (value: unknown): value is unknown[] => Array.isArray(value),
-  object: (value: unknown): value is Record<string, unknown> =>
+  string: (value: any): value is string => typeof value === 'string',
+  number: (value: any): value is number => typeof value === 'number' && !isNaN(value),
+  boolean: (value: any): value is boolean => typeof value === 'boolean',
+  array: (value: any): value is any[] => Array.isArray(value),
+  object: (value: any): value is Record<string, any> =>
     value !== null && typeof value === 'object' && !Array.isArray(value),
   optional:
-    <T>(validator: (value: unknown) => value is T) =>
-    (value: unknown): value is T | undefined =>
+    <T>(validator: (value: any) => value is T) =>
+    (value: any): value is T | undefined =>
       value === undefined || validator(value)
 };
 
@@ -260,10 +260,10 @@ import setDataDefault from '@/../main/set.json';
 /**
  * 应用配置验证器
  */
-const appConfigValidator = (value: unknown): value is AppConfig => {
+const appConfigValidator = (value: any): value is AppConfig => {
   if (!value || typeof value !== 'object') return false;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value as Record<string, any>;
 
   // 验证可选的数字类型
   if (obj.musicApiPort !== undefined && !validators.number(obj.musicApiPort)) return false;

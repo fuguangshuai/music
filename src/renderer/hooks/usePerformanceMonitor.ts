@@ -3,11 +3,37 @@
  * 提供Vue组件中使用性能监控的便捷接口
  */
 
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, type Ref, ref } from 'vue';
 
 import { performanceMonitor, type PerformanceReport } from '@/services/performanceMonitor';
 
-export function usePerformanceMonitor(): any {
+/**
+ * 性能监控Hook返回类型接口
+ */
+export interface UsePerformanceMonitorReturn {
+  /** 监控是否激活 */
+  isActive: Ref<boolean>;
+  /** 当前性能报告 */
+  currentReport: Ref<PerformanceReport | null>;
+  /** 启动性能监控 */
+  startMonitoring: () => void;
+  /** 停止性能监控 */
+  stopMonitoring: () => void;
+  /** 跟踪页面加载性能 */
+  trackPageLoad: (route: string) => void;
+  /** 跟踪音频加载性能 */
+  trackAudioLoad: (url: string, duration: number) => void;
+  /** 跟踪路由切换性能 */
+  trackRouteChange: (from: string, to: string, duration: number) => void;
+  /** 获取当前性能指标 */
+  getMetrics: () => any;
+  /** 生成性能报告 */
+  generateReport: () => PerformanceReport;
+  /** 保存性能基准 */
+  saveBaseline: () => void;
+}
+
+export function usePerformanceMonitor(): UsePerformanceMonitorReturn {
   const isActive = ref(false);
   const currentReport = ref<PerformanceReport | null>(null);
   const reportInterval = ref<number | null>(null);
@@ -113,10 +139,18 @@ export function usePerformanceMonitor(): any {
 }
 
 /**
+ * 路由性能监控返回类型接口
+ */
+export interface UseRoutePerformanceMonitorReturn {
+  /** 监控路由切换性能 */
+  monitorRouteChange: (to: string, from: string) => () => void;
+}
+
+/**
  * 路由性能监控组合式函数
  */
-export function useRoutePerformanceMonitor(): any {
-  const { trackRouteChange } = usePerformanceMonitor() as any;
+export function useRoutePerformanceMonitor(): UseRoutePerformanceMonitorReturn {
+  const { trackRouteChange } = usePerformanceMonitor();
 
   /**
    * 监控路由切换性能
@@ -136,10 +170,18 @@ export function useRoutePerformanceMonitor(): any {
 }
 
 /**
+ * 音频性能监控返回类型接口
+ */
+export interface UseAudioPerformanceMonitorReturn {
+  /** 监控音频加载性能 */
+  monitorAudioLoad: (url: string) => () => void;
+}
+
+/**
  * 音频性能监控组合式函数
  */
-export function useAudioPerformanceMonitor(): any {
-  const { trackAudioLoad } = usePerformanceMonitor() as any;
+export function useAudioPerformanceMonitor(): UseAudioPerformanceMonitorReturn {
+  const { trackAudioLoad } = usePerformanceMonitor();
 
   /**
    * 监控音频加载性能

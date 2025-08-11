@@ -35,7 +35,7 @@
             class="cursor-pointer"
             circle
             size="medium"
-            :src="getImgUrl((userStore.user as any)?.avatarUrl)"
+            :src="getImgUrl(getUserAvatarUrl())"
             @click="selectItem('user')"
           />
           <div v-else class="mx-2 rounded-full cursor-pointer text-sm" @click="toLogin">
@@ -45,7 +45,7 @@
       </template>
       <div class="user-popover">
         <div v-if="userStore.user" class="user-header" @click="selectItem('user')">
-          <n-avatar circle size="small" :src="getImgUrl((userStore.user as any)?.avatarUrl)" />
+          <n-avatar circle size="small" :src="getImgUrl(getUserAvatarUrl())" />
           <div>
             <p class="username">{{ userStore.user?.nickname || 'Theodore' }}</p>
             <p></p>
@@ -124,12 +124,20 @@ import { useSearchStore } from '@/store/modules/search';
 import { useSettingsStore } from '@/store/modules/settings';
 import { useUserStore } from '@/store/modules/user';
 import { getImgUrl, isElectron } from '@/utils';
+import { safeExtractUser } from '@/utils/unified-api-handler';
 
 const router = useRouter();
 const searchStore = useSearchStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const userSetOptions = ref(USER_SET_OPTIONS);
+
+// 安全获取用户头像URL
+const getUserAvatarUrl = () => {
+  if (!userStore.user) return '';
+  const userData = safeExtractUser({ data: userStore.user });
+  return userData?.avatarUrl || '';
+};
 const { t, locale } = useI18n();
 
 // 使用缩放hook

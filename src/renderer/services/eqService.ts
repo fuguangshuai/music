@@ -1,6 +1,8 @@
 import { Howl, Howler } from 'howler';
 import Tuna from 'tunajs';
 
+import { SafeHowlerAPI } from '@/utils/unified-audio-api';
+
 // 类型定义扩展
 interface HowlSound {
   _sounds: Array<{
@@ -70,7 +72,12 @@ export class EQService {
         await this.context.resume();
       }
 
-      const sound = ((this as any).howl as any as HowlSound)._sounds[0];
+      // 安全获取音频节点
+      const howlInstance = SafeHowlerAPI.getGlobalState();
+      if (!howlInstance) throw new Error('Howler实例不可用');
+
+      // 注意：这里仍需要访问内部API，但通过更安全的方式
+      const sound = ((this as any).howl as HowlSound)?._sounds?.[0];
       if (!sound?._node) throw new Error('无法获取音频节点');
 
       // 清理现有资源

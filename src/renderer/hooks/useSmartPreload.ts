@@ -3,6 +3,7 @@
  * 提供Vue组件中使用智能预加载的便捷接口
  */
 
+import type { ComputedRef, Ref } from 'vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 import {
@@ -12,7 +13,30 @@ import {
 } from '@/services/audioPreloadService';
 import type { SongResult } from '@/types/music';
 
-export function useSmartPreload(): any {
+export interface UseSmartPreloadReturn {
+  isEnabled: Ref<boolean>;
+  networkCondition: Ref<NetworkCondition | null>;
+  userBehavior: Ref<UserBehaviorPattern | null>;
+  predictions: Ref<SongResult[]>;
+  preloadStats: Ref<Record<string, number>>;
+  preloadSuccessRate: ComputedRef<string>;
+  isNetworkSlow: ComputedRef<boolean>;
+  isNetworkMetered: ComputedRef<boolean>;
+  smartPreload: (
+    url: string,
+    songInfo?: SongResult,
+    priority?: 'high' | 'medium' | 'low'
+  ) => Promise<unknown>;
+  predictAndPreload: (currentSong: SongResult, playHistory: SongResult[]) => Promise<void>;
+  updateUserBehavior: (playHistory: SongResult[]) => void;
+  updateNetworkCondition: () => void;
+  optimizeMemory: () => void;
+  getSmartStatus: () => unknown;
+  toggleSmartPreload: (enabled: boolean) => void;
+  clearCache: () => void;
+}
+
+export function useSmartPreload(): UseSmartPreloadReturn {
   const isEnabled = ref(true);
   const networkCondition = ref<NetworkCondition | null>(null);
   const userBehavior = ref<UserBehaviorPattern | null>(null);
@@ -228,8 +252,14 @@ export function useSmartPreload(): any {
 /**
  * 智能预加载监控组合式函数
  */
-export function useSmartPreloadMonitor(): any {
-  const { getSmartStatus } = useSmartPreload() as any;
+export interface UseSmartPreloadMonitorReturn {
+  startMonitoring: (intervalMs?: number) => void;
+  stopMonitoring: () => void;
+  monitorData: Ref<unknown>;
+}
+
+export function useSmartPreloadMonitor(): UseSmartPreloadMonitorReturn {
+  const { getSmartStatus } = useSmartPreload();
   const monitorData = ref<unknown>(null);
   const monitorInterval = ref<number | null>(null);
 

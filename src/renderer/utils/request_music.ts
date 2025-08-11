@@ -1,7 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { getApiEnvVars } from '@/utils/env';
-import { withRetry } from '@/utils/retry';
+import { unifiedRetry } from '@/utils/unified-helpers';
 
 import { createRequest, type RequestConfig } from './requestFactory';
 
@@ -72,7 +72,7 @@ const requestMusic = (apiIndex: number = 0): AxiosInstance => {
 export const smartRequest = async (_config: AxiosRequestConfig, maxRetry?: number) => {
   const apiUrls = getApiUrls();
   const actualMaxRetry = maxRetry ?? apiUrls.length - 1;
-  return withRetry(
+  return unifiedRetry(
     async () => {
       // 尝试所有可用的API
       let lastError: Error | null = null;

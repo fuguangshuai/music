@@ -50,7 +50,9 @@
         isElectron &&
         (settingsStore.setData?.alwaysShowDownloadButton ||
           settingsStore.showDownloadDrawer ||
-          (settingsStore.setData as any)?.hasDownloadingTasks)
+          ((settingsStore.setData as Record<string, unknown> | undefined)?.hasDownloadingTasks as
+            | boolean
+            | undefined))
       "
     />
     <!-- 播放列表抽屉 -->
@@ -108,7 +110,7 @@ const route = useRoute();
 // 判断当前路由是否应该在移动端显示AppMenu
 const shouldShowMobileMenu = computed(() => {
   // 过滤出在menus中定义的路径
-  const menuPaths = menus.map((item: any) => (item as any).path);
+  const menuPaths = menus.map((item) => item.path as string);
   // 检查当前路由路径是否在menus中
   return menuPaths.includes(route.path) && isMobile.value && !playerStore.musicFull;
 });

@@ -15,7 +15,7 @@ export interface CacheConfig {
 // 缓存装饰器选项
 export interface CacheDecoratorOptions extends CacheConfig {
   type: CacheType;
-  keyGenerator?: (...args: unknown[]) => string;
+  keyGenerator?: (...args: any[]) => string;
 }
 
 /**
@@ -23,10 +23,10 @@ export interface CacheDecoratorOptions extends CacheConfig {
  * 自动缓存函数结果
  */
 export function cached(_options: CacheDecoratorOptions) {
-  return function (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: unknown[]) {
+    descriptor.value = async function (...args: any[]) {
       try {
         // 生成缓存键
         const cacheKey = _options.keyGenerator
@@ -87,15 +87,13 @@ export class CacheUtils {
    */
   static async cacheAudioMetadata(
     songId: string,
-    metadata: Record<string, unknown>,
+    metadata: Record<string, any>,
     ttl?: number
   ): Promise<boolean> {
     return await smartCacheService.cacheData(CacheType.AUDIO_METADATA, songId, metadata, ttl);
   }
 
-  static async getCachedAudioMetadata(
-    songId: string
-  ): Promise<Record<string, unknown> | undefined> {
+  static async getCachedAudioMetadata(songId: string): Promise<Record<string, any> | undefined> {
     return await smartCacheService.getCachedData(CacheType.AUDIO_METADATA, songId);
   }
 
@@ -104,7 +102,7 @@ export class CacheUtils {
    */
   static async cacheApiResponse(
     endpoint: string,
-    params: Record<string, unknown>,
+    params: Record<string, any>,
     response: any,
     ttl?: number
   ): Promise<boolean> {
@@ -114,7 +112,7 @@ export class CacheUtils {
 
   static async getCachedApiResponse(
     endpoint: string,
-    params: Record<string, unknown>
+    params: Record<string, any>
   ): Promise<unknown> {
     const _key = this.generateApiKey(endpoint, params);
     return await smartCacheService.getCachedData(CacheType.API_RESPONSE, _key);
@@ -142,7 +140,7 @@ export class CacheUtils {
     return `img_${this.hashString(url)}`;
   }
 
-  private static generateApiKey(endpoint: string, params: Record<string, unknown>): string {
+  private static generateApiKey(endpoint: string, params: Record<string, any>): string {
     const paramStr = JSON.stringify(params, Object.keys(params).sort());
     return `api_${endpoint}_${this.hashString(paramStr)}`;
   }
@@ -266,7 +264,7 @@ export const CacheDecorators = {
     cached({
       type: CacheType.IMAGE,
       ttl,
-      keyGenerator: (...args: unknown[]) => CacheUtils.generateImageKey(args[0] as string)
+      keyGenerator: (...args: any[]) => CacheUtils.generateImageKey(args[0] as string)
     }),
 
   /**
@@ -276,7 +274,7 @@ export const CacheDecorators = {
     cached({
       type: CacheType.USER_DATA,
       ttl,
-      keyGenerator: (...args: unknown[]) => args[0] as string
+      keyGenerator: (...args: any[]) => args[0] as string
     })
 };
 

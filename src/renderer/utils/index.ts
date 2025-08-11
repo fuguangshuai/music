@@ -3,6 +3,8 @@ import { computed } from 'vue';
 
 import { useSettingsStore } from '@/store/modules/settings';
 
+import { formatTime as _formatTime } from './modules/format';
+
 // 设置歌手背景图片
 export const setBackgroundImg = (url: string) => {
   return `background-image:url(${url})`;
@@ -34,12 +36,12 @@ export const setAnimationDelay = (index: number = 6, time: number = 50) => {
 };
 
 // 直接导出统一的格式化函数，避免重复包装
-export { formatNumber, formatTime } from './formatters';
+export { formatNumber, formatTime } from './modules/format';
+export { formatDuration } from './musicDataFormatter';
 
 // 将秒转换为分钟和秒 - 使用统一的formatTime函数
 export const secondToMinute = (s: number): string => {
-  const { formatTime } = require('./formatters');
-  return formatTime(s, 'mm:ss');
+  return _formatTime(s, { format: 'mm:ss' });
 };
 
 export const getImgUrl = (url: string | undefined, _size: string = '') => {

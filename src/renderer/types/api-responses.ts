@@ -23,7 +23,7 @@ import type { StandardApiResponse } from './enhanced-api-types';
  *
  * 此接口将在下个版本中移除
  */
-export interface BaseApiResponse<T = unknown> {
+export interface BaseApiResponse<T = any> {
   code: number;
   message?: string;
   data?: T;

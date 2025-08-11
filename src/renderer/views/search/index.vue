@@ -139,7 +139,7 @@ const route = useRoute();
 const playerStore = usePlayerStore();
 const searchStore = useSearchStore();
 
-const searchDetail = ref<unknown>();
+const searchDetail = ref<any>();
 const searchType = computed(() => searchStore.searchType as number);
 const searchDetailLoading = ref(false);
 const searchHistory = ref<Array<{ keyword: string; type: number }>>([]);

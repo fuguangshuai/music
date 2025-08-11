@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 
 import { checkQr, createQr, getQrKey, getUserDetail } from '@/api/login';
 import { setAnimationClass } from '@/utils';
+import { safeExtractLoginData, safeExtractQrData } from '@/utils/unified-api-handler';
 
 defineOptions({
   name: 'QrLogin'
@@ -38,7 +39,12 @@ const loadLogin = async () => {
     }
 
     const qrKey = await getQrKey();
-    const key = (qrKey as any).data.data.unikey;
+    const qrData = safeExtractQrData(qrKey);
+    if (!qrData?.unikey) {
+      console.error('🔒 获取二维码密钥失败');
+      return;
+    }
+    const key = qrData.unikey;
     const { data } = await createQr(key);
     qrUrl.value = data.data.qrimg;
     qrStatus.value = 'active';
@@ -88,9 +94,12 @@ const timerIsQr = (key: string) => {
         qrStatus.value = 'confirmed';
         localStorage.setItem('token', data.cookie);
         const user = await getUserDetail();
-        const successMsg = t('login.message.loginSuccess');
-        message.success(successMsg);
-        emit('loginSuccess', (user as any).data.profile, 'qr');
+        const loginData = safeExtractLoginData(user);
+        if (loginData?.profile) {
+          const successMsg = t('login.message.loginSuccess');
+          message.success(successMsg);
+          emit('loginSuccess', loginData.profile, 'qr');
+        }
 
         clearInterval(timer);
         timerRef.value = null;
